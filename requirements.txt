@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pydantic
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+python-dotenv
+openai
+pypdf
+python-docx
+iyzipay
+psycopg2-binary
