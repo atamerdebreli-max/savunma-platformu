@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .form-kutu { max-width: 450px; margin: 0 auto; }
+        .form-grup { margin-bottom: 20px; text-align: left; }
+        .form-grup label {
+            display: block; color: #a8c5e0; margin-bottom: 8px;
+            font-size: 14px; font-weight: 600;
+        }
+        .form-grup input {
+            width: 100%; padding: 14px; border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: white; font-size: 16px; transition: all 0.3s;
+        }
+        .form-grup input:focus {
+            outline: none; border-color: #00b4d8;
+            background: rgba(255,255,255,0.1);
+        }
+        .form-grup input::placeholder { color: #6b8ba3; }
+        .alt-link {
+            margin-top: 20px; color: #a8c5e0; font-size: 14px;
+        }
+        .alt-link a {
+            color: #00b4d8; text-decoration: none; font-weight: 600;
+        }
+        .alt-link a:hover { text-decoration: underline; }
+        .mesaj {
+            padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; font-size: 14px;
+        }
+        .mesaj-basari {
+            background: rgba(74, 222, 128, 0.1);
+            border-left: 4px solid #4ade80; color: #4ade80;
+        }
+        .mesaj-hata {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444; color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-kutu">
+            <h1>Giriş Yap</h1>
+            <p>Hesabınıza giriş yapın</p>
+            <div id="mesaj" style="display: none;"></div>
+            <form id="girisForm" onsubmit="girisYap(event)">
+                <div class="form-grup">
+                    <label>E-posta</label>
+                    <input type="email" id="email" 
+                           placeholder="ornek@sirket.com" required>
+                </div>
+                <div class="form-grup">
+                    <label>Şifre</label>
+                    <input type="password" id="sifre" 
+                           placeholder="Şifreniz" required>
+                </div>
+                <button type="submit" style="width: 100%;">Giriş Yap</button>
+            </form>
+            <div class="alt-link">
+                Hesabınız yok mu? 
+                <a href="kayit.html">Kayıt Olun</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function girisYap(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const sifre = document.getElementById('sifre').value;
+            if (!email || !sifre) {
+                mesajGoster('Lütfen tüm alanları doldurun.', 'hata');
+                return;
+            }
+            mesajGoster('Giriş yapılıyor...', 'basari');
+            try {
+                // OAuth2 form-data formatı kullanıyoruz
+                const formData = new URLSearchParams();
+                formData.append('username', email);
+                formData.append('password', sifre);
+                const response = await fetch('http://127.0.0.1:8000/giris', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Giriş başarısız');
+                }
+                // Token'ı localStorage'a kaydet
+                localStorage.setItem('token', data.access_token);
+                localStorage.setItem('kullanici', JSON.stringify(data.kullanici));
+                mesajGoster('✅ Giriş başarılı! Panele yönlendiriliyorsunuz...', 'basari');
+                setTimeout(() => {
+                    window.location.href = 'panel.html';
+                }, 1500);
+            } catch (error) {
+                mesajGoster('❌ Hata: ' + error.message, 'hata');
+            }
+        }
+        function mesajGoster(mesaj, tip) {
+            const mesajKutusu = document.getElementById('mesaj');
+            mesajKutusu.className = 'mesaj mesaj-' + tip;
+            mesajKutusu.textContent = mesaj;
+            mesajKutusu.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

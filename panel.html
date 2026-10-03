@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Paneli</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .panel-baslik {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .cikis-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .cikis-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+        .kullanici-kart {
+            background: rgba(255,255,255,0.05);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #00b4d8;
+            text-align: left;
+        }
+        .kullanici-kart h3 {
+            color: #00b4d8;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        .kullanici-bilgi {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            color: #a8c5e0;
+        }
+        .kullanici-bilgi strong {
+            color: #ffffff;
+        }
+        .aksiyon-kartlar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .aksiyon-kart {
+            background: rgba(255,255,255,0.05);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .aksiyon-kart:hover {
+            background: rgba(0, 180, 216, 0.1);
+            border-color: #00b4d8;
+            transform: translateY(-3px);
+        }
+        .aksiyon-ikon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        .aksiyon-baslik {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+        .aksiyon-aciklama {
+            font-size: 14px;
+            color: #a8c5e0;
+        }
+        .abonelik-kart {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .abonelik-kart h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+        .abonelik-kart p {
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 15px;
+        }
+        @media (max-width: 600px) {
+            .aksiyon-kartlar { grid-template-columns: 1fr; }
+            .kullanici-bilgi { grid-template-columns: 1fr; }
+        }
+                @media (max-width: 768px) {
+            .panel-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            .panel-baslik {
+                font-size: 22px;
+            }
+            .aksiyon-kartlar {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .aksiyon-kart {
+                padding: 20px;
+            }
+            .aksiyon-ikon {
+                font-size: 36px;
+            }
+            .kullanici-bilgi {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .kullanici-kart {
+                padding: 20px;
+            }
+            .abonelik-kart {
+                padding: 20px;
+            }
+            .abonelik-kart h3 {
+                font-size: 18px;
+            }
+            #kullanimBilgi {
+                font-size: 13px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="panel-header">
+            <div class="panel-baslik">Kullanıcı Paneli</div>
+            <button class="cikis-btn" onclick="cikisYap()">Çıkış Yap</button>
+        </div>
+
+        <div class="kullanici-kart">
+            <h3>Hoş geldiniz</h3>
+            <div class="kullanici-bilgi">
+                <div><strong>Şirket:</strong> <span id="sirketAdi">-</span></div>
+                <div><strong>E-posta:</strong> <span id="email">-</span></div>
+                <div><strong>Rol:</strong> <span id="rol">-</span></div>
+                <div><strong>Durum:</strong> <span style="color: #4ade80;">Aktif</span></div>
+            </div>
+        </div>
+
+        <div class="abonelik-kart" id="abonelikKart">
+    <h3 id="planBaslik">📦 Mevcut Abonelik: Yükleniyor...</h3>
+    <p id="planAciklama"></p>
+    <div id="kullanimBilgi" style="margin: 15px 0; padding: 15px; background: rgba(0,0,0,0.15); border-radius: 10px; font-size: 14px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span>📝 Assessment Kullanımı:</span>
+            <strong id="assessmentKullanim">- / -</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+            <span>🤖 AI Tarama Kullanımı:</span>
+            <strong id="aiKullanim">- / -</strong>
+        </div>
+    </div>
+    <button onclick="window.location.href='fiyatlandirma.html'" 
+            style="background: white; color: #0077b6; border: none; 
+                   padding: 12px 30px; border-radius: 50px; 
+                   font-size: 16px; font-weight: 600; cursor: pointer;">
+        Planı Yükselt
+    </button>
+</div>
+
+        <h2 style="color: #00b4d8; margin-bottom: 20px; text-align: left;">
+            Hızlı İşlemler
+        </h2>
+
+        <div class="aksiyon-kartlar">
+            <div class="aksiyon-kart" onclick="window.location.href='assessment-v2.html'">
+                <div class="aksiyon-ikon">📝</div>
+                <div class="aksiyon-baslik">Yeni Assessment</div>
+                <div class="aksiyon-aciklama">70 soruluk detaylı değerlendirme başlat</div>
+            </div>
+
+            <div class="aksiyon-kart" onclick="window.location.href='raporlar.html'">
+                <div class="aksiyon-ikon">📊</div>
+                <div class="aksiyon-baslik">Raporlarım</div>
+                <div class="aksiyon-aciklama">Geçmiş değerlendirmelerinizi görün</div>
+            </div>
+
+            <div class="aksiyon-kart" onclick="window.location.href='dokuman.html'">
+                <div class="aksiyon-ikon">🤖</div>
+                <div class="aksiyon-baslik">AI Doküman Tarama</div>
+                
+                <div class="aksiyon-aciklama">Kalite dokümanlarınızı AI ile analiz edin</div>
+            </div>
+            <div class="aksiyon-kart" onclick="window.location.href='yol-haritasi.html'">
+                <div class="aksiyon-ikon">📋</div>
+                <div class="aksiyon-baslik">Sertifikasyon Yol Haritam</div>
+                <div class="aksiyon-aciklama">Adım adım sertifikasyona ilerleyin</div>
+            </div>
+            <div class="aksiyon-kart" onclick="window.location.href='sablonlar.html'">
+                <div class="aksiyon-ikon">📄</div>
+                <div class="aksiyon-baslik">Doküman Şablonları</div>
+                <div class="aksiyon-aciklama">AS9100 uyumlu hazır şablonlar</div>
+            </div>
+                        <div class="aksiyon-kart" onclick="window.location.href='denetim-simulasyonu.html'">
+                <div class="aksiyon-ikon">🎯</div>
+                <div class="aksiyon-baslik">Denetim Simülasyonu</div>
+                <div class="aksiyon-aciklama">AI denetçi ile prova yapın</div>
+            </div>
+
+            <div class="aksiyon-kart" onclick="window.location.href='hatirlaticilar.html'">
+                <div class="aksiyon-ikon">🔔</div>
+                <div class="aksiyon-baslik">Hatırlatıcılar</div>
+                <div class="aksiyon-aciklama">Denetim ve kalibrasyon tarihlerini takip edin</div>
+            </div>
+                        <div class="aksiyon-kart" onclick="window.location.href='kalibrasyonlar.html'">
+                <div class="aksiyon-ikon">📏</div>
+                <div class="aksiyon-baslik">Kalibrasyon Takibi</div>
+                <div class="aksiyon-aciklama">Ölçüm ekipmanlarını takip edin</div>
+            </div>
+            <div class="aksiyon-kart" onclick="window.location.href='danismanlik.html'">
+                <div class="aksiyon-ikon">👨‍💼</div>
+                <div class="aksiyon-baslik">Danışmanlık Talebi</div>
+                <div class="aksiyon-aciklama">Uzman desteği alın</div>
+            </div>
+        </div>
+    </div>
+
+        <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const kullaniciStr = localStorage.getItem('kullanici');
+
+            if (!token || !kullaniciStr) {
+                window.location.href = 'giris.html';
+                return;
+            }
+
+            try {
+                const kullanici = JSON.parse(kullaniciStr);
+                document.getElementById('sirketAdi').textContent = kullanici.sirket_adi || '-';
+                document.getElementById('email').textContent = kullanici.email || '-';
+                document.getElementById('rol').textContent = kullanici.rol || 'kobi';
+
+                // Plan bilgisini yükle
+                planBilgisiYukle(kullanici.email);
+            } catch (e) {
+                window.location.href = 'giris.html';
+            }
+        });
+
+        async function planBilgisiYukle(email) {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/plan-bilgisi?email=' + encodeURIComponent(email));
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('planBaslik').textContent = '📦 Mevcut Abonelik: ' + data.plan_adi + ' Plan';
+
+                    let aciklama = '';
+                    if (data.plan === 'ucretsiz') {
+                        aciklama = 'Aylık 2.000 TL\'ye yükselterek 5 assessment ve PDF çıktısı alın.';
+                    } else if (data.plan === 'temel') {
+                        aciklama = 'Aylık 5.000 TL\'ye yükselterek AI doküman tarama özelliğini açın.';
+                    } else if (data.plan === 'profesyonel') {
+                        aciklama = 'Sınırsız assessment ve aylık 5 AI tarama hakkınız var.';
+                    } else if (data.plan === 'kurumsal') {
+                        aciklama = 'Kurumsal plan: Sınırsız assessment ve sınırsız AI tarama.';
+                    }
+                    document.getElementById('planAciklama').textContent = aciklama;
+
+                    const aKullanim = data.assessment_limit >= 999999 ?
+                        (data.assessment_kullanim + ' / Sınırsız') :
+                        (data.assessment_kullanim + ' / ' + data.assessment_limit);
+                    document.getElementById('assessmentKullanim').textContent = aKullanim;
+
+                    const aiKullanim = data.ai_limit >= 999999 ?
+                        (data.ai_kullanim + ' / Sınırsız') :
+                        (data.ai_kullanim + ' / ' + data.ai_limit);
+                    document.getElementById('aiKullanim').textContent = aiKullanim;
+                }
+            } catch (e) {
+                console.error('Plan bilgisi yüklenemedi:', e);
+            }
+        }
+
+        function cikisYap() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('kullanici');
+            window.location.href = 'giris.html';
+        }
+    </script>
+</body>
+</html>

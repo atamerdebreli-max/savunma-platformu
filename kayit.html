@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .form-kutu { max-width: 450px; margin: 0 auto; }
+        .form-grup { margin-bottom: 20px; text-align: left; }
+        .form-grup label {
+            display: block; color: #a8c5e0; margin-bottom: 8px;
+            font-size: 14px; font-weight: 600;
+        }
+        .form-grup input {
+            width: 100%; padding: 14px; border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: white; font-size: 16px; transition: all 0.3s;
+        }
+        .form-grup input:focus {
+            outline: none; border-color: #00b4d8;
+            background: rgba(255,255,255,0.1);
+        }
+        .form-grup input::placeholder { color: #6b8ba3; }
+        .alt-link {
+            margin-top: 20px; color: #a8c5e0; font-size: 14px;
+        }
+        .alt-link a {
+            color: #00b4d8; text-decoration: none; font-weight: 600;
+        }
+        .alt-link a:hover { text-decoration: underline; }
+        .mesaj {
+            padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; font-size: 14px;
+        }
+        .mesaj-basari {
+            background: rgba(74, 222, 128, 0.1);
+            border-left: 4px solid #4ade80; color: #4ade80;
+        }
+        .mesaj-hata {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444; color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-kutu">
+            <h1>Kayıt Ol</h1>
+            <p>AS9100/EYDEP uyumluluk platformuna katılın</p>
+            <div id="mesaj" style="display: none;"></div>
+            <form id="kayitForm" onsubmit="kayitOl(event)">
+                <div class="form-grup">
+                    <label>Şirket Adı</label>
+                    <input type="text" id="sirketAdi" 
+                           placeholder="Örn: Test Makine A.Ş." required>
+                </div>
+                <div class="form-grup">
+                    <label>E-posta</label>
+                    <input type="email" id="email" 
+                           placeholder="ornek@sirket.com" required>
+                </div>
+                <div class="form-grup">
+                    <label>Şifre</label>
+                    <input type="password" id="sifre" 
+                           placeholder="En az 6 karakter" required minlength="6">
+                </div>
+                               <div style="margin-top: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 10px; text-align: left;">
+                    <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; margin-bottom: 12px; font-size: 14px; color: #d1e3f0; line-height: 1.5;">
+                        <input type="checkbox" id="onayKvkk" required style="margin-top: 3px; width: 18px; height: 18px; cursor: pointer;">
+                        <span>
+                            <a href="kvkk-aydinlatma.html" target="_blank" style="color: #00b4d8; text-decoration: none;">KVKK Aydınlatma Metni</a>'ni 
+                            ve <a href="kvkk-acik-riza.html" target="_blank" style="color: #00b4d8; text-decoration: none;">Açık Rıza Metni</a>'ni 
+                            okudum, anladım ve kabul ediyorum. <strong style="color: #ef4444;">*</strong>
+                        </span>
+                    </label>
+
+                    <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; margin-bottom: 12px; font-size: 14px; color: #d1e3f0; line-height: 1.5;">
+                        <input type="checkbox" id="onaySozlesme" required style="margin-top: 3px; width: 18px; height: 18px; cursor: pointer;">
+                        <span>
+                            <a href="kullanici-sozlesmesi.html" target="_blank" style="color: #00b4d8; text-decoration: none;">Kullanıcı Sözleşmesi</a>'ni 
+                            ve <a href="gizlilik-politikasi.html" target="_blank" style="color: #00b4d8; text-decoration: none;">Gizlilik Politikası</a>'nı 
+                            okudum, anladım ve kabul ediyorum. <strong style="color: #ef4444;">*</strong>
+                        </span>
+                    </label>
+
+                    <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 14px; color: #d1e3f0; line-height: 1.5;">
+                        <input type="checkbox" id="onayPazarlama" style="margin-top: 3px; width: 18px; height: 18px; cursor: pointer;">
+                        <span>
+                            Yeni özellikler ve kampanyalar hakkında e-posta/SMS almak istiyorum. (Opsiyonel)
+                        </span>
+                    </label>
+                </div>
+                <button type="submit" style="width: 100%;">Kayıt Ol</button>
+            </form>
+            <div class="alt-link">
+                Zaten hesabınız var mı? 
+                <a href="giris.html">Giriş Yapın</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function kayitOl(event) {
+            event.preventDefault();
+            const sirketAdi = document.getElementById('sirketAdi').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const sifre = document.getElementById('sifre').value;
+            if (!sirketAdi || !email || !sifre) {
+                mesajGoster('Lütfen tüm alanları doldurun.', 'hata');
+                return;
+            }
+                        // Onay kutuları kontrolü
+            const onayKvkk = document.getElementById('onayKvkk').checked;
+            const onaySozlesme = document.getElementById('onaySozlesme').checked;
+
+            if (!onayKvkk || !onaySozlesme) {
+                mesajGoster('Lütfen KVKK metinlerini ve Kullanıcı Sözleşmesi\'ni kabul edin.', 'hata');
+                return;
+            }
+            if (sifre.length < 6) {
+                mesajGoster('Şifre en az 6 karakter olmalıdır.', 'hata');
+                return;
+            }
+            mesajGoster('Kayıt yapılıyor...', 'basari');
+            try {
+                const response = await fetch('http://127.0.0.1:8000/kayit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        sifre: sifre,
+                        sirket_adi: sirketAdi
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Kayıt başarısız');
+                }
+                mesajGoster('✅ Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...', 'basari');
+                setTimeout(() => {
+                    window.location.href = 'giris.html';
+                }, 2000);
+            } catch (error) {
+                mesajGoster('❌ Hata: ' + error.message, 'hata');
+            }
+        }
+        function mesajGoster(mesaj, tip) {
+            const mesajKutusu = document.getElementById('mesaj');
+            mesajKutusu.className = 'mesaj mesaj-' + tip;
+            mesajKutusu.textContent = mesaj;
+            mesajKutusu.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doküman Şablonları</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: block !important; padding: 0 !important; }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .panel-baslik {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .geri-btn {
+            background: rgba(0, 180, 216, 0.2);
+            color: #00b4d8;
+            border: 1px solid #00b4d8;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .geri-btn:hover { background: #00b4d8; color: white; }
+
+        .sablon-kapsayici {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+            max-width: 1200px;
+        }
+
+        .sidebar {
+            background: rgba(255,255,255,0.04);
+            border-radius: 15px;
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        .sidebar-baslik {
+            color: #00b4d8;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+        .kategori {
+            margin-bottom: 20px;
+        }
+        .kategori-adi {
+            color: #a8c5e0;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .sablon-link {
+            display: block;
+            padding: 10px 15px;
+            color: #d1e3f0;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+        .sablon-link:hover {
+            background: rgba(0, 180, 216, 0.1);
+            color: #00b4d8;
+        }
+        .sablon-link.aktif {
+            background: rgba(0, 180, 216, 0.2);
+            color: #00b4d8;
+            font-weight: 600;
+        }
+
+        .icerik-alani {
+            background: rgba(255,255,255,0.04);
+            border-radius: 15px;
+            padding: 30px;
+            min-height: 600px;
+        }
+        .sablon-baslik {
+            color: #00b4d8;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .sablon-aciklama {
+            color: #a8c5e0;
+            font-size: 14px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sablon-aksiyon {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .btn-pdf {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-pdf:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 180, 216, 0.4);
+        }
+
+        .sablon-icerik {
+            background: white;
+            color: #1a1a1a;
+            padding: 40px;
+            border-radius: 10px;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+        .sablon-icerik h1 {
+            font-size: 22px;
+            color: #0a1929;
+            border-bottom: 2px solid #00b4d8;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .sablon-icerik h2 {
+            font-size: 18px;
+            color: #0077b6;
+            margin-top: 25px;
+            margin-bottom: 12px;
+        }
+        .sablon-icerik h3 {
+            font-size: 15px;
+            color: #1a3a5c;
+            margin-top: 18px;
+            margin-bottom: 8px;
+        }
+        .sablon-icerik p {
+            margin-bottom: 12px;
+            color: #333;
+        }
+        .sablon-icerik ul, .sablon-icerik ol {
+            margin: 12px 0;
+            padding-left: 25px;
+        }
+        .sablon-icerik li {
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .sablon-icerik table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+        .sablon-icerik th {
+            background: #0077b6;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #005a8c;
+        }
+        .sablon-icerik td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+        .sablon-icerik .bos-alan {
+            background: #f9f9f9;
+            padding: 15px;
+            border: 1px dashed #999;
+            border-radius: 5px;
+            color: #666;
+            font-style: italic;
+            margin: 10px 0;
+        }
+        .sablon-icerik .not {
+            background: #fff9e6;
+            border-left: 4px solid #f0ad4e;
+            padding: 12px 18px;
+            margin: 15px 0;
+            color: #856404;
+            font-size: 13px;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 900px) {
+            .sablon-kapsayici { grid-template-columns: 1fr; }
+            .sidebar { position: static; }
+        }
+
+        @media print {
+            body { background: white !important; }
+            .panel-header, .sidebar, .sablon-aksiyon, .geri-btn { display: none !important; }
+            .icerik-alani { background: white !important; padding: 0 !important; }
+            .sablon-baslik, .sablon-aciklama { display: none !important; }
+            .sablon-icerik { padding: 0 !important; }
+            .sablon-kapsayici { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 1250px;">
+        <div class="panel-header">
+            <div class="panel-baslik">📄 Doküman Şablonları</div>
+            <a href="panel.html" class="geri-btn">← Panele Dön</a>
+        </div>
+
+        <p style="color: #a8c5e0; margin-bottom: 25px; font-size: 15px;">
+            AS9100 uyumlu hazır şablonlar. İndirin, doldurun, kullanın.
+        </p>
+
+        <div class="sablon-kapsayici">
+            <div class="sidebar">
+                <div id="sidebarIcerik">Yükleniyor...</div>
+            </div>
+            <div class="icerik-alani">
+                <div id="sablonIcerik">
+                    <div style="text-align: center; padding: 60px; color: #a8c5e0;">
+                        ← Soldan bir şablon seçin
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+                const SABLONLAR = [
+            // ==================== KALİTE YÖNETİM SİSTEMİ ====================
+            {
+                id: "kalite-politikasi",
+                kategori: "Kalite Yönetim Sistemi",
+                baslik: "📌 Kalite Politikası",
+                aciklama: "Şirketinizin kalite politikasını AS9100 uyumlu şekilde yazın.",
+                icerik: `
+                    <h1>KALİTE POLİTİKASI</h1>
+                    <p><strong>Şirket Adı:</strong> <span class="bos-alan" style="display:inline-block; padding:5px 20px;">[Şirket adınız]</span></p>
+                    <p><strong>Doküman No:</strong> KP-001 | <strong>Revizyon:</strong> 01 | <strong>Tarih:</strong> [Tarih]</p>
+                    <h2>1. AMAÇ</h2>
+                    <p>Bu politika, <strong>[Şirket Adı]</strong>'nın kalite yönetim sistemi çerçevesinde kalite hedeflerini ve taahhütlerini tanımlar.</p>
+                    <h2>2. KAPSAM</h2>
+                    <p>Bu politika, şirketimizin tüm faaliyetlerini (tasarım, üretim, satın alma, kalite kontrol, sevkiyat) kapsar.</p>
+                    <h2>3. KALİTE POLİTİKAMIZ</h2>
+                    <p><strong>[Şirket Adı]</strong> olarak, aşağıdaki ilkeleri taahhüt ederiz:</p>
+                    <ul>
+                        <li>Müşteri memnuniyetini en üst düzeyde tutmak</li>
+                        <li>AS9100 standardının tüm gereksinimlerini karşılamak</li>
+                        <li>Sürekli iyileştirmeyi teşvik etmek</li>
+                        <li>Çalışanlarımızın yetkinliğini geliştirmek</li>
+                        <li>Yasal ve düzenleyici şartlara uymak</li>
+                        <li>Ürün güvenliğini ön planda tutmak</li>
+                        <li>Sahte parça önleme politikalarını uygulamak</li>
+                    </ul>
+                    <h2>4. KALİTE HEDEFLERİMİZ</h2>
+                    <table>
+                        <tr><th>Hedef</th><th>Ölçüt</th><th>Hedef Değer</th></tr>
+                        <tr><td>Müşteri memnuniyeti</td><td>Anket skoru</td><td>≥ 85%</td></tr>
+                        <tr><td>Uygunsuzluk oranı</td><td>Ret oranı</td><td>≤ 2%</td></tr>
+                        <tr><td>Zamanında teslimat</td><td>OTD oranı</td><td>≥ 95%</td></tr>
+                    </table>
+                    <h2>5. SORUMLULUK</h2>
+                    <p>Bu politikanın uygulanmasından <strong>Genel Müdür</strong> sorumludur. Tüm çalışanlar bu politikaya uymakla yükümlüdür.</p>
+                    <p style="margin-top: 30px;"><strong>Onaylayan:</strong> _________________________ | <strong>Tarih:</strong> _________</p>
+                `
+            },
+            {
+                id: "kalite-el-kitabi",
+                kategori: "Kalite Yönetim Sistemi",
+                baslik: "📘 Kalite El Kitabı",
+                aciklama: "AS9100 gereksinimlerini karşılayan kalite el kitabı şablonu.",
+                icerik: `
+                    <h1>KALİTE EL KİTABI</h1>
+                    <p><strong>Şirket Adı:</strong> [Şirket adınız]</p>
+                    <p><strong>Doküman No:</strong> KEK-001 | <strong>Revizyon:</strong> 01 | <strong>Tarih:</strong> [Tarih]</p>
+                    <h2>1. GİRİŞ</h2>
+                    <p>Bu Kalite El Kitabı, <strong>[Şirket Adı]</strong>'nın AS9100 standardına uygun Kalite Yönetim Sistemi'ni tanımlar.</p>
+                    <h2>2. KAPSAM</h2>
+                    <p>Bu el kitabı, şirketimizin [lokasyon] adresindeki tüm faaliyetlerini kapsar. Aşağıdaki AS9100 maddeleri uygulanmaz: [varsa istisnalar].</p>
+                    <h2>3. NORMATİF REFERANSLAR</h2>
+                    <ul>
+                        <li>AS9100 Rev D - Havacılık, Uzay ve Savunma Kalite Yönetim Sistemi</li>
+                        <li>ISO 9001:2015 - Kalite Yönetim Sistemi Temel Esasları</li>
+                        <li>ISO 9000:2015 - Temel Esaslar ve Terimler</li>
+                    </ul>
+                    <h2>4. TERİMLER VE TARİFLER</h2>
+                    <table>
+                        <tr><th>Terim</th><th>Tanım</th></tr>
+                        <tr><td>KYS</td><td>Kalite Yönetim Sistemi</td></tr>
+                        <tr><td>FAI</td><td>İlk Parça Muayenesi</td></tr>
+                        <tr><td>FOD</td><td>Yabancı Madde</td></tr>
+                        <tr><td>FMEA</td><td>Hata Türü ve Etkileri Analizi</td></tr>
+                    </table>
+                    <h2>5. KURULUŞUN BAĞLAMI</h2>
+                    <p>Şirketimiz, savunma ve havacılık sektörüne yönelik [ürün/hizmet] üretmektedir. İç ve dış faktörler düzenli olarak analiz edilir.</p>
+                    <h2>6. LİDERLİK</h2>
+                    <p>Üst yönetim, kalite politikasını belirler ve KYS'nin etkinliğinden sorumludur.</p>
+                    <h2>7. PLANLAMA</h2>
+                    <p>Risk ve fırsatlar, kalite hedefleri ve değişiklik yönetimi bu bölümde tanımlanır.</p>
+                    <h2>8. DESTEK</h2>
+                    <p>Kaynaklar, yetkinlik, farkındalık, iletişim ve dokümante edilmiş bilgi bu bölümde ele alınır.</p>
+                    <h2>9. OPERASYON</h2>
+                    <p>Ürün ve hizmetlerin tasarımı, üretimi, serbest bırakılması ve uygun olmayan çıktılar bu bölümde tanımlanır.</p>
+                    <h2>10. PERFORMANS DEĞERLENDİRME</h2>
+                    <p>İzleme, ölçme, iç denetim ve yönetim gözden geçirme bu bölümde ele alınır.</p>
+                    <h2>11. İYİLEŞTİRME</h2>
+                    <p>Uygunsuzluk, düzeltici faaliyet ve sürekli iyileştirme bu bölümde tanımlanır.</p>
+                `
+            },
+            {
+                id: "dokuman-kontrol",
+                kategori: "Kalite Yönetim Sistemi",
+                baslik: "📁 Doküman Kontrol Prosedürü",
+                aciklama: "Dokümanların hazırlanması, onaylanması ve kontrolü için prosedür.",
+                icerik: `
+                    <h1>DOKÜMAN KONTROL PROSEDÜRÜ</h1>
+                    <p><strong>Doküman No:</strong> PR-001 | <strong>Revizyon:</strong> 01 | <strong>Tarih:</strong> [Tarih]</p>
+                    <h2>1. AMAÇ</h2>
+                    <p>Kalite Yönetim Sistemi kapsamındaki dokümanların hazırlanması, onaylanması, dağıtımı, revizyonu ve arşivlenmesini kontrol altına almak.</p>
+                    <h2>2. KAPSAM</h2>
+                    <p>Bu prosedür, şirkette kullanılan tüm iç ve dış kaynaklı dokümanları kapsar.</p>
+                    <h2>3. SORUMLULUKLAR</h2>
+                    <ul>
+                        <li><strong>Kalite Yöneticisi:</strong> Prosedürün uygulanmasından sorumlu</li>
+                        <li><strong>Doküman Sorumlusu:</strong> Dokümanların kaydı ve dağıtımı</li>
+                        <li><strong>Birim Sorumluları:</strong> Kendi alanındaki dokümanların güncelliği</li>
+                    </ul>
+                    <h2>4. DOKÜMAN TÜRLERİ</h2>
+                    <table>
+                        <tr><th>Seviye</th><th>Doküman Türü</th><th>Örnek</th></tr>
+                        <tr><td>1</td><td>Politika / El Kitabı</td><td>Kalite Politikası, Kalite El Kitabı</td></tr>
+                        <tr><td>2</td><td>Prosedürler</td><td>Doküman Kontrol Prosedürü</td></tr>
+                        <tr><td>3</td><td>Talimatlar / Formlar</td><td>İş Talimatı, FAI Formu</td></tr>
+                        <tr><td>4</td><td>Kayıtlar</td><td>Denetim Raporu, Eğitim Kaydı</td></tr>
+                    </table>
+                    <h2>5. DOKÜMAN HAZIRLAMA VE ONAY</h2>
+                    <p>Yeni dokümanlar ilgili birim tarafından hazırlanır, Kalite Yöneticisi tarafından onaylanır.</p>
+                    <h2>6. REVİZYON KONTROLÜ</h2>
+                    <ul>
+                        <li>Her dokümanın revizyon numarası ve tarihi vardır</li>
+                        <li>Revizyonlar "Revizyon Geçmişi" tablosunda kayıt altına alınır</li>
+                        <li>Eski versiyonlar arşivlenir, "GEÇERSİZ" olarak işaretlenir</li>
+                    </ul>
+                    <h2>7. DAĞITIM</h2>
+                    <p>Onaylı dokümanlar ilgili birimlere kontrollü kopya olarak dağıtılır. Dağıtım listesi tutulur.</p>
+                    <h2>8. DIŞ KAYNAKLI DOKÜMANLAR</h2>
+                    <p>Müşteri ve tedarikçi dokümanları ayrı bir kayıt defterinde takip edilir.</p>
+                    <h2>9. ARŞİVLEME</h2>
+                    <p>Dokümanlar minimum 5 yıl süreyle saklanır. Elektronik ortamda yedekleme yapılır.</p>
+                    <h2>10. REVİZYON GEÇMİŞİ</h2>
+                    <table>
+                        <tr><th>Rev.</th><th>Tarih</th><th>Açıklama</th><th>Onay</th></tr>
+                        <tr><td>01</td><td>[Tarih]</td><td>İlk yayın</td><td></td></tr>
+                        <tr><td>02</td><td></td><td></td><td></td></tr>
+                    </table>
+                `
+            },
+            {
+                id: "kayit-kontrol",
+                kategori: "Kalite Yönetim Sistemi",
+                baslik: "🗂️ Kayıt Kontrol Prosedürü",
+                aciklama: "Kalite kayıtlarının tanımlanması, saklanması ve korunması.",
+                icerik: `
+                    <h1>KAYIT KONTROL PROSEDÜRÜ</h1>
+                    <p><strong>Doküman No:</strong> PR-002 | <strong>Revizyon:</strong> 01 | <strong>Tarih:</strong> [Tarih]</p>
+                    <h2>1. AMAÇ</h2>
+                    <p>Kalite kayıtlarının tanımlanması, toplanması, indekslenmesi, erişimi, saklanması, korunması ve elden çıkarılmasını kontrol etmek.</p>
+                    <h2>2. KAPSAM</h2>
+                    <p>Bu prosedür, KYS kapsamındaki tüm kayıtları kapsar.</p>
+                    <h2>3. KAYIT TÜRLERİ VE SAKLAMA SÜRELERİ</h2>
+                    <table>
+                        <tr><th>Kayıt Türü</th><th>Saklama Süresi</th><th>Sorumlu</th></tr>
+                        <tr><td>Kalite kayıtları</td><td>5 yıl</td><td>Kalite</td></tr>
+                        <tr><td>Eğitim kayıtları</td><td>Personel ayrılışından sonra 5 yıl</td><td>İK</td></tr>
+                        <tr><td>Kalibrasyon kayıtları</td><td>5 yıl</td><td>Kalite</td></tr>
+                        <tr><td>İç denetim kayıtları</td><td>5 yıl</td><td>Kalite</td></tr>
+                        <tr><td>Müşteri şikayetleri</td><td>5 yıl</td><td>Kalite</td></tr>
+                        <tr><td>Üretim kayıtları</td><td>5 yıl</td><td>Üretim</td></tr>
+                    </table>
+                    <h2>4. KAYIT ORTAMI</h2>
+                    <p>Kayıtlar hem <strong>kağıt</strong> hem de <strong>elektronik</strong> ortamda tutulabilir. Elektronik kayıtlar yedeklenir.</p>
+                    <h2>5. KAYITLARA ERİŞİM</h2>
+                    <p>Kayıtlara erişim yetkisi, ilgili birim sorumlusu tarafından verilir. Yetkisiz erişim engellenir.</p>
+                    <h2>6. KAYITLARIN KORUNMASI</h2>
+                    <ul>
+                        <li>Kayıtlar nem, yangın, su baskını gibi risklerden korunur</li>
+                        <li>Elektronik kayıtlar şifreli ortamda saklanır</li>
+                        <li>Yetkisiz değişiklik engellenir</li>
+                    </ul>
+                    <h2>7. KAYITLARIN ELDEN ÇIKARILMASI</h2>
+                    <p>Saklama süresi dolan kayıtlar, Kalite Yöneticisi onayıyla imha edilir. İmha tutanağı tutulur.</p>
+                `
+            },
+            {
+                id: "yonetim-gozden-gecirme",
+                kategori: "Kalite Yönetim Sistemi",
+                baslik: "📊 Yönetim Gözden Geçirme Tutanağı",
+                aciklama: "Üst yönetimin KYS'yi gözden geçirmesi için tutanak şablonu.",
+                icerik: `
+                    <h1>YÖNETİM GÖZDEN GEÇİRME TUTANAĞI</h1>
+                    <table>
+                        <tr><td><strong>Toplantı No:</strong></td><td>YGG-2026-001</td><td><strong>Tarih:</strong></td><td>[Tarih]</td></tr>
+                        <tr><td><strong>Toplantı Yeri:</strong></td><td>[Yer]</td><td><strong>Saat:</strong></td><td>[Saat]</td></tr>
+                    </table>
+                    <h2>1. KATILIMCILAR</h2>
+                    <table>
+                        <tr><th>Ad Soyad</th><th>Görev</th><th>İmza</th></tr>
+                        <tr><td></td><td>Genel Müdür</td><td></td></tr>
+                        <tr><td></td><td>Kalite Yöneticisi</td><td></td></tr>
+                        <tr><td></td><td>Üretim Müdürü</td><td></td></tr>
+                        <tr><td></td><td>Satın Alma Sorumlusu</td><td></td></tr>
+                    </table>
+                    <h2>2. GÖRÜŞÜLEN KONULAR</h2>
+                    <h3>2.1. Önceki Toplantı Kararları</h3>
+                    <p>[Önceki toplantıdan bu yana yapılanlar]</p>
+                    <h3>2.2. Kalite Politikası ve Hedefleri</h3>
+                    <p>[Hedeflere ulaşma durumu]</p>
+                    <h3>2.3. Müşteri Memnuniyeti</h3>
+                    <p>[Müşteri şikayetleri, memnuniyet anketleri]</p>
+                    <h3>2.4. Denetim Sonuçları</h3>
+                    <p>[İç ve dış denetim bulguları]</p>
+                    <h3>2.5. Uygunsuzluklar ve Düzeltici Faaliyetler</h3>
+                    <p>[Açık ve kapatılan uygunsuzluklar]</p>
+                    <h3>2.6. Risk ve Fırsatlar</h3>
+                    <p>[Güncel risk kaydı değerlendirmesi]</p>
+                    <h3>2.7. Kaynaklar</h3>
+                    <p>[İnsan kaynağı, altyapı, bütçe durumu]</p>
+                    <h2>3. KARARLAR VE AKSİYONLAR</h2>
+                    <table>
+                        <tr><th>No</th><th>Karar / Aksiyon</th><th>Sorumlu</th><th>Termin</th><th>Durum</th></tr>
+                        <tr><td>1</td><td></td><td></td><td></td><td>☐</td></tr>
+                        <tr><td>2</td><td></td><td></td><td></td><td>☐</td></tr>
+                        <tr><td>3</td><td></td><td></td><td></td><td>☐</td></tr>
+                    </table>
+                    <h2>4. SONUÇ</h2>
+                    <p>Kalite Yönetim Sistemi'nin uygunluğu, yeterliliği ve etkinliği değerlendirilmiştir. [Genel değerlendirme notu]</p>
+                    <p style="margin-top: 30px;"><strong>Toplantıyı Düzenleyen:</strong> _________________________</p>
+                `
+            },
+
+            // ==================== ÜRETİM ====================
+            {
+                id: "is-talimati",
+                kategori: "Üretim",
+                baslik: "🔧 İş Talimatı Şablonu",
+                aciklama: "Üretim operasyonları için standart iş talimatı.",
+                icerik: `
+                    <h1>İŞ TALİMATI</h1>
+                    <table>
+                        <tr><td><strong>Talimat No:</strong></td><td>IT-001</td><td><strong>Revizyon:</strong></td><td>01</td></tr>
+                        <tr><td><strong>Operasyon:</strong></td><td>[Operasyon adı]</td><td><strong>Makine:</strong></td><td>[Makine adı]</td></tr>
+                        <tr><td><strong>Parça No:</strong></td><td>[Parça no]</td><td><strong>Malzeme:</strong></td><td>[Malzeme]</td></tr>
+                    </table>
+                    <h2>1. GEREKLİ EKİPMAN</h2>
+                    <ul>
+                        <li>Makine: [Makine adı ve modeli]</li>
+                        <li>Takım: [Takım listesi]</li>
+                        <li>Ölçüm aletleri: [Kumpas, mikrometre vb.]</li>
+                        <li>Kişisel koruyucu donanım: [Gözlük, eldiven vb.]</li>
+                    </ul>
+                    <h2>2. OPERASYON ADIMLARI</h2>
+                    <table>
+                        <tr><th>Adım</th><th>İşlem</th><th>Parametre</th><th>Kontrol</th></tr>
+                        <tr><td>1</td><td>İş parçasını bağla</td><td>—</td><td>Bağlama kontrolü</td></tr>
+                        <tr><td>2</td><td>Referans al</td><td>—</td><td>Sıfır kontrolü</td></tr>
+                        <tr><td>3</td><td>Kaba işleme</td><td>Devir: ___ / İlerleme: ___</td><td>Ölçüm</td></tr>
+                        <tr><td>4</td><td>İnce işleme</td><td>Devir: ___ / İlerleme: ___</td><td>Ölçüm</td></tr>
+                        <tr><td>5</td><td>Ölçüm ve kontrol</td><td>—</td><td>Teknik resim</td></tr>
+                    </table>
+                    <h2>3. KALİTE KONTROL</h2>
+                    <p><strong>Kritik ölçüler:</strong> [Ölçü listesi]</p>
+                    <p><strong>Toleranslar:</strong> [Toleranslar]</p>
+                    <p><strong>Kontrol sıklığı:</strong> [Her parça / 5 parçada bir]</p>
+                    <h2>4. GÜVENLİK</h2>
+                    <ul>
+                        <li>Makine çalışırken müdahale etmeyin</li>
+                        <li>Talaş temizliği düzenli yapılmalı</li>
+                        <li>Acil durdurma butonunun yeri: [Konum]</li>
+                    </ul>
+                    <h2>5. FOD ÖNLEME</h2>
+                    <p>İş sonunda tezgah ve çevresi temizlenir, yabancı madde kontrolü yapılır.</p>
+                    <p style="margin-top: 30px;"><strong>Hazırlayan:</strong> _________ | <strong>Onaylayan:</strong> _________</p>
+                `
+            },
+            {
+                id: "fai-raporu",
+                kategori: "Üretim",
+                baslik: "🔍 FAI Raporu",
+                aciklama: "İlk parça muayenesi (First Article Inspection) raporu.",
+                icerik: `
+                    <h1>İLK PARÇA MUAYENESİ (FAI) RAPORU</h1>
+                    <table>
+                        <tr><td><strong>FAI No:</strong></td><td>FAI-2026-001</td><td><strong>Tarih:</strong></td><td>[Tarih]</td></tr>
+                        <tr><td><strong>Parça Adı:</strong></td><td>[Parça adı]</td><td><strong>Parça No:</strong></td><td>[Parça no]</td></tr>
+                        <tr><td><strong>Seri No:</strong></td><td>[Seri no]</td><td><strong>Müşteri:</strong></td><td>[Müşteri]</td></tr>
+                    </table>
+                    <h2>1. FAI NEDENİ</h2>
+                    <p>☐ Yeni parça &nbsp; ☐ Tasarım değişikliği &nbsp; ☐ Süreç değişikliği &nbsp; ☐ Üretim yeri değişikliği</p>
+                    <h2>2. KULLANILAN MALZEMELER</h2>
+                    <table>
+                        <tr><th>Malzeme</th><th>Spesifikasyon</th><th>Sertifika No</th></tr>
+                        <tr><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>3. ÖLÇÜM SONUÇLARI</h2>
+                    <table>
+                        <tr><th>Ölçü No</th><th>Özellik</th><th>Nominal</th><th>Tolerans</th><th>Ölçüm</th><th>Sonuç</th></tr>
+                        <tr><td>1</td><td></td><td></td><td></td><td></td><td>☐ Uygun ☐ Değil</td></tr>
+                        <tr><td>2</td><td></td><td></td><td></td><td></td><td>☐ Uygun ☐ Değil</td></tr>
+                        <tr><td>3</td><td></td><td></td><td></td><td></td><td>☐ Uygun ☐ Değil</td></tr>
+                    </table>
+                    <h2>4. ÖZEL SÜREÇLER</h2>
+                    <table>
+                        <tr><th>Süreç</th><th>Parametre</th><th>Sonuç</th><th>Sertifika</th></tr>
+                        <tr><td>Isıl İşlem</td><td></td><td></td><td></td></tr>
+                        <tr><td>Kaplama</td><td></td><td></td><td></td></tr>
+                        <tr><td>NDT</td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>5. SONUÇ</h2>
+                    <p>☐ FAI ONAYLANDI &nbsp;&nbsp; ☐ FAI REDDEDİLDİ (Düzeltici faaliyet gerekli)</p>
+                    <h2>6. İMZALAR</h2>
+                    <table>
+                        <tr><th>Üretim</th><th>Kalite Kontrol</th><th>Kalite Yöneticisi</th></tr>
+                        <tr><td style="height: 60px;"></td><td></td><td></td></tr>
+                    </table>
+                `
+            },
+            {
+                id: "ozel-surec-kaydi",
+                kategori: "Üretim",
+                baslik: "🌡️ Özel Süreç Parametre Kaydı",
+                aciklama: "Isıl işlem, kaplama gibi özel süreçler için parametre kaydı.",
+                icerik: `
+                    <h1>ÖZEL SÜREÇ PARAMETRE KAYDI</h1>
+                    <table>
+                        <tr><td><strong>Kayıt No:</strong></td><td>OSK-2026-001</td><td><strong>Tarih:</strong></td><td>[Tarih]</td></tr>
+                        <tr><td><strong>Süreç:</strong></td><td>[Isıl işlem / Kaplama / Kaynak]</td><td><strong>Parti No:</strong></td><td>[Parti no]</td></tr>
+                    </table>
+                    <h2>1. PARTİ BİLGİSİ</h2>
+                    <table>
+                        <tr><th>Parça No</th><th>Miktar</th><th>Malzeme</th><th>Seri No</th></tr>
+                        <tr><td></td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>2. SÜREÇ PARAMETRELERİ</h2>
+                    <table>
+                        <tr><th>Parametre</th><th>Hedef</th><th>Gerçekleşen</th><th>Sonuç</th></tr>
+                        <tr><td>Sıcaklık (°C)</td><td></td><td></td><td>☐ Uygun</td></tr>
+                        <tr><td>Süre (dk)</td><td></td><td></td><td>☐ Uygun</td></tr>
+                        <tr><td>Soğutma hızı</td><td></td><td></td><td>☐ Uygun</td></tr>
+                        <tr><td>Atmosfer</td><td></td><td></td><td>☐ Uygun</td></tr>
+                    </table>
+                    <h2>3. KULLANILAN EKİPMAN</h2>
+                    <table>
+                        <tr><th>Ekipman</th><th>Kalibrasyon Tarihi</th><th>Operatör</th></tr>
+                        <tr><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>4. SERTİFİKALAR</h2>
+                    <p>☐ Isıl işlem sertifikası &nbsp; ☐ Kaplama sertifikası &nbsp; ☐ NDT raporu</p>
+                    <h2>5. NOTLAR</h2>
+                    <div class="bos-alan">[Varsa sapmalar, notlar]</div>
+                    <p style="margin-top: 30px;"><strong>Operatör:</strong> _________ | <strong>Onaylayan:</strong> _________</p>
+                `
+            },
+            {
+                id: "kapasite-plani",
+                kategori: "Üretim",
+                baslik: "📈 Üretim Kapasite Planı",
+                aciklama: "Aylık/yıllık üretim kapasitesi planlama şablonu.",
+                icerik: `
+                    <h1>ÜRETİM KAPASİTE PLANI</h1>
+                    <p><strong>Plan No:</strong> KP-2026 | <strong>Yıl:</strong> 2026 | <strong>Tarih:</strong> [Tarih]</p>
+                    <h2>1. MAKİNE KAPASİTESİ</h2>
+                    <table>
+                        <tr><th>Makine</th><th>Vardiya/Saat</th><th>Günlük Kapasite</th><th>Aylık Kapasite</th></tr>
+                        <tr><td></td><td>8</td><td></td><td></td></tr>
+                        <tr><td></td><td>8</td><td></td><td></td></tr>
+                        <tr><td></td><td>8</td><td></td><td></td></tr>
+                    </table>
+                    <h2>2. AYLIK ÜRETİM PLANI</h2>
+                    <table>
+                        <tr><th>Ay</th><th>Planlanan Üretim</th><th>Gerçekleşen</th><th>Doluluk %</th></tr>
+                        <tr><td>Ocak</td><td></td><td></td><td></td></tr>
+                        <tr><td>Şubat</td><td></td><td></td><td></td></tr>
+                        <tr><td>Mart</td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>3. PERSONEL DURUMU</h2>
+                    <table>
+                        <tr><th>Pozisyon</th><th>Mevcut</th><th>İhtiyaç</th><th>Eksik</th></tr>
+                        <tr><td>CNC Operatörü</td><td></td><td></td><td></td></tr>
+                        <tr><td>Kalite Kontrol</td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>4. DARBOĞAZLAR</h2>
+                    <div class="bos-alan">[Kapasite kısıtları ve çözüm önerileri]</div>
+                    <h2>5. YATIRIM İHTİYACI</h2>
+                    <div class="bos-alan">[Yeni makine, ekipman ihtiyacı]</div>
+                `
+            },
+
+            // ==================== İZLENEBİLİRLİK ====================
+            {
+                id: "parti-takip",
+                kategori: "İzlenebilirlik",
+                baslik: "🏷️ Parti/Lot Takip Formu",
+                aciklama: "Üretim partilerinin izlenebilirliği için takip formu.",
+                icerik: `
+                    <h1>PARTİ / LOT TAKİP FORMU</h1>
+                    <table>
+                        <tr><td><strong>Parti No:</strong></td><td>PT-2026-001</td><td><strong>Tarih:</strong></td><td>[Tarih]</td></tr>
+                        <tr><td><strong>Parça No:</strong></td><td>[Parça no]</td><td><strong>Miktar:</strong></td><td>[Miktar]</td></tr>
+                    </table>
+                    <h2>1. HAMMADDE BİLGİSİ</h2>
+                    <table>
+                        <tr><th>Malzeme</th><th>Lot No</th><th>Tedarikçi</th><th>Sertifika No</th></tr>
+                        <tr><td></td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>2. ÜRETİM ADIMLARI</h2>
+                    <table>
+                        <tr><th>Tarih</th><th>Operasyon</th><th>Makine</th><th>Operatör</th><th>Sonuç</th></tr>
+                        <tr><td></td><td></td><td></td><td></td><td>☐ Uygun</td></tr>
+                        <tr><td></td><td></td><td></td><td></td><td>☐ Uygun</td></tr>
+                    </table>
+                    <h2>3. ÖZEL SÜREÇLER</h2>
+                    <table>
+                        <tr><th>Süreç</th><th>Lot No</th><th>Parametre</th><th>Sonuç</th></tr>
+                        <tr><td>Isıl İşlem</td><td></td><td></td><td></td></tr>
+                        <tr><td>Kaplama</td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>4. KALİTE KONTROL</h2>
+                    <table>
+                        <tr><th>Kontrol</th><th>Ölçüm</th><th>Sonuç</th><th>Kontrol Eden</th></tr>
+                        <tr><td>Boyut</td><td></td><td></td><td></td></tr>
+                        <tr><td>Yüzey</td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>5. SEVKİYAT</h2>
+                    <table>
+                        <tr><th>Müşteri</th><th>Sevk Tarihi</th><th>İrsaliye No</th><th>Miktar</th></tr>
+                        <tr><td></td><td></td><td></td><td></td></tr>
+                    </table>
+                `
+            },
+            {
+                id: "hammadde-sertifika",
+                kategori: "İzlenebilirlik",
+                baslik: "📋 Hammadde Sertifika Takip",
+                aciklama: "Gelen hammaddelerin sertifika takip formu.",
+                icerik: `
+                    <h1>HAMMADDE SERTİFİKA TAKİP FORMU</h1>
+                    <p><strong>Kayıt No:</strong> HST-2026-001 | <strong>Tarih:</strong> [Tarih]</p>
+                    <h2>1. GELEN MALZEME</h2>
+                    <table>
+                        <tr><th>Tarih</th><th>Malzeme</th><th>Lot No</th><th>Tedarikçi</th><th>Miktar</th></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>2. SERTİFİKA KONTROLÜ</h2>
+                    <table>
+                        <tr><th>Malzeme</th><th>Sertifika No</th><th>Standart</th><th>Kontrol</th></tr>
+                        <tr><td></td><td></td><td></td><td>☐ Uygun ☐ Değil</td></tr>
+                    </table>
+                    <h2>3. GİRİŞ KONTROLÜ</h2>
+                    <table>
+                        <tr><th>Kontrol</th><th>Sonuç</th><th>Kontrol Eden</th><th>Tarih</th></tr>
+                        <tr><td>Görsel kontrol</td><td></td><td></td><td></td></tr>
+                        <tr><td>Boyut kontrolü</td><td></td><td></td><td></td></tr>
+                        <tr><td>Kimyasal analiz</td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>4. ONAY</h2>
+                    <p>☐ KABUL &nbsp;&nbsp; ☐ RED &nbsp;&nbsp; ☐ ŞARTLI KABUL</p>
+                    <div class="bos-alan">[Red/şartlı kabul nedeni]</div>
+                    <p style="margin-top: 30px;"><strong>Onaylayan:</strong> _________________________</p>
+                `
+            },
+            {
+                id: "kalibrasyon-takip",
+                kategori: "İzlenebilirlik",
+                baslik: "📏 Kalibrasyon Takip Formu",
+                aciklama: "Ölçüm ekipmanlarının kalibrasyon takibi.",
+                icerik: `
+                    <h1>KALİBRASYON TAKİP FORMU</h1>
+                    <p><strong>Kayıt No:</strong> KT-2026 | <strong>Tarih:</strong> [Tarih]</p>
+                    <h2>1. ÖLÇÜM EKİPMANLARI LİSTESİ</h2>
+                    <table>
+                        <tr><th>Ekipman</th><th>Marka/Model</th><th>Seri No</th><th>Kalibrasyon Tarihi</th><th>Sonraki</th><th>Durum</th></tr>
+                        <tr><td>Kumpas</td><td></td><td></td><td></td><td></td><td>☐ Geçerli</td></tr>
+                        <tr><td>Mikrometre</td><td></td><td></td><td></td><td></td><td>☐ Geçerli</td></tr>
+                        <tr><td>Komparatör</td><td></td><td></td><td></td><td></td><td>☐ Geçerli</td></tr>
+                        <tr><td>Mastar</td><td></td><td></td><td></td><td></td><td>☐ Geçerli</td></tr>
+                    </table>
+                    <h2>2. KALİBRASYON KAYITLARI</h2>
+                    <table>
+                        <tr><th>Ekipman</th><th>Tarih</th><th>Kalibrasyon Firması</th><th>Sertifika No</th><th>Sonuç</th></tr>
+                        <tr><td></td><td></td><td></td><td></td><td>☐ Uygun</td></tr>
+                    </table>
+                    <h2>3. KALİBRASYONU GEÇEN EKİPMANLAR</h2>
+                    <table>
+                        <tr><th>Ekipman</th><th>Son Kalibrasyon</th><th>Gecikme (gün)</th><th>Aksiyon</th></tr>
+                        <tr><td></td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>4. UYGUNSUZ ÖLÇÜM EKİPMANI</h2>
+                    <p>Kalibrasyon sonucu uygun olmayan ekipmanlar kırmızı etiketle işaretlenir ve kullanımdan çekilir.</p>
+                `
+            },
+            {
+                id: "sevkiyat-izleme",
+                kategori: "İzlenebilirlik",
+                baslik: "🚚 Sevkiyat İzleme Formu",
+                aciklama: "Sevkiyat süreçlerinin takibi ve müşteriye teslim.",
+                icerik: `
+                    <h1>SEVKİYAT İZLEME FORMU</h1>
+                    <p><strong>Sevkiyat No:</strong> SV-2026-001 | <strong>Tarih:</strong> [Tarih]</p>
+                    <h2>1. MÜŞTERİ BİLGİSİ</h2>
+                    <table>
+                        <tr><td><strong>Müşteri:</strong></td><td>[Müşteri adı]</td><td><strong>Sipariş No:</strong></td><td>[Sipariş no]</td></tr>
+                        <tr><td><strong>Teslim Yeri:</strong></td><td>[Adres]</td><td><strong>Teslim Tarihi:</strong></td><td>[Tarih]</td></tr>
+                    </table>
+                    <h2>2. SEVK EDİLEN ÜRÜNLER</h2>
+                    <table>
+                        <tr><th>Parça No</th><th>Tanım</th><th>Miktar</th><th>Seri No</th></tr>
+                        <tr><td></td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>3. SEVKİYAT BELGELERİ</h2>
+                    <ul>
+                        <li>☐ İrsaliye</li>
+                        <li>☐ Fatura</li>
+                        <li>☐ Kalite sertifikası (CoC)</li>
+                        <li>☐ FAI raporu</li>
+                        <li>☐ Malzeme sertifikaları</li>
+                        <li>☐ Özel süreç sertifikaları</li>
+                    </ul>
+                    <h2>4. PAKETLEME VE KORUMA</h2>
+                    <table>
+                        <tr><th>Kontrol</th><th>Sonuç</th><th>Not</th></tr>
+                        <tr><td>Uygun paketleme</td><td>☐ Uygun</td><td></td></tr>
+                        <tr><td>FOD önleme</td><td>☐ Uygun</td><td></td></tr>
+                        <tr><td>Etiketleme</td><td>☐ Uygun</td><td></td></tr>
+                    </table>
+                    <h2>5. TAŞIMA BİLGİSİ</h2>
+                    <table>
+                        <tr><th>Taşıyıcı</th><th>Takip No</th><th>Çıkış Tarihi</th><th>Teslim Tarihi</th></tr>
+                        <tr><td></td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>6. TESLİM ONAYI</h2>
+                    <p><strong>Teslim Alan:</strong> _________________________ &nbsp; <strong>Tarih:</strong> _________</p>
+                `
+            },
+
+            // ==================== DENETİM ====================
+            {
+                id: "ic-denetim-raporu",
+                kategori: "Denetim",
+                baslik: "📋 İç Denetim Raporu",
+                aciklama: "AS9100 9.2 maddesi için iç denetim raporu.",
+                icerik: `
+                    <h1>İÇ DENETİM RAPORU</h1>
+                    <table>
+                        <tr><td><strong>Denetim No:</strong></td><td>ID-2026-001</td><td><strong>Tarih:</strong></td><td>[Tarih]</td></tr>
+                        <tr><td><strong>Denetlenen Birim:</strong></td><td>[Birim adı]</td><td><strong>Denetçi:</strong></td><td>[Ad Soyad]</td></tr>
+                        <tr><td><strong>Denetim Kapsamı:</strong></td><td colspan="3">AS9100 Madde [X]</td></tr>
+                    </table>
+                    <h2>1. DENETİM AMACI</h2>
+                    <p>Bu denetim, şirketimizin AS9100 Kalite Yönetim Sistemi'nin ilgili maddesine uygunluğunu değerlendirmek amacıyla yapılmıştır.</p>
+                    <h2>2. DENETİM BULGULARI</h2>
+                    <table>
+                        <tr><th>No</th><th>Madde</th><th>Bulgu</th><th>Tip</th></tr>
+                        <tr><td>1</td><td></td><td></td><td>Uygunsuzluk</td></tr>
+                        <tr><td>2</td><td></td><td></td><td>Uygunsuzluk</td></tr>
+                        <tr><td>3</td><td></td><td></td><td>Uygun</td></tr>
+                    </table>
+                    <h2>3. SONUÇ</h2>
+                    <p>Denetim sonucunda <strong>[X] adet uygunsuzluk</strong> tespit edilmiştir.</p>
+                    <h2>4. ÖNERİLER</h2>
+                    <ul>
+                        <li></li>
+                        <li></li>
+                    </ul>
+                    <h2>5. İMZALAR</h2>
+                    <table>
+                        <tr><th>Denetçi</th><th>Denetlenen Birim Sorumlusu</th><th>Kalite Yöneticisi</th></tr>
+                        <tr><td style="height: 60px;"></td><td></td><td></td></tr>
+                    </table>
+                `
+            },
+            {
+                id: "duzeltici-faaliyet",
+                kategori: "Denetim",
+                baslik: "🔧 Düzeltici Faaliyet Formu",
+                aciklama: "AS9100 10.2 maddesi için düzeltici faaliyet formu.",
+                icerik: `
+                    <h1>DÜZELTİCİ FAALİYET FORMU</h1>
+                    <table>
+                        <tr><td><strong>Form No:</strong></td><td>DF-2026-001</td><td><strong>Tarih:</strong></td><td>[Tarih]</td></tr>
+                        <tr><td><strong>Açan:</strong></td><td>[Ad Soyad]</td><td><strong>Birim:</strong></td><td>[Birim]</td></tr>
+                    </table>
+                    <h2>1. UYGUNSUZLUK TANIMI</h2>
+                    <div class="bos-alan">[Uygunsuzluğun detaylı tanımı]</div>
+                    <p><strong>Kaynak:</strong> ☐ İç Denetim &nbsp; ☐ Dış Denetim &nbsp; ☐ Müşteri Şikayeti &nbsp; ☐ Diğer</p>
+                    <h2>2. ACİL DÜZELTME</h2>
+                    <div class="bos-alan">[Uygunsuzluğun hemen giderilmesi için yapılanlar]</div>
+                    <h2>3. KÖK NEDEN ANALİZİ</h2>
+                    <p><strong>Yöntem:</strong> ☐ 5 Neden &nbsp; ☐ Balık Kılçığı &nbsp; ☐ Diğer</p>
+                    <div class="bos-alan">[Kök neden analizi sonucu]</div>
+                    <h2>4. DÜZELTİCİ FAALİYET PLANI</h2>
+                    <table>
+                        <tr><th>No</th><th>Faaliyet</th><th>Sorumlu</th><th>Termin</th><th>Durum</th></tr>
+                        <tr><td>1</td><td></td><td></td><td></td><td>☐</td></tr>
+                        <tr><td>2</td><td></td><td></td><td></td><td>☐</td></tr>
+                    </table>
+                    <h2>5. ETKİNLİK DEĞERLENDİRMESİ</h2>
+                    <p><strong>Faaliyet etkin mi?</strong> ☐ Evet &nbsp; ☐ Hayır</p>
+                    <p><strong>Kapatma Tarihi:</strong> [Tarih]</p>
+                    <h2>6. İMZALAR</h2>
+                    <table>
+                        <tr><th>Açan</th><th>Uygulayan</th><th>Onaylayan</th></tr>
+                        <tr><td style="height: 60px;"></td><td></td><td></td></tr>
+                    </table>
+                `
+            },
+
+            // ==================== İNSAN KAYNAĞI ====================
+            {
+                id: "yetkinlik-matrisi",
+                kategori: "İnsan Kaynağı",
+                baslik: "👥 Personel Yetkinlik Matrisi",
+                aciklama: "Personelin yetkinliklerini takip etmek için matris.",
+                icerik: `
+                    <h1>PERSONEL YETKİNLİK MATRİSİ</h1>
+                    <p><strong>Revizyon:</strong> 01 | <strong>Tarih:</strong> [Tarih]</p>
+                    <h2>1. YETKİNLİK SEVİYELERİ</h2>
+                    <table>
+                        <tr><th>Seviye</th><th>Tanım</th></tr>
+                        <tr><td>1</td><td>Temel bilgi</td></tr>
+                        <tr><td>2</td><td>Gözetim altında yapabilir</td></tr>
+                        <tr><td>3</td><td>Bağımsız yapabilir</td></tr>
+                        <tr><td>4</td><td>Eğitim verebilir</td></tr>
+                    </table>
+                    <h2>2. YETKİNLİK MATRİSİ</h2>
+                    <table>
+                        <tr><th>Personel</th><th>CNC</th><th>Kaynak</th><th>Kalite Kontrol</th><th>Ölçüm</th><th>Forklift</th></tr>
+                        <tr><td></td><td>3</td><td>2</td><td>—</td><td>2</td><td>3</td></tr>
+                        <tr><td></td><td>4</td><td>—</td><td>3</td><td>4</td><td>—</td></tr>
+                        <tr><td></td><td>2</td><td>3</td><td>2</td><td>—</td><td>2</td></tr>
+                    </table>
+                    <h2>3. EĞİTİM İHTİYACI</h2>
+                    <table>
+                        <tr><th>Personel</th><th>Eksik Yetkinlik</th><th>Planlanan Eğitim</th><th>Termin</th></tr>
+                        <tr><td></td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>4. SERTİFİKALAR</h2>
+                    <table>
+                        <tr><th>Personel</th><th>Sertifika</th><th>Geçerlilik Tarihi</th></tr>
+                        <tr><td></td><td>Kaynakçı</td><td></td></tr>
+                        <tr><td></td><td>Forklift</td><td></td></tr>
+                    </table>
+                `
+            },
+            {
+                id: "egitim-kaydi",
+                kategori: "İnsan Kaynağı",
+                baslik: "🎓 Eğitim Kayıt Formu",
+                aciklama: "Personel eğitimlerinin kayıt altına alınması.",
+                icerik: `
+                    <h1>EĞİTİM KAYIT FORMU</h1>
+                    <table>
+                        <tr><td><strong>Eğitim No:</strong></td><td>EK-2026-001</td><td><strong>Tarih:</strong></td><td>[Tarih]</td></tr>
+                        <tr><td><strong>Eğitim Konusu:</strong></td><td colspan="3">[Konu]</td></tr>
+                    </table>
+                    <h2>1. EĞİTİM BİLGİSİ</h2>
+                    <table>
+                        <tr><td><strong>Eğitmen:</strong></td><td>[Ad Soyad]</td><td><strong>Süre:</strong></td><td>[Saat]</td></tr>
+                        <tr><td><strong>Yer:</strong></td><td>[Yer]</td><td><strong>Tür:</strong></td><td>☐ İç ☐ Dış</td></tr>
+                    </table>
+                    <h2>2. KATILIMCILAR</h2>
+                    <table>
+                        <tr><th>No</th><th>Ad Soyad</th><th>Departman</th><th>İmza</th></tr>
+                        <tr><td>1</td><td></td><td></td><td></td></tr>
+                        <tr><td>2</td><td></td><td></td><td></td></tr>
+                        <tr><td>3</td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>3. EĞİTİM İÇERİĞİ</h2>
+                    <div class="bos-alan">[Eğitim konuları]</div>
+                    <h2>4. DEĞERLENDİRME</h2>
+                    <p><strong>Değerlendirme Yöntemi:</strong> ☐ Sınav ☐ Uygulama ☐ Gözlem</p>
+                    <p><strong>Başarı Kriteri:</strong> [Kriter]</p>
+                    <table>
+                        <tr><th>Ad Soyad</th><th>Puan</th><th>Sonuç</th></tr>
+                        <tr><td></td><td></td><td>☐ Başarılı ☐ Başarısız</td></tr>
+                    </table>
+                    <p style="margin-top: 30px;"><strong>Eğitmen İmza:</strong> _________ | <strong>İK Onay:</strong> _________</p>
+                `
+            },
+
+            // ==================== TASARIM VE AR-GE ====================
+            {
+                id: "tasarim-girdileri",
+                kategori: "Tasarım ve Ar-Ge",
+                baslik: "✏️ Tasarım Girdileri Formu",
+                aciklama: "AS9100 8.3 maddesi için tasarım girdileri formu.",
+                icerik: `
+                    <h1>TASARIM GİRDİLERİ FORMU</h1>
+                    <table>
+                        <tr><td><strong>Proje No:</strong></td><td>TG-2026-001</td><td><strong>Tarih:</strong></td><td>[Tarih]</td></tr>
+                        <tr><td><strong>Proje Adı:</strong></td><td colspan="3">[Proje adı]</td></tr>
+                    </table>
+                    <h2>1. MÜŞTERİ GEREKSİNİMLERİ</h2>
+                    <div class="bos-alan">[Müşterinin fonksiyonel ve performans gereksinimleri]</div>
+                    <h2>2. YASAL VE DÜZENLEYİCİ GEREKSİNİMLER</h2>
+                    <div class="bos-alan">[İlgili yasalar, standartlar, sertifikasyon gereksinimleri]</div>
+                    <h2>3. ÖNCEKİ BENZER TASARIMLARDAN EDİNİLEN BİLGİLER</h2>
+                    <div class="bos-alan">[Varsa benzer projelerden alınan dersler]</div>
+                    <h2>4. STANDARTLAR VE SPESİFİKASYONLAR</h2>
+                    <ul>
+                        <li>AS9100 Rev D</li>
+                        <li>[Diğer standartlar]</li>
+                    </ul>
+                    <h2>5. TEMEL GÜVENLİK GEREKSİNİMLERİ</h2>
+                    <div class="bos-alan">[Ürün güvenliği ile ilgili gereksinimler]</div>
+                    <h2>6. TASARIM GİRDİLERİNİN GÖZDEN GEÇİRİLMESİ</h2>
+                    <table>
+                        <tr><th>Girdi</th><th>Yeterli mi?</th><th>Not</th></tr>
+                        <tr><td>Müşteri gereksinimleri</td><td>☐ Evet ☐ Hayır</td><td></td></tr>
+                        <tr><td>Yasal gereksinimler</td><td>☐ Evet ☐ Hayır</td><td></td></tr>
+                        <tr><td>Standartlar</td><td>☐ Evet ☐ Hayır</td><td></td></tr>
+                    </table>
+                    <p style="margin-top: 30px;"><strong>Hazırlayan:</strong> _________ | <strong>Onaylayan:</strong> _________</p>
+                `
+            },
+            {
+                id: "fmea",
+                kategori: "Tasarım ve Ar-Ge",
+                baslik: "⚠️ FMEA Şablonu",
+                aciklama: "Hata Türü ve Etkileri Analizi (FMEA) şablonu.",
+                icerik: `
+                    <h1>FMEA (HATA TÜRÜ VE ETKİLERİ ANALİZİ)</h1>
+                    <p><strong>FMEA No:</strong> FMEA-2026-001 | <strong>Tarih:</strong> [Tarih]</p>
+                    <p><strong>Tür:</strong> ☐ Tasarım FMEA (DFMEA) &nbsp; ☐ Süreç FMEA (PFMEA)</p>
+                    <h2>1. FMEA EKİBİ</h2>
+                    <table>
+                        <tr><th>Ad Soyad</th><th>Departman</th><th>Rol</th></tr>
+                        <tr><td></td><td></td><td>Lider</td></tr>
+                        <tr><td></td><td></td><td>Üye</td></tr>
+                    </table>
+                    <h2>2. DEĞERLENDİRME KRİTERLERİ</h2>
+                    <p><strong>Şiddet (S):</strong> 1 (Etkisiz) - 10 (Tehlikeli)</p>
+                    <p><strong>Olasılık (O):</strong> 1 (Çok düşük) - 10 (Çok yüksek)</p>
+                    <p><strong>Tespit (D):</strong> 1 (Kesin tespit) - 10 (Tespit edilemez)</p>
+                    <p><strong>RPN = S × O × D</strong></p>
+                    <h2>3. FMEA TABLOSU</h2>
+                    <table>
+                        <tr>
+                            <th>No</th><th>Hata Türü</th><th>Etki</th><th>S</th>
+                            <th>Neden</th><th>O</th><th>Kontrol</th><th>D</th>
+                            <th>RPN</th><th>Aksiyon</th>
+                        </tr>
+                        <tr><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>3</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>4. YÜKSEK RİSKLİ HATA TÜRLERİ (RPN > 100)</h2>
+                    <table>
+                        <tr><th>Hata Türü</th><th>RPN</th><th>Sorumlu</th><th>Termin</th><th>Yeni RPN</th></tr>
+                        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                    </table>
+                    <h2>5. SONUÇ</h2>
+                    <div class="bos-alan">[Genel değerlendirme ve öneriler]</div>
+                `
+            }
+        ];
+        // Sidebar'ı oluştur
+        function sidebarOlustur() {
+            const kategoriler = {};
+            SABLONLAR.forEach(s => {
+                if (!kategoriler[s.kategori]) kategoriler[s.kategori] = [];
+                kategoriler[s.kategori].push(s);
+            });
+
+            let html = '';
+            for (const [katAdi, sablonlar] of Object.entries(kategoriler)) {
+                html += '<div class="kategori">';
+                html += '<div class="kategori-adi">' + katAdi + '</div>';
+                sablonlar.forEach(s => {
+                    html += '<a class="sablon-link" data-id="' + s.id + '" onclick="sablonGoster(\'' + s.id + '\')">' + s.baslik + '</a>';
+                });
+                html += '</div>';
+            }
+            document.getElementById('sidebarIcerik').innerHTML = html;
+        }
+
+        // Şablon göster
+        function sablonGoster(id) {
+            const sablon = SABLONLAR.find(s => s.id === id);
+            if (!sablon) return;
+
+            // Aktif link
+            document.querySelectorAll('.sablon-link').forEach(l => l.classList.remove('aktif'));
+            document.querySelector('.sablon-link[data-id="' + id + '"]').classList.add('aktif');
+
+                        let html = '';
+            html += '<div class="sablon-baslik">' + sablon.baslik + '</div>';
+            html += '<div class="sablon-aciklama">' + sablon.aciklama + '</div>';
+            html += '<div class="sablon-aksiyon">';
+            html += '<button class="btn-pdf" onclick="window.print()">📄 PDF Olarak İndir / Yazdır</button>';
+            html += '<button class="btn-pdf" style="background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); margin-left: 10px;" onclick="wordIndir(\'' + sablon.id + '\')">📥 Word Olarak İndir</button>';
+            html += '</div>';
+            html += '<div class="sablon-icerik">' + sablon.icerik + '</div>';
+            document.getElementById('sablonIcerik').innerHTML = html;
+        }
+
+                  function wordIndir(sablonId) {
+            const sablon = SABLONLAR.find(s => s.id === sablonId);
+            if (!sablon) return;
+
+            const htmlIcerik = 
+                '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+                'xmlns:w="urn:schemas-microsoft-com:office:word" ' +
+                'xmlns="http://www.w3.org/TR/REC-html40">' +
+                '<head>' +
+                '<meta charset="UTF-8">' +
+                '<title>' + sablon.baslik + '</title>' +
+                '<style>' +
+                'body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #000; }' +
+                'h1 { font-size: 18pt; color: #0a1929; border-bottom: 2px solid #0077b6; padding-bottom: 8px; }' +
+                'h2 { font-size: 14pt; color: #0077b6; margin-top: 20px; }' +
+                'h3 { font-size: 12pt; color: #1a3a5c; }' +
+                'p { margin: 8px 0; }' +
+                'table { border-collapse: collapse; width: 100%; margin: 12px 0; }' +
+                'th { background: #0077b6; color: white; padding: 8px; text-align: left; border: 1px solid #005a8c; }' +
+                'td { padding: 8px; border: 1px solid #ddd; }' +
+                '.bos-alan { background: #f9f9f9; padding: 12px; border: 1px dashed #999; margin: 10px 0; }' +
+                '.not { background: #fff9e6; border-left: 4px solid #f0ad4e; padding: 12px; margin: 12px 0; }' +
+                'ul, ol { margin: 10px 0; padding-left: 25px; }' +
+                'li { margin-bottom: 6px; }' +
+                '</style>' +
+                '</head>' +
+                '<body>' +
+                sablon.icerik +
+                '</body>' +
+                '</html>';
+
+            const blob = new Blob([htmlIcerik], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            
+            const dosyaAdi = sablon.baslik
+                .replace(/[📌📘📁🗂️📊🔧🔍🌡️📈🏷️📋📏🚚👥🎓✏️⚠️]/g, '')
+                .replace(/^\s+/, '')
+                .replace(/\s+/g, '_') + '.doc';
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = dosyaAdi;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            alert('📥 Word dosyası indirildi: ' + dosyaAdi + '\n\nAçarken "Farklı Kaydet" uyarısı çıkabilir. "Evet" deyin.');
+        }
+
+        // Başlangıç
+        window.addEventListener('DOMContentLoaded', () => {
+            const kullaniciStr = localStorage.getItem('kullanici');
+            if (!kullaniciStr) {
+                window.location.href = 'giris.html';
+                return;
+            }
+            sidebarOlustur();
+        });
+    </script>
+</body>
+</html>

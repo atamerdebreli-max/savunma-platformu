@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Denetim Simülasyonu</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: block !important; padding: 0 !important; }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .panel-baslik {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .geri-btn {
+            background: rgba(0, 180, 216, 0.2);
+            color: #00b4d8;
+            border: 1px solid #00b4d8;
+            padding: 8px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .geri-btn:hover { background: #00b4d8; color: white; }
+
+        .chat-kapsayici {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-mesajlar {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .mesaj {
+            max-width: 80%;
+            padding: 14px 18px;
+            border-radius: 15px;
+            font-size: 15px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .mesaj.ai {
+            background: rgba(0, 180, 216, 0.15);
+            color: #d1e3f0;
+            border-left: 4px solid #00b4d8;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        .mesaj.kullanici {
+            background: rgba(74, 222, 128, 0.15);
+            color: #d1fae5;
+            border-right: 4px solid #4ade80;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        .mesaj.sistem {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fef3c7;
+            align-self: center;
+            font-size: 14px;
+            text-align: center;
+            max-width: 90%;
+            border-left: 4px solid #fbbf24;
+        }
+        .mesaj-rol {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            opacity: 0.8;
+        }
+        .mesaj.ai .mesaj-rol { color: #00b4d8; }
+        .mesaj.kullanici .mesaj-rol { color: #4ade80; }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 14px 18px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 15px;
+        }
+        .chat-input input:focus {
+            outline: none;
+            border-color: #00b4d8;
+        }
+        .chat-input button {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .chat-input button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,180,216,0.4);
+        }
+        .chat-input button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .yukleniyor-mesaj {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            color: #6b8ba3;
+            font-style: italic;
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00b4d8;
+            animation: pulse 1.4s infinite ease-in-out;
+        }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse {
+            0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+            40% { opacity: 1; transform: scale(1); }
+        }
+
+        .baslangic-ekrani {
+            text-align: center;
+            padding: 60px 30px;
+        }
+        .baslangic-ekrani h2 {
+            color: #00b4d8;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        .baslangic-ekrani p {
+            color: #a8c5e0;
+            margin-bottom: 30px;
+            font-size: 15px;
+            line-height: 1.6;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .basla-btn {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        .basla-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,180,216,0.4);
+        }
+
+        .uyari-kutu {
+            background: rgba(251, 191, 36, 0.1);
+            border-left: 4px solid #fbbf24;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            color: #fef3c7;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .mesaj { max-width: 95%; font-size: 14px; }
+            .chat-kapsayici { height: 500px; }
+            .panel-baslik { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 900px;">
+        <div class="panel-header">
+            <div class="panel-baslik">🎯 Denetim Simülasyonu</div>
+            <a href="panel.html" class="geri-btn">← Panele Dön</a>
+        </div>
+
+        <div id="baslangicEkrani">
+            <div class="baslangic-ekrani">
+                <h2>🤖 AI Denetçi ile Prova Yapın</h2>
+                <p>
+                    Gerçek AS9100 denetimine girmeden önce, yapay zeka denetçimizle prova yapın.<br>
+                    AI denetçi size AS9100 maddelerinden sorular soracak, cevaplarınızı değerlendirecek ve denetim özeti verecek.
+                </p>
+
+                <div class="uyari-kutu" style="text-align: left;">
+                    <strong>⚠️ Önemli:</strong> Bu bir simülasyondur. Resmi sertifikasyon denetimi yerine geçmez. Gerçek denetim, akredite belgelendirme kuruluşu tarafından yapılır.
+                </div>
+
+                <button class="basla-btn" onclick="denetimBasla()">
+                    🚀 Denetimi Başlat
+                </button>
+            </div>
+        </div>
+
+        <div id="chatEkrani" style="display: none;">
+            <div class="chat-kapsayici">
+                <div class="chat-mesajlar" id="chatMesajlar"></div>
+                <div class="chat-input" id="chatInputAlani">
+                    <input type="text" id="mesajInput" 
+                           placeholder="Cevabınızı yazın..." 
+                           onkeypress="if(event.key==='Enter') mesajGonder()">
+                    <button id="gonderBtn" onclick="mesajGonder()">Gönder</button>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 15px;">
+                <button class="geri-btn" onclick="denetimBitir()" style="background: rgba(239,68,68,0.2); color: #ef4444; border-color: #ef4444;">
+                    ⏹️ Denetimi Bitir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let mesajlar = [];
+        let sirketAdi = "";
+        let aiBekliyor = false;
+        let denetimBitti = false;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const kullaniciStr = localStorage.getItem('kullanici');
+            if (!kullaniciStr) {
+                window.location.href = 'giris.html';
+                return;
+            }
+            try {
+                const kullanici = JSON.parse(kullaniciStr);
+                sirketAdi = kullanici.sirket_adi || "KOBİ";
+            } catch (e) {
+                window.location.href = 'giris.html';
+            }
+        });
+
+        function denetimBasla() {
+            document.getElementById('baslangicEkrani').style.display = 'none';
+            document.getElementById('chatEkrani').style.display = 'block';
+            aiMesajGonder();
+        }
+
+        async function aiMesajGonder() {
+            if (aiBekliyor) return;
+            aiBekliyor = true;
+
+            // Yükleniyor göstergesi
+            const yukleniyorDiv = document.createElement('div');
+            yukleniyorDiv.className = 'yukleniyor-mesaj';
+            yukleniyorDiv.id = 'yukleniyorGosterge';
+            yukleniyorDiv.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div> AI Denetçi düşünüyor...';
+            document.getElementById('chatMesajlar').appendChild(yukleniyorDiv);
+            scrollToBottom();
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/denetim-mesaj', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mesajlar: mesajlar,
+                        sirket_adi: sirketAdi
+                    })
+                });
+
+                const data = await response.json();
+
+                // Yükleniyor kaldır
+                document.getElementById('yukleniyorGosterge').remove();
+
+                if (!data.basarili) {
+                    mesajEkle('sistem', '❌ Hata: ' + (data.hata || 'Bilinmeyen hata'));
+                    aiBekliyor = false;
+                    return;
+                }
+
+                // AI mesajını ekle
+                mesajlar.push({ role: "assistant", content: data.mesaj });
+                mesajEkle('ai', data.mesaj);
+
+                                // Özet geldiyse denetimi bitir
+                if (data.ozet_mi) {
+                    denetimBitti = true;
+                    document.getElementById('chatInputAlani').innerHTML = 
+                        '<div style="text-align: center; width: 100%; padding: 15px;">' +
+                        '<div style="color: #4ade80; font-weight: 700; font-size: 18px; margin-bottom: 10px;">' +
+                        '✅ Denetim tamamlandı!' +
+                        '</div>' +
+                        '<div style="color: #a8c5e0; font-size: 14px; margin-bottom: 15px;">' +
+                        'Yukarıdaki özeti inceleyin. Yeni bir denetim için aşağıdaki butona tıklayın.' +
+                        '</div>' +
+                        '<button onclick="window.location.reload()" ' +
+                        'style="background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%); ' +
+                        'color: white; border: none; padding: 12px 30px; border-radius: 50px; ' +
+                        'font-size: 15px; font-weight: 600; cursor: pointer;">' +
+                        '🔄 Yeni Denetim Başlat' +
+                        '</button>' +
+                        '</div>';
+                }
+
+            } catch (error) {
+                if (document.getElementById('yukleniyorGosterge')) {
+                    document.getElementById('yukleniyorGosterge').remove();
+                }
+                mesajEkle('sistem', '❌ Bağlantı hatası: ' + error.message);
+            }
+
+            aiBekliyor = false;
+        }
+
+        async function mesajGonder() {
+            if (aiBekliyor || denetimBitti) return;
+
+            const input = document.getElementById('mesajInput');
+            const mesaj = input.value.trim();
+            if (!mesaj) return;
+
+            // Kullanıcı mesajını ekle
+            mesajlar.push({ role: "user", content: mesaj });
+            mesajEkle('kullanici', mesaj);
+            input.value = '';
+
+            // AI'dan cevap al
+            await aiMesajGonder();
+        }
+
+        function mesajEkle(rol, icerik) {
+            const div = document.createElement('div');
+            div.className = 'mesaj ' + rol;
+
+            let rolEtiketi = '';
+            if (rol === 'ai') rolEtiketi = '<div class="mesaj-rol">🤖 AI Denetçi</div>';
+            else if (rol === 'kullanici') rolEtiketi = '<div class="mesaj-rol">👤 Siz</div>';
+
+            div.innerHTML = rolEtiketi + escapeHtml(icerik);
+            document.getElementById('chatMesajlar').appendChild(div);
+            scrollToBottom();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function scrollToBottom() {
+            const chat = document.getElementById('chatMesajlar');
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function denetimBitir() {
+            if (confirm('Denetimi bitirmek istediğinizden emin misiniz?')) {
+                window.location.href = 'panel.html';
+            }
+        }
+    </script>
+</body>
+</html>

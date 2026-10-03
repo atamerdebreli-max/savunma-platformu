@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raporlarım</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: block !important; padding: 0 !important; }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .panel-baslik {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .geri-btn {
+            background: rgba(0, 180, 216, 0.2);
+            color: #00b4d8;
+            border: 1px solid #00b4d8;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        .geri-btn:hover {
+            background: #00b4d8;
+            color: white;
+        }
+        .rapor-kart {
+            background: rgba(255,255,255,0.05);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #00b4d8;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .rapor-kart:hover {
+            background: rgba(0, 180, 216, 0.1);
+            transform: translateX(5px);
+        }
+        .rapor-bilgi h3 {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .rapor-bilgi p {
+            color: #a8c5e0;
+            font-size: 14px;
+            margin: 4px 0;
+        }
+        .rapor-skor {
+            font-size: 36px;
+            font-weight: bold;
+        }
+        .skor-iyi { color: #4ade80; }
+        .skor-orta { color: #fbbf24; }
+        .skor-zayif { color: #ef4444; }
+        .bos-mesaj {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a8c5e0;
+        }
+        .bos-mesaj h3 {
+            color: #00b4d8;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="panel-header">
+            <div class="panel-baslik">Raporlarım</div>
+            <a href="panel.html" class="geri-btn">← Panele Dön</a>
+        </div>
+
+        <div id="karsilastirma" style="display: none;"></div>
+
+        <div id="yukleniyor" style="color: #a8c5e0; text-align: center; padding: 40px;">
+            Raporlar yükleniyor...
+        </div>
+
+        <div id="raporlar"></div>
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const kullaniciStr = localStorage.getItem('kullanici');
+
+            if (!kullaniciStr) {
+                window.location.href = 'giris.html';
+                return;
+            }
+
+            try {
+                const kullanici = JSON.parse(kullaniciStr);
+                raporlariYukle(kullanici.email);
+            } catch (e) {
+                window.location.href = 'giris.html';
+            }
+        });
+
+        async function raporlariYukle(email) {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/kullanicinin-degerlendirmeleri?email=' + encodeURIComponent(email));
+                const data = await response.json();
+
+                document.getElementById('yukleniyor').style.display = 'none';
+
+                if (data.toplam === 0) {
+                    document.getElementById('raporlar').innerHTML = 
+                        '<div class="bos-mesaj">' +
+                        '<h3>Henüz raporunuz yok</h3>' +
+                        '<p>İlk assessment\'ınızı yaparak başlayın.</p>' +
+                        '<button onclick="window.location.href=\'assessment-v2.html\'" ' +
+                        'style="margin-top: 20px; background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%); ' +
+                        'color: white; border: none; padding: 12px 30px; ' +
+                        'border-radius: 50px; font-size: 16px; font-weight: 600; cursor: pointer;">' +
+                        'Yeni Assessment Yap' +
+                        '</button>' +
+                        '</div>';
+                    return;
+                }
+
+                // Karşılaştırma göster
+                karsilastirmaGoster(data.kayitlar);
+
+                // Rapor kartları
+                let html = '';
+                data.kayitlar.forEach(kayit => {
+                    let skorSinif = 'skor-orta';
+                    if (kayit.yuzde >= 70) skorSinif = 'skor-iyi';
+                    else if (kayit.yuzde < 40) skorSinif = 'skor-zayif';
+
+                    const tarih = new Date(kayit.olusturma_tarihi).toLocaleDateString('tr-TR', {
+                        year: 'numeric', month: 'long', day: 'numeric',
+                        hour: '2-digit', minute: '2-digit'
+                    });
+
+                    html += '<div class="rapor-kart" onclick="window.location.href=\'gap-raporu.html?id=' + kayit.id + '\'">';
+                    html += '<div class="rapor-bilgi">';
+                    html += '<h3>' + kayit.sirket_adi + '</h3>';
+                    html += '<p>📅 ' + tarih + '</p>';
+                    html += '<p>Toplam Puan: ' + kayit.toplam_puan + ' / ' + kayit.maksimum_puan + '</p>';
+                    html += '</div>';
+                    html += '<div class="rapor-skor ' + skorSinif + '">%' + kayit.yuzde + '</div>';
+                    html += '</div>';
+                });
+
+                document.getElementById('raporlar').innerHTML = html;
+
+            } catch (error) {
+                document.getElementById('yukleniyor').innerHTML = 
+                    '<div style="color: #ef4444;">Hata: ' + error.message + '</div>';
+            }
+        }
+
+        function karsilastirmaGoster(kayitlar) {
+            const kutu = document.getElementById('karsilastirma');
+            
+            if (!kayitlar || kayitlar.length < 2) {
+                kutu.style.display = 'none';
+                return;
+            }
+
+            const son = kayitlar[0];
+            const onceki = kayitlar[1];
+            const fark = son.yuzde - onceki.yuzde;
+
+            let farkRenk = '#a8c5e0';
+            let farkIkon = '➖';
+            let farkMesaj = 'Değişim yok';
+            let farkBg = 'rgba(168, 197, 224, 0.1)';
+
+            if (fark > 0) {
+                farkRenk = '#4ade80';
+                farkIkon = '📈';
+                farkMesaj = 'Tebrikler! ' + fark + ' puan gelişme var.';
+                farkBg = 'rgba(74, 222, 128, 0.1)';
+            } else if (fark < 0) {
+                farkRenk = '#ef4444';
+                farkIkon = '📉';
+                farkMesaj = 'Dikkat! ' + Math.abs(fark) + ' puan gerileme var.';
+                farkBg = 'rgba(239, 68, 68, 0.1)';
+            }
+
+            let html = '<div style="background: rgba(0, 180, 216, 0.08); border: 1px solid rgba(0, 180, 216, 0.3); border-radius: 15px; padding: 25px; margin-bottom: 30px;">';
+            html += '<h3 style="color: #00b4d8; margin-bottom: 20px; font-size: 20px;">📊 İlerlemeniz</h3>';
+            html += '<div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center; margin-bottom: 20px;">';
+            
+            html += '<div style="text-align: center;">';
+            html += '<div style="color: #a8c5e0; font-size: 13px; margin-bottom: 8px;">Önceki Assessment</div>';
+            html += '<div style="color: #ffffff; font-size: 36px; font-weight: bold;">%' + onceki.yuzde + '</div>';
+            html += '<div style="color: #6b8ba3; font-size: 12px; margin-top: 5px;">' + new Date(onceki.olusturma_tarihi).toLocaleDateString('tr-TR') + '</div>';
+            html += '</div>';
+
+            html += '<div style="text-align: center;">';
+            html += '<div style="font-size: 32px;">' + farkIkon + '</div>';
+            html += '<div style="color: ' + farkRenk + '; font-size: 20px; font-weight: bold; margin-top: 5px;">' + (fark > 0 ? '+' : '') + fark + '</div>';
+            html += '</div>';
+
+            html += '<div style="text-align: center;">';
+            html += '<div style="color: #a8c5e0; font-size: 13px; margin-bottom: 8px;">Son Assessment</div>';
+            html += '<div style="color: #ffffff; font-size: 36px; font-weight: bold;">%' + son.yuzde + '</div>';
+            html += '<div style="color: #6b8ba3; font-size: 12px; margin-top: 5px;">' + new Date(son.olusturma_tarihi).toLocaleDateString('tr-TR') + '</div>';
+            html += '</div>';
+
+            html += '</div>';
+
+            html += '<div style="background: ' + farkBg + '; padding: 15px; border-radius: 10px; text-align: center; color: ' + farkRenk + '; font-weight: 600; font-size: 15px;">';
+            html += farkMesaj;
+            html += '</div>';
+
+            html += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; font-size: 14px;">';
+            html += '<div style="color: #a8c5e0;">Toplam Puan: <strong style="color: #ffffff;">' + onceki.toplam_puan + ' → ' + son.toplam_puan + '</strong></div>';
+            html += '<div style="color: #a8c5e0;">Tarih: <strong style="color: #ffffff;">' + new Date(onceki.olusturma_tarihi).toLocaleDateString('tr-TR') + ' → ' + new Date(son.olusturma_tarihi).toLocaleDateString('tr-TR') + '</strong></div>';
+            html += '</div>';
+
+            html += '</div>';
+
+            kutu.innerHTML = html;
+            kutu.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

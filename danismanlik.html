@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danışmanlık Talebi</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .form-kutu { max-width: 550px; margin: 0 auto; }
+        .form-grup { margin-bottom: 20px; text-align: left; }
+        .form-grup label {
+            display: block; color: #a8c5e0; margin-bottom: 8px;
+            font-size: 14px; font-weight: 600;
+        }
+        .form-grup input, .form-grup textarea {
+            width: 100%; padding: 14px; border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: white; font-size: 16px; transition: all 0.3s;
+            font-family: inherit;
+        }
+        .form-grup textarea { min-height: 100px; resize: vertical; }
+        .form-grup input:focus, .form-grup textarea:focus {
+            outline: none; border-color: #00b4d8;
+            background: rgba(255,255,255,0.1);
+        }
+        .form-grup input::placeholder, .form-grup textarea::placeholder {
+            color: #6b8ba3;
+        }
+        .mesaj {
+            padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; font-size: 14px;
+        }
+        .mesaj-basari {
+            background: rgba(74, 222, 128, 0.1);
+            border-left: 4px solid #4ade80; color: #4ade80;
+        }
+        .mesaj-hata {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444; color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-kutu">
+            <h1>Danışmanlık Talebi</h1>
+            <p>Ücretsiz ön görüşme için formu doldurun. En kısa sürede size ulaşacağız.</p>
+
+            <div id="mesaj" style="display: none;"></div>
+
+            <form id="talepForm" onsubmit="talepGonder(event)">
+                <div class="form-grup">
+                    <label>Şirket Adı *</label>
+                    <input type="text" id="sirketAdi" required
+                           placeholder="Örn: Test Makine A.Ş.">
+                </div>
+
+                <div class="form-grup">
+                    <label>E-posta *</label>
+                    <input type="email" id="email" required
+                           placeholder="ornek@sirket.com">
+                </div>
+
+                <div class="form-grup">
+                    <label>Telefon *</label>
+                    <input type="tel" id="telefon" required
+                           placeholder="05XX XXX XX XX">
+                </div>
+
+                <div class="form-grup">
+                    <label>Mesajınız (opsiyonel)</label>
+                    <textarea id="mesajIcerik" 
+                              placeholder="Hangi konuda desteğe ihtiyacınız var?"></textarea>
+                </div>
+
+                <button type="submit" style="width: 100%;">
+                    Talebi Gönder
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const kullaniciStr = localStorage.getItem('kullanici');
+            if (kullaniciStr) {
+                try {
+                    const kullanici = JSON.parse(kullaniciStr);
+                    document.getElementById('sirketAdi').value = kullanici.sirket_adi || '';
+                    document.getElementById('email').value = kullanici.email || '';
+                } catch (e) {}
+            }
+        });
+
+        async function talepGonder(event) {
+            event.preventDefault();
+
+            const sirketAdi = document.getElementById('sirketAdi').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const telefon = document.getElementById('telefon').value.trim();
+            const mesaj = document.getElementById('mesajIcerik').value.trim();
+
+            if (!sirketAdi || !email || !telefon) {
+                mesajGoster('Lütfen zorunlu alanları doldurun.', 'hata');
+                return;
+            }
+
+            mesajGoster('Gönderiliyor...', 'basari');
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/danismanlik-talebi', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sirket_adi: sirketAdi,
+                        email: email,
+                        telefon: telefon,
+                        mesaj: mesaj
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Talep gönderilemedi');
+                }
+
+                mesajGoster('✅ ' + data.mesaj, 'basari');
+                document.getElementById('talepForm').reset();
+
+                setTimeout(() => {
+                    window.location.href = 'panel.html';
+                }, 2500);
+
+            } catch (error) {
+                mesajGoster('❌ Hata: ' + error.message, 'hata');
+            }
+        }
+
+        function mesajGoster(mesaj, tip) {
+            const kutu = document.getElementById('mesaj');
+            kutu.className = 'mesaj mesaj-' + tip;
+            kutu.textContent = mesaj;
+            kutu.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

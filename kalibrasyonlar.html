@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalibrasyon Takibi</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: block !important; padding: 0 !important; }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .panel-baslik {
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .geri-btn {
+            background: rgba(0, 180, 216, 0.2);
+            color: #00b4d8;
+            border: 1px solid #00b4d8;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .geri-btn:hover { background: #00b4d8; color: white; }
+
+        .ozet-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .ozet-kart {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border-left: 5px solid #00b4d8;
+        }
+        .ozet-kart.yesil { border-left-color: #4ade80; }
+        .ozet-kart.sari { border-left-color: #fbbf24; }
+        .ozet-kart.kirmizi { border-left-color: #ef4444; }
+        .ozet-sayi {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .ozet-baslik {
+            font-size: 13px;
+            color: #a8c5e0;
+            margin-top: 6px;
+        }
+
+        .ekle-kart {
+            background: rgba(255,255,255,0.05);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid #00b4d8;
+        }
+        .ekle-kart h3 {
+            color: #00b4d8;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        .form-grup {
+            margin-bottom: 15px;
+        }
+        .form-grup label {
+            display: block;
+            color: #a8c5e0;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .form-grup input,
+        .form-grup select,
+        .form-grup textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        .form-grup input:focus,
+        .form-grup select:focus,
+        .form-grup textarea:focus {
+            outline: none;
+            border-color: #00b4d8;
+        }
+        .form-grup select option { background: #1a3a5c; color: white; }
+
+        .form-satir {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .form-satir-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .ekle-btn {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .ekle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,180,216,0.4);
+        }
+
+        .kalibrasyon-kart {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid #00b4d8;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+        .kalibrasyon-kart:hover { background: rgba(0, 180, 216, 0.08); }
+        .kalibrasyon-kart.yesil { border-left-color: #4ade80; }
+        .kalibrasyon-kart.sari { border-left-color: #fbbf24; }
+        .kalibrasyon-kart.kirmizi { border-left-color: #ef4444; }
+
+        .kalibrasyon-bilgi { flex: 1; }
+        .kalibrasyon-bilgi h4 {
+            color: #ffffff;
+            font-size: 17px;
+            margin-bottom: 6px;
+        }
+        .kalibrasyon-bilgi p {
+            color: #a8c5e0;
+            font-size: 13px;
+            margin: 3px 0;
+        }
+        .durum-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .durum-badge.yesil {
+            background: rgba(74, 222, 128, 0.15);
+            color: #4ade80;
+        }
+        .durum-badge.sari {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+        }
+        .durum-badge.kirmizi {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .kalibrasyon-aksiyon {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .btn-kucuk {
+            background: rgba(0, 180, 216, 0.2);
+            color: #00b4d8;
+            border: 1px solid #00b4d8;
+            padding: 8px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .btn-kucuk:hover { background: #00b4d8; color: white; }
+        .btn-kucuk.kirmizi {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+        .btn-kucuk.kirmizi:hover { background: #ef4444; color: white; }
+
+        .bos-mesaj {
+            text-align: center;
+            padding: 40px 20px;
+            color: #a8c5e0;
+        }
+
+        .mesaj-kutu {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: none;
+            font-size: 14px;
+        }
+        .mesaj-kutu.goster { display: block; }
+        .mesaj-basari {
+            background: rgba(74, 222, 128, 0.1);
+            border-left: 4px solid #4ade80;
+            color: #4ade80;
+        }
+        .mesaj-hata {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            color: #ef4444;
+        }
+
+        .modal-arka {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-arka.goster { display: flex; }
+        .modal-icerik {
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid rgba(0,180,216,0.3);
+        }
+        .modal-icerik h3 {
+            color: #00b4d8;
+            margin-bottom: 20px;
+        }
+        .modal-btnler {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .modal-btnler button { flex: 1; }
+
+        @media (max-width: 768px) {
+            .panel-header { flex-direction: column; gap: 12px; text-align: center; }
+            .panel-baslik { font-size: 20px; }
+            .ozet-grid { grid-template-columns: 1fr; }
+            .form-satir, .form-satir-3 { grid-template-columns: 1fr; }
+            .kalibrasyon-kart { flex-direction: column; }
+            .kalibrasyon-aksiyon { width: 100%; flex-direction: row; }
+            .kalibrasyon-aksiyon button { flex: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 1000px;">
+        <div class="panel-header">
+            <div class="panel-baslik">📏 Kalibrasyon Takibi</div>
+            <a href="panel.html" class="geri-btn">← Panele Dön</a>
+        </div>
+
+        <p style="color: #a8c5e0; margin-bottom: 25px; font-size: 15px;">
+            Ölçüm ekipmanlarınızın kalibrasyon tarihlerini takip edin. AS9100 7.1.5 maddesi gereği tüm ölçüm ekipmanları kalibre edilmelidir.
+        </p>
+
+        <div id="mesajKutu" class="mesaj-kutu"></div>
+
+        <div class="ozet-grid">
+            <div class="ozet-kart yesil">
+                <div class="ozet-sayi" id="gecerliSayi">-</div>
+                <div class="ozet-baslik">✅ Geçerli</div>
+            </div>
+            <div class="ozet-kart sari">
+                <div class="ozet-sayi" id="yaklasiyorSayi">-</div>
+                <div class="ozet-baslik">⚠️ Yaklaşan (30 gün)</div>
+            </div>
+            <div class="ozet-kart kirmizi">
+                <div class="ozet-sayi" id="gecmisSayi">-</div>
+                <div class="ozet-baslik">🔴 Gecikmiş</div>
+            </div>
+        </div>
+
+        <div class="ekle-kart">
+            <h3>➕ Yeni Ekipman Ekle</h3>
+            <div class="form-satir">
+                <div class="form-grup">
+                    <label>Ekipman Adı *</label>
+                    <input type="text" id="ekipmanAdi" placeholder="Örn: Dijital Kumpas">
+                </div>
+                <div class="form-grup">
+                    <label>Marka / Model</label>
+                    <input type="text" id="markaModel" placeholder="Örn: Mitutoyo 500-196">
+                </div>
+            </div>
+            <div class="form-satir">
+                <div class="form-grup">
+                    <label>Seri No</label>
+                    <input type="text" id="seriNo" placeholder="SN-XXXXX">
+                </div>
+                <div class="form-grup">
+                    <label>Konum</label>
+                    <input type="text" id="konum" placeholder="Örn: Kalite Kontrol">
+                </div>
+            </div>
+            <div class="form-satir">
+                <div class="form-grup">
+                    <label>Son Kalibrasyon</label>
+                    <input type="date" id="sonKalibrasyon">
+                </div>
+                <div class="form-grup">
+                    <label>Sonraki Kalibrasyon *</label>
+                    <input type="date" id="sonrakiKalibrasyon">
+                </div>
+            </div>
+            <div class="form-satir">
+                <div class="form-grup">
+                    <label>Kalibrasyon Firması</label>
+                    <input type="text" id="kalibrasyonFirmasi" placeholder="Örn: TSE">
+                </div>
+                <div class="form-grup">
+                    <label>Sertifika No</label>
+                    <input type="text" id="sertifikaNo" placeholder="KAL-2026-001">
+                </div>
+            </div>
+            <div class="form-grup">
+                <label>Notlar (opsiyonel)</label>
+                <input type="text" id="notlar" placeholder="Kısa not">
+            </div>
+            <button class="ekle-btn" onclick="kalibrasyonEkle()">📏 Ekipman Ekle</button>
+        </div>
+
+        <h3 style="color: #00b4d8; margin: 25px 0 15px 0;">📋 Kalibrasyon Listesi</h3>
+        <div id="kalibrasyonListesi">
+            <div class="bos-mesaj">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- Modal: Kalibrasyon Güncelle -->
+    <div class="modal-arka" id="guncelleModal">
+        <div class="modal-icerik">
+            <h3 id="guncelleBaslik">📝 Kalibrasyonu Güncelle</h3>
+            <div class="form-grup">
+                <label>Son Kalibrasyon Tarihi *</label>
+                <input type="date" id="guncelSonKalibrasyon">
+            </div>
+            <div class="form-grup">
+                <label>Sonraki Kalibrasyon Tarihi *</label>
+                <input type="date" id="guncelSonrakiKalibrasyon">
+            </div>
+            <div class="form-grup">
+                <label>Sertifika No</label>
+                <input type="text" id="guncelSertifikaNo" placeholder="KAL-2026-XXX">
+            </div>
+            <div class="modal-btnler">
+                <button class="btn-kucuk kirmizi" onclick="modalKapat()">İptal</button>
+                <button class="btn-kucuk" onclick="kalibrasyonGuncelle()" id="guncelleBtn">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let kullaniciEmail = "";
+        let guncellenecekId = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const kullaniciStr = localStorage.getItem('kullanici');
+            if (!kullaniciStr) {
+                window.location.href = 'giris.html';
+                return;
+            }
+            try {
+                const kullanici = JSON.parse(kullaniciStr);
+                kullaniciEmail = kullanici.email;
+                kalibrasyonlariYukle();
+            } catch (e) {
+                window.location.href = 'giris.html';
+            }
+        });
+
+        async function kalibrasyonlariYukle() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/kalibrasyonlar?email=' + encodeURIComponent(kullaniciEmail));
+                const data = await response.json();
+
+                // Özet sayıları
+                let gecerli = 0, yaklasiyor = 0, gecmis = 0;
+                data.kalibrasyonlar.forEach(k => {
+                    if (k.durum === 'gecerli') gecerli++;
+                    else if (k.durum === 'yaklasiyor') yaklasiyor++;
+                    else if (k.durum === 'gecmis') gecmis++;
+                });
+                document.getElementById('gecerliSayi').textContent = gecerli;
+                document.getElementById('yaklasiyorSayi').textContent = yaklasiyor;
+                document.getElementById('gecmisSayi').textContent = gecmis;
+
+                if (data.toplam === 0) {
+                    document.getElementById('kalibrasyonListesi').innerHTML = 
+                        '<div class="bos-mesaj">Henüz kalibrasyon kaydı yok.<br>Yukarıdaki formu kullanarak ilk ekipmanınızı ekleyin.</div>';
+                    return;
+                }
+
+                let html = '';
+                data.kalibrasyonlar.forEach(k => {
+                    let durumYazi = "";
+                    let durumIkon = "";
+                    if (k.durum === 'gecmis') {
+                        durumYazi = Math.abs(k.gun_fark) + " gün GECİKMİŞ";
+                        durumIkon = "🔴";
+                    } else if (k.durum === 'yaklasiyor') {
+                        durumYazi = k.gun_fark + " gün kaldı";
+                        durumIkon = "⚠️";
+                    } else {
+                        durumYazi = k.gun_fark + " gün kaldı";
+                        durumIkon = "✅";
+                    }
+
+                    html += '<div class="kalibrasyon-kart ' + k.renk + '">';
+                    html += '<div class="kalibrasyon-bilgi">';
+                    html += '<h4>📏 ' + k.ekipman_adi + '</h4>';
+                    if (k.marka_model) html += '<p><strong>Marka:</strong> ' + k.marka_model + '</p>';
+                    if (k.seri_no) html += '<p><strong>Seri No:</strong> ' + k.seri_no + '</p>';
+                    if (k.konum) html += '<p><strong>Konum:</strong> ' + k.konum + '</p>';
+                    html += '<p><strong>Son Kalibrasyon:</strong> ' + (k.son_kalibrasyon || '—') + '</p>';
+                    html += '<p><strong>Sonraki Kalibrasyon:</strong> ' + k.sonraki_kalibrasyon + '</p>';
+                    if (k.kalibrasyon_firmasi) html += '<p><strong>Firma:</strong> ' + k.kalibrasyon_firmasi + '</p>';
+                    if (k.sertifika_no) html += '<p><strong>Sertifika:</strong> ' + k.sertifika_no + '</p>';
+                    html += '<div class="durum-badge ' + k.renk + '">' + durumIkon + ' ' + durumYazi + '</div>';
+                    html += '</div>';
+                    html += '<div class="kalibrasyon-aksiyon">';
+                    html += '<button class="btn-kucuk" onclick="guncelleAc(' + k.id + ', \'' + k.ekipman_adi.replace(/'/g, "\\'") + '\', \'' + (k.son_kalibrasyon || '') + '\', \'' + k.sonraki_kalibrasyon + '\', \'' + (k.sertifika_no || '') + '\')">📝 Güncelle</button>';
+                    html += '<button class="btn-kucuk kirmizi" onclick="kalibrasyonSil(' + k.id + ')">🗑️ Sil</button>';
+                    html += '</div>';
+                    html += '</div>';
+                });
+
+                document.getElementById('kalibrasyonListesi').innerHTML = html;
+            } catch (error) {
+                document.getElementById('kalibrasyonListesi').innerHTML = 
+                    '<div class="bos-mesaj" style="color: #ef4444;">Hata: ' + error.message + '</div>';
+            }
+        }
+
+        async function kalibrasyonEkle() {
+            const ekipmanAdi = document.getElementById('ekipmanAdi').value.trim();
+            const sonrakiKalibrasyon = document.getElementById('sonrakiKalibrasyon').value;
+
+            if (!ekipmanAdi || !sonrakiKalibrasyon) {
+                mesajGoster('Lütfen ekipman adı ve sonraki kalibrasyon tarihini girin.', 'hata');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/kalibrasyon-ekle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        kullanici_email: kullaniciEmail,
+                        ekipman_adi: ekipmanAdi,
+                        marka_model: document.getElementById('markaModel').value.trim(),
+                        seri_no: document.getElementById('seriNo').value.trim(),
+                        konum: document.getElementById('konum').value.trim(),
+                        son_kalibrasyon: document.getElementById('sonKalibrasyon').value,
+                        sonraki_kalibrasyon: sonrakiKalibrasyon,
+                        kalibrasyon_firmasi: document.getElementById('kalibrasyonFirmasi').value.trim(),
+                        sertifika_no: document.getElementById('sertifikaNo').value.trim(),
+                        notlar: document.getElementById('notlar').value.trim()
+                    })
+                });
+
+                if (!response.ok) throw new Error('Ekipman eklenemedi');
+
+                mesajGoster('✅ Ekipman başarıyla eklendi!', 'basari');
+                
+                // Formu temizle
+                document.getElementById('ekipmanAdi').value = '';
+                document.getElementById('markaModel').value = '';
+                document.getElementById('seriNo').value = '';
+                document.getElementById('konum').value = '';
+                document.getElementById('sonKalibrasyon').value = '';
+                document.getElementById('sonrakiKalibrasyon').value = '';
+                document.getElementById('kalibrasyonFirmasi').value = '';
+                document.getElementById('sertifikaNo').value = '';
+                document.getElementById('notlar').value = '';
+                
+                kalibrasyonlariYukle();
+            } catch (error) {
+                mesajGoster('❌ Hata: ' + error.message, 'hata');
+            }
+        }
+
+        function guncelleAc(id, ekipmanAdi, sonKalibrasyon, sonrakiKalibrasyon, sertifikaNo) {
+            guncellenecekId = id;
+            document.getElementById('guncelleBaslik').textContent = '📝 ' + ekipmanAdi + ' - Güncelle';
+            document.getElementById('guncelSonKalibrasyon').value = sonKalibrasyon;
+            document.getElementById('guncelSonrakiKalibrasyon').value = sonrakiKalibrasyon;
+            document.getElementById('guncelSertifikaNo').value = sertifikaNo;
+            document.getElementById('guncelleModal').classList.add('goster');
+        }
+
+        function modalKapat() {
+            document.getElementById('guncelleModal').classList.remove('goster');
+            guncellenecekId = null;
+        }
+
+        async function kalibrasyonGuncelle() {
+            const sonKal = document.getElementById('guncelSonKalibrasyon').value;
+            const sonrakiKal = document.getElementById('guncelSonrakiKalibrasyon').value;
+            const sertifika = document.getElementById('guncelSertifikaNo').value.trim();
+
+            if (!sonKal || !sonrakiKal) {
+                alert('Lütfen tarihleri doldurun.');
+                return;
+            }
+
+            try {
+                const url = 'http://127.0.0.1:8000/kalibrasyon-guncelle/' + guncellenecekId + 
+                    '?son_kalibrasyon=' + encodeURIComponent(sonKal) + 
+                    '&sonraki_kalibrasyon=' + encodeURIComponent(sonrakiKal) + 
+                    '&sertifika_no=' + encodeURIComponent(sertifika);
+                
+                const response = await fetch(url, { method: 'PUT' });
+
+                if (!response.ok) throw new Error('Güncellenemedi');
+
+                mesajGoster('✅ Kalibrasyon güncellendi!', 'basari');
+                modalKapat();
+                kalibrasyonlariYukle();
+            } catch (error) {
+                mesajGoster('❌ Hata: ' + error.message, 'hata');
+            }
+        }
+
+        async function kalibrasyonSil(id) {
+            if (!confirm('Bu ekipmanı silmek istediğinizden emin misiniz?')) return;
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/kalibrasyon-sil/' + id, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    mesajGoster('🗑️ Ekipman silindi.', 'basari');
+                    kalibrasyonlariYukle();
+                }
+            } catch (error) {
+                mesajGoster('❌ Hata: ' + error.message, 'hata');
+            }
+        }
+
+        function mesajGoster(mesaj, tip) {
+            const kutu = document.getElementById('mesajKutu');
+            kutu.className = 'mesaj-kutu goster mesaj-' + tip;
+            kutu.textContent = mesaj;
+            setTimeout(() => {
+                kutu.classList.remove('goster');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+Bu klasör, savunma tedarik zinciri platformu için kodları içerir.

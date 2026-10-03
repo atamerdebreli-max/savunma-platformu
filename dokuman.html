@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Doküman Tarama</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .panel-baslik {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .geri-btn {
+            background: rgba(0, 180, 216, 0.2);
+            color: #00b4d8;
+            border: 1px solid #00b4d8;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .geri-btn:hover { background: #00b4d8; color: white; }
+
+        .upload-alani {
+            background: rgba(255,255,255,0.05);
+            border: 2px dashed rgba(0, 180, 216, 0.5);
+            border-radius: 15px;
+            padding: 60px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 25px;
+        }
+        .upload-alani:hover {
+            background: rgba(0, 180, 216, 0.1);
+            border-color: #00b4d8;
+        }
+        .upload-alani.aktif {
+            background: rgba(0, 180, 216, 0.15);
+            border-color: #00b4d8;
+        }
+        .upload-ikon { font-size: 64px; margin-bottom: 20px; }
+        .upload-baslik {
+            font-size: 20px;
+            color: #ffffff;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .upload-aciklama { color: #a8c5e0; font-size: 14px; }
+
+        .dosya-bilgi {
+            background: rgba(0, 180, 216, 0.1);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #00b4d8;
+        }
+        .dosya-bilgi.goster { display: flex; }
+
+        .input-grup {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-grup label {
+            display: block;
+            color: #a8c5e0;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .input-grup input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 16px;
+        }
+        .input-grup input:focus {
+            outline: none;
+            border-color: #00b4d8;
+        }
+
+        .analiz-sonuc {
+            background: rgba(255,255,255,0.05);
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: left;
+            display: none;
+        }
+        .analiz-sonuc.goster { display: block; }
+
+        .sonuc-bolum {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sonuc-bolum:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+        .sonuc-baslik {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sonuc-baslik.bulunanlar { color: #4ade80; }
+        .sonuc-baslik.eksikler { color: #ef4444; }
+        .sonuc-baslik.oneriler { color: #fbbf24; }
+
+        .sonuc-item {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        .sonuc-item.bulunan {
+            background: rgba(74, 222, 128, 0.08);
+            border-left: 3px solid #4ade80;
+            color: #d1fae5;
+        }
+        .sonuc-item.eksik {
+            background: rgba(239, 68, 68, 0.08);
+            border-left: 3px solid #ef4444;
+            color: #fecaca;
+        }
+        .sonuc-item.oneri {
+            background: rgba(251, 191, 36, 0.08);
+            border-left: 3px solid #fbbf24;
+            color: #fef3c7;
+        }
+
+        .skor-kart {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .skor-deger {
+            font-size: 64px;
+            font-weight: bold;
+            color: white;
+            margin: 10px 0;
+        }
+        .skor-etiket {
+            color: rgba(255,255,255,0.9);
+            font-size: 16px;
+        }
+
+        .yukleniyor {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+        .yukleniyor.goster { display: block; }
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid #00b4d8;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hata-mesaj {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            color: #fecaca;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .hata-mesaj.goster { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 900px;">
+        <div class="panel-header">
+            <div class="panel-baslik">🤖 AI Doküman Tarama</div>
+            <a href="panel.html" class="geri-btn">← Panele Dön</a>
+        </div>
+
+        <p style="color: #a8c5e0; margin-bottom: 30px; text-align: center;">
+            Kalite dokümanınızı yükleyin. Yapay zeka, AS9100 kriterlerine göre analiz edip eksikleri gösterecek.
+        </p>
+
+        <div class="input-grup">
+            <label>Şirket Adı</label>
+            <input type="text" id="sirketAdi" placeholder="Örn: Test Makine A.Ş.">
+        </div>
+
+        <div class="upload-alani" id="uploadAlani" onclick="document.getElementById('dosyaInput').click()">
+            <div class="upload-ikon">📄</div>
+            <div class="upload-baslik">Dosya Yüklemek İçin Tıklayın</div>
+            <div class="upload-aciklama">PDF, DOCX veya TXT — Maksimum 10 MB</div>
+        </div>
+        <input type="file" id="dosyaInput" style="display: none;" accept=".pdf,.docx,.txt" onchange="dosyaSecildi(event)">
+
+        <div class="dosya-bilgi" id="dosyaBilgi">
+            <div>
+                <strong style="color: #00b4d8;">📎 Seçilen dosya:</strong>
+                <span id="dosyaAdi" style="color: #ffffff;"></span>
+            </div>
+            <button onclick="dosyaTemizle()" style="background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; padding: 8px 16px; border-radius: 50px; cursor: pointer; font-size: 13px;">
+                Kaldır
+            </button>
+        </div>
+
+        <button id="analizBtn" onclick="analizEt()" style="width: 100%; display: none;">
+            🔍 Analiz Et
+        </button>
+
+        <div class="hata-mesaj" id="hataMesaj"></div>
+
+        <div class="yukleniyor" id="yukleniyor">
+            <div class="spinner"></div>
+            <div style="color: #a8c5e0;">AI dokümanı analiz ediyor...</div>
+            <div style="color: #6b8ba3; font-size: 14px; margin-top: 10px;">Bu işlem 15-30 saniye sürebilir</div>
+        </div>
+
+        <div class="analiz-sonuc" id="analizSonuc"></div>
+    </div>
+
+    <script>
+        let secilenDosya = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const kullaniciStr = localStorage.getItem('kullanici');
+            if (kullaniciStr) {
+                try {
+                    const k = JSON.parse(kullaniciStr);
+                    document.getElementById('sirketAdi').value = k.sirket_adi || '';
+                } catch (e) {}
+            }
+        });
+
+        function dosyaSecildi(event) {
+            const dosya = event.target.files[0];
+            if (!dosya) return;
+
+            if (dosya.size > 10 * 1024 * 1024) {
+                hataGoster('Dosya boyutu 10 MB\'dan büyük olamaz.');
+                return;
+            }
+
+            secilenDosya = dosya;
+            document.getElementById('dosyaAdi').textContent = dosya.name + ' (' + (dosya.size / 1024).toFixed(1) + ' KB)';
+            document.getElementById('dosyaBilgi').classList.add('goster');
+            document.getElementById('analizBtn').style.display = 'block';
+            document.getElementById('hataMesaj').classList.remove('goster');
+        }
+
+        function dosyaTemizle() {
+            secilenDosya = null;
+            document.getElementById('dosyaInput').value = '';
+            document.getElementById('dosyaBilgi').classList.remove('goster');
+            document.getElementById('analizBtn').style.display = 'none';
+            document.getElementById('analizSonuc').classList.remove('goster');
+        }
+
+        function hataGoster(mesaj) {
+            const kutu = document.getElementById('hataMesaj');
+            kutu.textContent = '❌ ' + mesaj;
+            kutu.classList.add('goster');
+        }
+
+        async function analizEt() {
+            if (!secilenDosya) {
+                hataGoster('Lütfen bir dosya seçin.');
+                return;
+            }
+
+            const sirketAdi = document.getElementById('sirketAdi').value.trim();
+            if (!sirketAdi) {
+                hataGoster('Lütfen şirket adınızı girin.');
+                return;
+            }
+
+            document.getElementById('hataMesaj').classList.remove('goster');
+            document.getElementById('analizSonuc').classList.remove('goster');
+            document.getElementById('yukleniyor').classList.add('goster');
+            document.getElementById('analizBtn').style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('dosya', secilenDosya);
+            formData.append('sirket_adi', sirketAdi);
+                        formData.append('kullanici_email', localStorage.getItem('kullanici') ?
+                JSON.parse(localStorage.getItem('kullanici')).email : '');
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/dokuman-tara', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                document.getElementById('yukleniyor').classList.remove('goster');
+
+                if (!data.basarili) {
+                    hataGoster(data.hata || 'Analiz başarısız oldu.');
+                    document.getElementById('analizBtn').style.display = 'block';
+                    return;
+                }
+
+                sonucGoster(data.sonuc, data.dosya_adi);
+
+            } catch (error) {
+                document.getElementById('yukleniyor').classList.remove('goster');
+                hataGoster('Bağlantı hatası: ' + error.message);
+                document.getElementById('analizBtn').style.display = 'block';
+            }
+        }
+
+        function sonucGoster(sonuc, dosyaAdi) {
+            const skor = sonuc.as9100_uygunluk_skoru || 0;
+            let skorRenk = '#ef4444';
+            if (skor >= 70) skorRenk = '#4ade80';
+            else if (skor >= 40) skorRenk = '#fbbf24';
+
+            let html = '';
+
+            // Skor kartı
+            html += '<div class="skor-kart">';
+            html += '<div class="skor-etiket">AS9100 Uygunluk Skoru</div>';
+            html += '<div class="skor-deger">%' + skor + '</div>';
+            html += '<div class="skor-etiket">📄 ' + dosyaAdi + '</div>';
+            html += '</div>';
+
+            // Genel özet
+            if (sonuc.genel_ozet) {
+                html += '<div class="sonuc-bolum">';
+                html += '<div class="sonuc-baslik" style="color: #00b4d8;">📋 Genel Değerlendirme</div>';
+                html += '<p style="color: #a8c5e0; line-height: 1.6; margin: 0;">' + sonuc.genel_ozet + '</p>';
+                html += '</div>';
+            }
+
+            // Bulunanlar
+            if (sonuc.bulunanlar && sonuc.bulunanlar.length > 0) {
+                html += '<div class="sonuc-bolum">';
+                html += '<div class="sonuc-baslik bulunanlar">✅ Bulunanlar (' + sonuc.bulunanlar.length + ')</div>';
+                sonuc.bulunanlar.forEach(item => {
+                    html += '<div class="sonuc-item bulunan">' + item + '</div>';
+                });
+                html += '</div>';
+            }
+
+            // Eksikler
+            if (sonuc.eksikler && sonuc.eksikler.length > 0) {
+                html += '<div class="sonuc-bolum">';
+                html += '<div class="sonuc-baslik eksikler">❌ Eksikler (' + sonuc.eksikler.length + ')</div>';
+                sonuc.eksikler.forEach(item => {
+                    html += '<div class="sonuc-item eksik">' + item + '</div>';
+                });
+                html += '</div>';
+            }
+
+            // Öneriler
+            if (sonuc.oneriler && sonuc.oneriler.length > 0) {
+                html += '<div class="sonuc-bolum">';
+                html += '<div class="sonuc-baslik oneriler">💡 İyileştirme Önerileri (' + sonuc.oneriler.length + ')</div>';
+                sonuc.oneriler.forEach(item => {
+                    html += '<div class="sonuc-item oneri">' + item + '</div>';
+                });
+                html += '</div>';
+            }
+
+            // CTA
+            html += '<div style="margin-top: 30px; padding: 25px; background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%); border-radius: 15px; text-align: center;">';
+            html += '<h3 style="color: white; margin-bottom: 15px;">Bu eksikleri kapatmak için danışmanlık gerekli</h3>';
+            html += '<p style="color: rgba(255,255,255,0.9); margin-bottom: 20px;">Ücretsiz ön görüşme için bize ulaşın</p>';
+            html += '<button onclick="window.location.href=\'danismanlik.html\'" style="background: white; color: #0077b6; border: none; padding: 12px 30px; border-radius: 50px; font-size: 16px; font-weight: 600; cursor: pointer;">Danışmanlık Talep Et</button>';
+            html += '</div>';
+
+            const kutu = document.getElementById('analizSonuc');
+            kutu.innerHTML = html;
+            kutu.classList.add('goster');
+            kutu.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            document.getElementById('analizBtn').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

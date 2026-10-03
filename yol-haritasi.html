@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sertifikasyon Yol Haritanız</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: block !important; padding: 0 !important; }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .panel-baslik {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .geri-btn {
+            background: rgba(0, 180, 216, 0.2);
+            color: #00b4d8;
+            border: 1px solid #00b4d8;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .geri-btn:hover { background: #00b4d8; color: white; }
+
+        .ilerleme-kart {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .ilerleme-baslik {
+            color: rgba(255,255,255,0.9);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .ilerleme-yuzde {
+            color: white;
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+        .ilerleme-cubugu-buyuk {
+            width: 100%;
+            height: 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .ilerleme-dolgu {
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+        .ilerleme-detay {
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+        }
+
+        .asama {
+            margin-bottom: 40px;
+        }
+        .asama-baslik {
+            color: #00b4d8;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 180, 216, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .asama-sayac {
+            background: rgba(0, 180, 216, 0.2);
+            color: #00b4d8;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .adim {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .adim:hover {
+            background: rgba(0, 180, 216, 0.08);
+            border-color: rgba(0, 180, 216, 0.3);
+        }
+        .adim.tamamlandi {
+            background: rgba(74, 222, 128, 0.08);
+            border-color: rgba(74, 222, 128, 0.3);
+        }
+        .adim.tamamlandi .adim-baslik {
+            text-decoration: line-through;
+            color: #6b8ba3;
+        }
+        .adim-checkbox {
+            width: 26px;
+            height: 26px;
+            min-width: 26px;
+            border: 2px solid #00b4d8;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+            transition: all 0.3s;
+        }
+        .adim.tamamlandi .adim-checkbox {
+            background: #4ade80;
+            border-color: #4ade80;
+        }
+        .adim-checkbox::after {
+            content: "✓";
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            display: none;
+        }
+        .adim.tamamlandi .adim-checkbox::after {
+            display: block;
+        }
+
+        .adim-icerik { flex: 1; }
+        .adim-baslik {
+            color: #ffffff;
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .adim-aciklama {
+            color: #a8c5e0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .yukleniyor {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a8c5e0;
+        }
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid #00b4d8;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tebrik-kart {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 30px;
+            display: none;
+        }
+        .tebrik-kart.goster { display: block; }
+        .tebrik-kart h3 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .tebrik-kart p { color: rgba(255,255,255,0.9); }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 900px;">
+        <div class="panel-header">
+            <div class="panel-baslik">📋 Sertifikasyon Yol Haritanız</div>
+            <a href="panel.html" class="geri-btn">← Panele Dön</a>
+        </div>
+
+        <p style="color: #a8c5e0; text-align: center; margin-bottom: 30px; font-size: 16px;">
+            AS9100 sertifikasyonuna giden yolda adım adım ilerleyin. Her adımı tamamladıkça işaretleyin.
+        </p>
+
+        <div id="yukleniyor" class="yukleniyor">
+            <div class="spinner"></div>
+            <div>Yol haritanız yükleniyor...</div>
+        </div>
+
+        <div id="icerik" style="display: none;"></div>
+    </div>
+
+    <script>
+        let kullaniciEmail = "";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const kullaniciStr = localStorage.getItem('kullanici');
+            if (!kullaniciStr) {
+                window.location.href = 'giris.html';
+                return;
+            }
+
+            try {
+                const kullanici = JSON.parse(kullaniciStr);
+                kullaniciEmail = kullanici.email;
+                yolHaritasiYukle();
+            } catch (e) {
+                window.location.href = 'giris.html';
+            }
+        });
+
+        async function yolHaritasiYukle() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/yol-haritasi/' + encodeURIComponent(kullaniciEmail));
+                const data = await response.json();
+
+                document.getElementById('yukleniyor').style.display = 'none';
+                document.getElementById('icerik').style.display = 'block';
+
+                ekranaYaz(data);
+            } catch (error) {
+                document.getElementById('yukleniyor').innerHTML = 
+                    '<div style="color: #ef4444;">Hata: ' + error.message + '</div>';
+            }
+        }
+
+        function ekranaYaz(data) {
+            let html = '';
+
+            // İlerleme kartı
+            html += '<div class="ilerleme-kart">';
+            html += '<div class="ilerleme-baslik">Toplam İlerleme</div>';
+            html += '<div class="ilerleme-yuzde">%' + data.ilerleme_yuzdesi + '</div>';
+            html += '<div class="ilerleme-cubugu-buyuk">';
+            html += '<div class="ilerleme-dolgu" style="width: ' + data.ilerleme_yuzdesi + '%"></div>';
+            html += '</div>';
+            html += '<div class="ilerleme-detay">' + data.tamamlanan_adim + ' / ' + data.toplam_adim + ' adım tamamlandı</div>';
+            html += '</div>';
+
+            // Aşamalar
+            for (const [asamaAdi, adimlar] of Object.entries(data.asamalar)) {
+                const tamamlananSayisi = adimlar.filter(a => a.tamamlandi).length;
+                
+                html += '<div class="asama">';
+                html += '<div class="asama-baslik">';
+                html += asamaAdi;
+                html += ' <span class="asama-sayac">' + tamamlananSayisi + '/' + adimlar.length + '</span>';
+                html += '</div>';
+
+                adimlar.forEach(adim => {
+                    const tamamlandiSinif = adim.tamamlandi ? 'tamamlandi' : '';
+                    html += '<div class="adim ' + tamamlandiSinif + '" onclick="adimDegistir(\'' + adim.id + '\', ' + adim.tamamlandi + ')">';
+                    html += '<div class="adim-checkbox"></div>';
+                    html += '<div class="adim-icerik">';
+                    html += '<div class="adim-baslik">' + adim.baslik + '</div>';
+                    html += '<div class="adim-aciklama">' + adim.aciklama + '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                });
+
+                html += '</div>';
+            }
+
+            // Tebrik kartı
+            html += '<div id="tebrikKart" class="tebrik-kart">';
+            html += '<h3>🎉 Tebrikler!</h3>';
+            html += '<p>Tüm adımları tamamladınız. Sertifikasyon denetimine hazırsınız!</p>';
+            html += '</div>';
+
+            document.getElementById('icerik').innerHTML = html;
+
+            // Tebrik kartı kontrolü
+            if (data.ilerleme_yuzdesi === 100) {
+                document.getElementById('tebrikKart').classList.add('goster');
+            }
+        }
+
+        async function adimDegistir(adimId, suAnTamamlandi) {
+            try {
+                const endpoint = suAnTamamlandi ? 'geri-al' : 'tamamla';
+                const response = await fetch('http://127.0.0.1:8000/yol-haritasi/' + endpoint + '?email=' + 
+                    encodeURIComponent(kullaniciEmail) + '&adim_id=' + adimId, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    // Sayfayı yenile
+                    yolHaritasiYukle();
+                }
+            } catch (error) {
+                console.error('Hata:', error);
+            }
+        }
+    </script>
+</body>
+</html>

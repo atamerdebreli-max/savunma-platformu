@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiyatlandırma</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .panel-baslik {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .geri-btn {
+            background: rgba(0, 180, 216, 0.2);
+            color: #00b4d8;
+            border: 1px solid #00b4d8;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .geri-btn:hover { background: #00b4d8; color: white; }
+
+        .sayfa-aciklama {
+            color: #a8c5e0;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .plan-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .plan-kart {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .plan-kart:hover {
+            transform: translateY(-5px);
+            border-color: #00b4d8;
+        }
+        .plan-kart.populer {
+            border-color: #00b4d8;
+            background: rgba(0, 180, 216, 0.08);
+            box-shadow: 0 10px 40px rgba(0, 180, 216, 0.2);
+        }
+        .populer-etiket {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .plan-adi {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+        .plan-fiyat {
+            font-size: 42px;
+            font-weight: bold;
+            color: #00b4d8;
+            margin: 15px 0;
+        }
+        .plan-fiyat span {
+            font-size: 16px;
+            color: #a8c5e0;
+            font-weight: normal;
+        }
+        .plan-aciklama {
+            color: #a8c5e0;
+            font-size: 13px;
+            margin-bottom: 20px;
+            min-height: 40px;
+        }
+
+        .plan-ozellikler {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .plan-ozellikler li {
+            padding: 8px 0;
+            color: #ffffff;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .plan-ozellikler li:last-child {
+            border-bottom: none;
+        }
+        .plan-ozellikler li::before {
+            content: "✅ ";
+            color: #4ade80;
+            margin-right: 5px;
+        }
+        .plan-ozellikler li.yok {
+            color: #6b8ba3;
+        }
+        .plan-ozellikler li.yok::before {
+            content: "❌ ";
+            color: #ef4444;
+        }
+
+        .plan-btn {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+        .plan-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 180, 216, 0.5);
+        }
+        .plan-btn.ikincil {
+            background: rgba(255,255,255,0.1);
+            color: #ffffff;
+        }
+        .plan-btn.ikincil:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .sss {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+            text-align: left;
+        }
+        .sss h2 {
+            color: #00b4d8;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .sss-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .sss-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .sss-soru {
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        .sss-cevap {
+            color: #a8c5e0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 900px) {
+            .plan-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .plan-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 1200px;">
+        <div class="panel-header">
+            <div class="panel-baslik">💎 Fiyatlandırma</div>
+            <a href="panel.html" class="geri-btn">← Panele Dön</a>
+        </div>
+
+        <p class="sayfa-aciklama">
+            İhtiyacınıza uygun planı seçin. Kredi kartı gerekmez, istediğiniz zaman iptal edebilirsiniz.
+        </p>
+
+        <div class="plan-grid">
+            <!-- ÜCRETSİZ -->
+            <div class="plan-kart">
+                <div class="plan-adi">Ücretsiz</div>
+                <div class="plan-fiyat">0 <span>TL/ay</span></div>
+                <div class="plan-aciklama">Platformu denemek için</div>
+                <ul class="plan-ozellikler">
+                    <li>1 assessment</li>
+                    <li>Temel gap raporu</li>
+                    <li class="yok">AI doküman tarama</li>
+                    <li class="yok">PDF çıktısı</li>
+                    <li class="yok">Danışmanlık indirimi</li>
+                </ul>
+                <button class="plan-btn ikincil" onclick="planSec('ucretsiz')">
+                    Ücretsiz Başla
+                </button>
+            </div>
+
+            <!-- TEMEL -->
+            <div class="plan-kart">
+                <div class="plan-adi">Temel</div>
+                <div class="plan-fiyat">2.000 <span>TL/ay</span></div>
+                <div class="plan-aciklama">Küçük ve orta ölçekli KOBİ'ler için</div>
+                <ul class="plan-ozellikler">
+                    <li>5 assessment</li>
+                    <li>Detaylı gap raporu</li>
+                    <li class="yok">AI doküman tarama</li>
+                    <li>PDF çıktısı</li>
+                    <li>%10 danışmanlık indirimi</li>
+                </ul>
+                <button class="plan-btn" onclick="planSec('temel')">
+                    Planı Seç
+                </button>
+            </div>
+
+            <!-- PROFESYONEL (POPÜLER) -->
+            <div class="plan-kart populer">
+                <div class="populer-etiket">⭐ EN POPÜLER</div>
+                <div class="plan-adi">Profesyonel</div>
+                <div class="plan-fiyat">5.000 <span>TL/ay</span></div>
+                <div class="plan-aciklama">Sertifikasyon hedefleyen KOBİ'ler için</div>
+                <ul class="plan-ozellikler">
+                    <li>Sınırsız assessment</li>
+                    <li>Detaylı gap raporu</li>
+                    <li>AI doküman tarama (5/ay)</li>
+                    <li>PDF çıktısı</li>
+                    <li>%20 danışmanlık indirimi</li>
+                </ul>
+                <button class="plan-btn" onclick="planSec('profesyonel')">
+                    Planı Seç
+                </button>
+            </div>
+
+            <!-- KURUMSAL -->
+            <div class="plan-kart">
+                <div class="plan-adi">Kurumsal</div>
+                <div class="plan-fiyat">Teklif <span>alın</span></div>
+                <div class="plan-aciklama">Ana yükleniciler ve büyük firmalar için</div>
+                <ul class="plan-ozellikler">
+                    <li>Sınırsız assessment</li>
+                    <li>Sınırsız AI tarama</li>
+                    <li>API erişimi</li>
+                    <li>Özel eğitim</li>
+                    <li>Öncelikli destek</li>
+                </ul>
+                <button class="plan-btn ikincil" onclick="planSec('kurumsal')">
+                    İletişime Geç
+                </button>
+            </div>
+        </div>
+
+        <!-- SSS -->
+        <div class="sss">
+            <h2>Sıkça Sorulan Sorular</h2>
+
+            <div class="sss-item">
+                <div class="sss-soru">💳 Kredi kartı bilgilerim güvende mi?</div>
+                <div class="sss-cevap">Evet. Ödeme altyapısı iyzico/PayTR üzerinden çalışır. Kart bilgileriniz platformumuzda saklanmaz.</div>
+            </div>
+
+            <div class="sss-item">
+                <div class="sss-soru">🔄 İstediğim zaman iptal edebilir miyim?</div>
+                <div class="sss-cevap">Evet. Aboneliğinizi dilediğiniz zaman iptal edebilirsiniz. İptal ettiğinizde bir sonraki fatura dönemine kadar kullanmaya devam edersiniz.</div>
+            </div>
+
+            <div class="sss-item">
+                <div class="sss-soru">🎁 Devlet hibesi ile ödeyebilir miyim?</div>
+                <div class="sss-cevap">Evet. Kalkınma Ajansı AS9100 danışmanlığı için proje başına 750.000 TL'ye kadar %100 destek sağlıyor. Detaylar için bizimle iletişime geçin.</div>
+            </div>
+
+            <div class="sss-item">
+                <div class="sss-soru">📞 Danışmanlık hizmeti fiyata dahil mi?</div>
+                <div class="sss-cevap">Hayır. Danışmanlık ayrıdır. Ancak SaaS abonelerimize %10-20 indirim uygulanır. Danışmanlık paketlerimiz 150.000 - 550.000 TL arasındadır.</div>
+            </div>
+
+            <div class="sss-item">
+                <div class="sss-soru">💼 Fatura kesiyor musunuz?</div>
+                <div class="sss-cevap">Evet. Tüm abonelikler için e-fatura düzenlenir.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+               async function planSec(plan) {
+            const kullaniciStr = localStorage.getItem('kullanici');
+
+            if (!kullaniciStr) {
+                alert('Önce giriş yapmanız gerekiyor.');
+                window.location.href = 'giris.html';
+                return;
+            }
+
+            if (plan === 'kurumsal') {
+                window.location.href = 'danismanlik.html';
+                return;
+            }
+
+            if (plan === 'ucretsiz') {
+                alert('Zaten Ücretsiz plandasınız.');
+                return;
+            }
+
+            const kullanici = JSON.parse(kullaniciStr);
+
+            // Kullanıcıya onay sor
+            const onay = confirm(
+                '💰 ' + plan.toUpperCase() + ' plana geçmek üzeresiniz.\n\n' +
+                'Aylık tutar: ' + (plan === 'temel' ? '2.000 TL' : '5.000 TL') + '\n\n' +
+                'Ödeme sayfasına yönlendirileceksiniz. Onaylıyor musunuz?'
+            );
+
+            if (!onay) return;
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/odeme-baslat?email=' + 
+                    encodeURIComponent(kullanici.email) + '&plan=' + plan, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.basarili && data.payment_page_url) {
+                    // Kullanıcıyı iyzico ödeme sayfasına yönlendir
+                    window.location.href = data.payment_page_url;
+                } else {
+                    alert('❌ Ödeme başlatılamadı: ' + (data.hata || 'Bilinmeyen hata'));
+                }
+            } catch (error) {
+                alert('❌ Bağlantı hatası: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

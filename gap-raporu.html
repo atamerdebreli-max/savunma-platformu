@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gap Raporu</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .kategori-kart {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #666;
+            text-align: left;
+        }
+        .kategori-kart.iyi { border-left-color: #4ade80; }
+        .kategori-kart.orta { border-left-color: #fbbf24; }
+        .kategori-kart.zayif { border-left-color: #ef4444; }
+        
+        .kategori-baslik {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .kategori-ad {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        .kategori-skor {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .skor-iyi { color: #4ade80; }
+        .skor-orta { color: #fbbf24; }
+        .skor-zayif { color: #ef4444; }
+        
+        .ilerleme-cubugu {
+            width: 100%;
+            height: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .ilerleme-dolgu {
+            height: 100%;
+        }
+        .dolgu-iyi { background: #4ade80; }
+        .dolgu-orta { background: #fbbf24; }
+        .dolgu-zayif { background: #ef4444; }
+        
+        .eksik-listesi {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .eksik-item {
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            background: rgba(239,68,68,0.1);
+            border-left: 3px solid #ef4444;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #fca5a5;
+        }
+        
+        .ozet-kart {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .ozet-skor {
+            font-size: 64px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        /* Yazdır butonu */
+        .yazdir-buton {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 180, 216, 0.3);
+            transition: all 0.3s ease;
+        }
+        .yazdir-buton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 180, 216, 0.5);
+        }
+        @media (max-width: 768px) {
+            .kategori-kart {
+                padding: 15px !important;
+                margin-bottom: 15px !important;
+            }
+            .kategori-baslik {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 8px;
+            }
+            .kategori-ad {
+                font-size: 16px !important;
+            }
+            .kategori-skor {
+                font-size: 22px !important;
+            }
+            .ozet-skor {
+                font-size: 48px !important;
+            }
+            .ozet-kart {
+                padding: 20px !important;
+            }
+            .eksik-item {
+                font-size: 13px !important;
+                padding: 6px 10px !important;
+            }
+            .container {
+                padding: 15px !important;
+            }
+            h1 {
+                font-size: 22px !important;
+            }
+            h2 {
+                font-size: 18px !important;
+            }
+            .ilerleme-cubugu {
+                height: 8px !important;
+            }
+        }
+        /* PDF için yazdırma stilleri */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .container {
+                background: white !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+            h1, h2, h3, p, .kategori-ad {
+                color: black !important;
+            }
+            .ozet-kart {
+                background: #f0f0f0 !important;
+                border: 1px solid #ccc !important;
+            }
+            .ozet-kart div {
+                color: black !important;
+            }
+            .kategori-kart {
+                background: #f5f5f5 !important;
+                border: 1px solid #ccc !important;
+                page-break-inside: avoid;
+            }
+            .kategori-kart.iyi { border-left-color: #2e7d32 !important; }
+            .kategori-kart.orta { border-left-color: #f57c00 !important; }
+            .kategori-kart.zayif { border-left-color: #c62828 !important; }
+            .skor-iyi { color: #2e7d32 !important; }
+            .skor-orta { color: #f57c00 !important; }
+            .skor-zayif { color: #c62828 !important; }
+            .eksik-item {
+                background: #ffe5e5 !important;
+                color: #c62828 !important;
+                border-left-color: #c62828 !important;
+            }
+            .ilerleme-cubugu {
+                border: 1px solid #999 !important;
+                background: #e0e0e0 !important;
+            }
+            .yazdir-buton {
+                display: none !important;
+            }
+            .oneri-kutusu {
+                background: #e3f2fd !important;
+                border: 1px solid #1976d2 !important;
+                page-break-inside: avoid;
+            }
+            .oneri-kutusu h3, .oneri-kutusu p {
+                color: #0d47a1 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AS9100/EYDEP Gap Raporu</h1>
+        <p>Kategorilere göre detaylı eksik analiziniz</p>
+
+        <button class="yazdir-buton" onclick="window.print()">
+            📄 PDF Olarak İndir / Yazdır
+        </button>
+
+        <div id="yukleniyor" style="color: #a8c5e0; margin-top: 30px;">
+            Rapor yükleniyor...
+        </div>
+
+        <div id="rapor" style="display: none;"></div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const kayitId = urlParams.get('id');
+
+        if (!kayitId) {
+            document.getElementById('yukleniyor').innerHTML = 
+                '<div style="color: #ef4444;">Hata: Kayıt ID bulunamadı.</div>';
+        } else {
+            raporYukle(kayitId);
+        }
+
+        async function raporYukle(id) {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/gap-analizi/${id}`);
+                
+                if (!response.ok) {
+                    throw new Error('Kayıt bulunamadı (ID: ' + id + ')');
+                }
+                
+                const data = await response.json();
+                raporuGoster(data);
+            } catch (error) {
+                document.getElementById('yukleniyor').innerHTML = 
+                    `<div style="color: #ef4444;">Hata: ${error.message}</div>`;
+            }
+        }
+
+        function raporuGoster(data) {
+            document.getElementById('yukleniyor').style.display = 'none';
+            
+            let genelRenk = 'skor-orta';
+            if (data.genel_yuzde >= 70) genelRenk = 'skor-iyi';
+            else if (data.genel_yuzde < 40) genelRenk = 'skor-zayif';
+
+            let html = `
+                <div class="ozet-kart">
+                    <div style="font-size: 20px; color: #a8c5e0;">${data.sirket_adi}</div>
+                    <div class="ozet-skor ${genelRenk}">%${data.genel_yuzde}</div>
+                    <div style="color: #a8c5e0;">
+                        Toplam Puan: ${data.toplam_puan} / ${data.maksimum_puan}
+                    </div>
+                    <div style="margin-top: 15px; color: #ef4444; font-size: 18px;">
+                        ${data.kritik_eksik_sayisi} kritik eksik tespit edildi
+                    </div>
+                </div>
+
+                <h2 style="color: #00b4d8; margin: 30px 0 20px 0; 
+                           border-bottom: 2px solid #00b4d8; padding-bottom: 10px;">
+                    Kategori Bazlı Analiz
+                </h2>
+            `;
+
+            data.kategoriler.forEach(kat => {
+                let sinif = '';
+                let skorSinif = '';
+                let dolguSinif = '';
+                
+                if (kat.yuzde >= 70) {
+                    sinif = 'iyi';
+                    skorSinif = 'skor-iyi';
+                    dolguSinif = 'dolgu-iyi';
+                } else if (kat.yuzde >= 40) {
+                    sinif = 'orta';
+                    skorSinif = 'skor-orta';
+                    dolguSinif = 'dolgu-orta';
+                } else {
+                    sinif = 'zayif';
+                    skorSinif = 'skor-zayif';
+                    dolguSinif = 'dolgu-zayif';
+                }
+
+                html += `
+                    <div class="kategori-kart ${sinif}">
+                        <div class="kategori-baslik">
+                            <span class="kategori-ad">${kat.kategori}</span>
+                            <span class="kategori-skor ${skorSinif}">%${kat.yuzde}</span>
+                        </div>
+                        <div style="color: #a8c5e0; font-size: 14px;">
+                            ${kat.puan} / ${kat.maksimum} puan — ${kat.durum}
+                        </div>
+                        <div class="ilerleme-cubugu">
+                            <div class="ilerleme-dolgu ${dolguSinif}" style="width: ${kat.yuzde}%"></div>
+                        </div>
+                `;
+
+                if (kat.eksikler.length > 0) {
+                    html += `<div class="eksik-listesi">`;
+                    kat.eksikler.forEach(eksik => {
+                        html += `<div class="eksik-item">⚠️ ${eksik.metin}</div>`;
+                    });
+                    html += `</div>`;
+                }
+
+                html += `</div>`;
+            });
+
+            if (data.kritik_eksikler.length > 0) {
+                html += `
+                    <h2 style="color: #ef4444; margin: 30px 0 20px 0; 
+                               border-bottom: 2px solid #ef4444; padding-bottom: 10px;">
+                        Kritik Eksikler (${data.kritik_eksik_sayisi})
+                    </h2>
+                    <div class="kategori-kart zayif">
+                `;
+                data.kritik_eksikler.forEach(eksik => {
+                    html += `
+                        <div class="eksik-item">
+                            <strong>${eksik.kategori}</strong> — ${eksik.metin}
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            html += `
+                <div class="oneri-kutusu" style="margin-top: 40px; padding: 30px; 
+                            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+                            border-radius: 15px; text-align: center;">
+                    <h3 style="color: white; margin-bottom: 15px;">
+                        Bu eksikleri kapatmak için danışmanlık gerekli
+                    </h3>
+                    <p style="color: rgba(255,255,255,0.9); margin-bottom: 20px;">
+                        Ücretsiz ön görüşme için bize ulaşın
+                    </p>
+                    <button onclick="window.location.href='danismanlik.html'"
+                            style="background: white; color: #0077b6; border: none; 
+                                   padding: 12px 30px; border-radius: 50px; 
+                                   font-size: 16px; font-weight: 600; cursor: pointer;">
+                        Ücretsiz Görüşme Talep Et
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('rapor').innerHTML = html;
+            document.getElementById('rapor').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

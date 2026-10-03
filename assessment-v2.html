@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AS9100/EYDEP Detaylı Değerlendirme</title>
+    <link rel="stylesheet" href="style.css">
+        <style>
+        @media (max-width: 768px) {
+            .soru {
+                padding: 15px !important;
+            }
+            .soru label {
+                font-size: 15px !important;
+                line-height: 1.5 !important;
+            }
+            .secenekler label {
+                padding: 12px 10px !important;
+                font-size: 14px !important;
+                margin-bottom: 8px !important;
+            }
+            h1 {
+                font-size: 22px !important;
+            }
+            h2 {
+                font-size: 18px !important;
+                padding-bottom: 8px !important;
+            }
+            .container {
+                padding: 15px !important;
+            }
+            #sirketAdi {
+                font-size: 16px !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .soru {
+                padding: 12px !important;
+            }
+            .soru label {
+                font-size: 14px !important;
+            }
+            .secenekler label {
+                font-size: 13px !important;
+                padding: 10px 8px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AS9100/EYDEP Detaylı Değerlendirme</h1>
+        <p>Bu form, savunma tedarik zincirine hazır olup olmadığınızı 7 kategoride detaylı olarak ölçer.</p>
+
+        <form id="assessmentForm">
+            <div class="soru">
+                <label>Şirket Adınız:</label>
+                <input type="text" id="sirketAdi" name="sirketAdi"
+                       style="width: 100%; padding: 12px; border-radius: 8px;
+                              border: 1px solid rgba(255,255,255,0.2);
+                              background: rgba(255,255,255,0.05);
+                              color: white; font-size: 16px;"
+                       placeholder="Örn: Test Makine A.Ş.">
+            </div>
+
+            <!-- KATEGORİ 1 -->
+            <h2 style="color: #00b4d8; margin-top: 40px; margin-bottom: 20px; border-bottom: 2px solid #00b4d8; padding-bottom: 10px;">Kategori 1: Kalite Yönetim Sistemi</h2>
+
+            <div class="soru">
+                <label>1. Yazılı bir kalite politikası belgeniz var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru1" value="10"> Evet, yazılı ve imzalı</label>
+                    <label><input type="radio" name="soru1" value="5"> Evet, ama yazılı değil</label>
+                    <label><input type="radio" name="soru1" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>2. Kalite hedefleriniz yazılı ve ölçülebilir mi?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru2" value="10"> Evet, tüm hedefler yazılı ve ölçülebilir</label>
+                    <label><input type="radio" name="soru2" value="5"> Bazı hedefler yazılı</label>
+                    <label><input type="radio" name="soru2" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>3. Kalite el kitabınız var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru3" value="10"> Evet, güncel</label>
+                    <label><input type="radio" name="soru3" value="5"> Var ama güncel değil</label>
+                    <label><input type="radio" name="soru3" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>4. Doküman kontrol prosedürünüz var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru4" value="10"> Evet, yazılı ve uygulanıyor</label>
+                    <label><input type="radio" name="soru4" value="5"> Var ama uygulanmıyor</label>
+                    <label><input type="radio" name="soru4" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>5. Kayıt kontrol prosedürünüz var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru5" value="10"> Evet, yazılı ve uygulanıyor</label>
+                    <label><input type="radio" name="soru5" value="5"> Var ama uygulanmıyor</label>
+                    <label><input type="radio" name="soru5" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>6. Yönetim gözden geçirme toplantıları yapıyor musunuz?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru6" value="10"> Evet, yılda en az bir kez, tutanaklı</label>
+                    <label><input type="radio" name="soru6" value="5"> Bazen, tutanaksız</label>
+                    <label><input type="radio" name="soru6" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>7. İç denetim prosedürünüz var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru7" value="10"> Evet, yazılı ve uygulanıyor</label>
+                    <label><input type="radio" name="soru7" value="5"> Var ama uygulanmıyor</label>
+                    <label><input type="radio" name="soru7" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>8. Düzeltici faaliyet prosedürünüz var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru8" value="10"> Evet, kök neden analizi yapılıyor</label>
+                    <label><input type="radio" name="soru8" value="5"> Var ama kök neden analizi yok</label>
+                    <label><input type="radio" name="soru8" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>9. Önleyici faaliyet prosedürünüz var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru9" value="10"> Evet, risk bazlı</label>
+                    <label><input type="radio" name="soru9" value="5"> Var ama risk bazlı değil</label>
+                    <label><input type="radio" name="soru9" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>10. Kalite kayıtlarınız düzenli olarak saklanıyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru10" value="10"> Evet, dijital sistemle</label>
+                    <label><input type="radio" name="soru10" value="5"> Evet, kağıt üzerinde</label>
+                    <label><input type="radio" name="soru10" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <!-- KATEGORİ 2 -->
+            <h2 style="color: #00b4d8; margin-top: 40px; margin-bottom: 20px; border-bottom: 2px solid #00b4d8; padding-bottom: 10px;">Kategori 2: Üretim Altyapısı</h2>
+
+            <div class="soru">
+                <label>11. Makine parkınızın listesi ve kapasitesi yazılı mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru11" value="10"> Evet, güncel ve detaylı</label>
+                    <label><input type="radio" name="soru11" value="5"> Var ama güncel değil</label>
+                    <label><input type="radio" name="soru11" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>12. Makineleriniz düzenli olarak bakımdan geçiyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru12" value="10"> Evet, planlı bakım programı var</label>
+                    <label><input type="radio" name="soru12" value="5"> Arıza olunca bakım yapılıyor</label>
+                    <label><input type="radio" name="soru12" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>13. Ölçüm ve test ekipmanlarınız kalibre ediliyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru13" value="10"> Evet, düzenli kalibrasyon kaydı var</label>
+                    <label><input type="radio" name="soru13" value="5"> Bazen</label>
+                    <label><input type="radio" name="soru13" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>14. Üretim kapasiteniz belirli mi ve yazılı mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru14" value="10"> Evet, aylık/yıllık kapasite planı var</label>
+                    <label><input type="radio" name="soru14" value="5"> Tahmini olarak biliyoruz</label>
+                    <label><input type="radio" name="soru14" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>15. Üretim süreçleriniz yazılı prosedürlerle tanımlı mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru15" value="10"> Evet, tüm kritik süreçler yazılı</label>
+                    <label><input type="radio" name="soru15" value="5"> Bazı süreçler yazılı</label>
+                    <label><input type="radio" name="soru15" value="0"> Hayır, sözlü olarak yürüyor</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>16. İş talimatları (iş emirleri) yazılı mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru16" value="10"> Evet, her iş için yazılı talimat var</label>
+                    <label><input type="radio" name="soru16" value="5"> Bazı işler için var</label>
+                    <label><input type="radio" name="soru16" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>17. Özel süreçler (ısıl işlem, kaplama, kaynak) için parametre kaydı tutuluyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru17" value="10"> Evet, her parti için kayıt var</label>
+                    <label><input type="radio" name="soru17" value="5"> Bazen tutuluyor</label>
+                    <label><input type="radio" name="soru17" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>18. İlk parça muayenesi (FAI) yapıyor musunuz?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru18" value="10"> Evet, yazılı FAI raporu var</label>
+                    <label><input type="radio" name="soru18" value="5"> Bazen</label>
+                    <label><input type="radio" name="soru18" value="0"> Hayır / FAI nedir bilmiyorum</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>19. Üretim ortamınız (sıcaklık, nem, temizlik) kontrol altında mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru19" value="10"> Evet, ölçülüyor ve kayıt tutuluyor</label>
+                    <label><input type="radio" name="soru19" value="5"> Gözle kontrol ediliyor</label>
+                    <label><input type="radio" name="soru19" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>20. Yabancı madde (FOD) önleme politikanız var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru20" value="10"> Evet, yazılı politika ve uygulama var</label>
+                    <label><input type="radio" name="soru20" value="5"> Farkındayız ama yazılı değil</label>
+                    <label><input type="radio" name="soru20" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <!-- KATEGORİ 3 -->
+            <h2 style="color: #00b4d8; margin-top: 40px; margin-bottom: 20px; border-bottom: 2px solid #00b4d8; padding-bottom: 10px;">Kategori 3: İzlenebilirlik</h2>
+
+            <div class="soru">
+                <label>21. Hammadde girişinden sevkiyata kadar izlenebilirlik kaydı tutuyor musunuz?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru21" value="10"> Evet, dijital sistemle</label>
+                    <label><input type="radio" name="soru21" value="5"> Evet, kağıt üzerinde</label>
+                    <label><input type="radio" name="soru21" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>22. Her ürün için parti/lot numarası takibi yapıyor musunuz?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru22" value="10"> Evet, tüm ürünler için</label>
+                    <label><input type="radio" name="soru22" value="5"> Sadece kritik ürünler için</label>
+                    <label><input type="radio" name="soru22" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>23. Hammadde sertifikalarını (mill cert) saklıyor musunuz?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru23" value="10"> Evet, her parti için dosyalanmış</label>
+                    <label><input type="radio" name="soru23" value="5"> Bazen saklanıyor</label>
+                    <label><input type="radio" name="soru23" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>24. Üretim parametreleri (hız, sıcaklık, basınç) kayıt altına alınıyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru24" value="10"> Evet, otomatik sistemle</label>
+                    <label><input type="radio" name="soru24" value="5"> Evet, manuel olarak</label>
+                    <label><input type="radio" name="soru24" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>25. Hangi parçanın hangi makinede üretildiği kayıtlı mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru25" value="10"> Evet, iş emri ile takip ediliyor</label>
+                    <label><input type="radio" name="soru25" value="5"> Kısmen</label>
+                    <label><input type="radio" name="soru25" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>26. Ölçüm sonuçları kayıt altına alınıyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru26" value="10"> Evet, dijital ölçüm raporu var</label>
+                    <label><input type="radio" name="soru26" value="5"> Evet, kağıt üzerinde</label>
+                    <label><input type="radio" name="soru26" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>27. Kalibrasyon kayıtları izlenebilir mi?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru27" value="10"> Evet, her ekipman için kayıt var</label>
+                    <label><input type="radio" name="soru27" value="5"> Bazı ekipmanlar için var</label>
+                    <label><input type="radio" name="soru27" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>28. Personel yetkinlik kayıtları izlenebilir mi?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru28" value="10"> Evet, her personel için dosya var</label>
+                    <label><input type="radio" name="soru28" value="5"> Kısmen</label>
+                    <label><input type="radio" name="soru28" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>29. Müşteri şikayetleri kayıt altına alınıyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru29" value="10"> Evet, sistematik kayıt var</label>
+                    <label><input type="radio" name="soru29" value="5"> Sözlü olarak takip ediliyor</label>
+                    <label><input type="radio" name="soru29" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>30. Sevkiyat sonrası geri bildirim toplanıyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru30" value="10"> Evet, sistematik geri bildirim var</label>
+                    <label><input type="radio" name="soru30" value="5"> Bazen</label>
+                    <label><input type="radio" name="soru30" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <!-- KATEGORİ 4 -->
+            <h2 style="color: #00b4d8; margin-top: 40px; margin-bottom: 20px; border-bottom: 2px solid #00b4d8; padding-bottom: 10px;">Kategori 4: İnsan Kaynağı</h2>
+
+            <div class="soru">
+                <label>31. Personelinizin yetkinlik belgeleri var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru31" value="10"> Evet, tüm personel için</label>
+                    <label><input type="radio" name="soru31" value="5"> Sadece kritik pozisyonlar için</label>
+                    <label><input type="radio" name="soru31" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>32. Yıllık eğitim planınız var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru32" value="10"> Evet, yazılı ve uygulanıyor</label>
+                    <label><input type="radio" name="soru32" value="5"> Var ama uygulanmıyor</label>
+                    <label><input type="radio" name="soru32" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>33. Eğitim kayıtları düzenli tutuluyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru33" value="10"> Evet, her çalışan için dosya var</label>
+                    <label><input type="radio" name="soru33" value="5"> Kısmen</label>
+                    <label><input type="radio" name="soru33" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>34. İş tanımları yazılı mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru34" value="10"> Evet, tüm pozisyonlar için</label>
+                    <label><input type="radio" name="soru34" value="5"> Bazı pozisyonlar için</label>
+                    <label><input type="radio" name="soru34" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>35. Kritik pozisyonlar için yedek personel planınız var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru35" value="10"> Evet, yazılı plan var</label>
+                    <label><input type="radio" name="soru35" value="5"> Gayri resmi olarak var</label>
+                    <label><input type="radio" name="soru35" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>36. Çalışan memnuniyeti ölçülüyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru36" value="10"> Evet, düzenli anket yapılıyor</label>
+                    <label><input type="radio" name="soru36" value="5"> Bazen</label>
+                    <label><input type="radio" name="soru36" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>37. İş güvenliği eğitimleri düzenli veriliyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru37" value="10"> Evet, yıllık ve kayıtlı</label>
+                    <label><input type="radio" name="soru37" value="5"> Bazen</label>
+                    <label><input type="radio" name="soru37" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>38. Operatör sertifikaları (kaynak, vinç, forklift) güncel mi?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru38" value="10"> Evet, tümü güncel</label>
+                    <label><input type="radio" name="soru38" value="5"> Bazıları güncel</label>
+                    <label><input type="radio" name="soru38" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>39. Personel devir hızı takip ediliyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru39" value="10"> Evet, düzenli ölçülüyor</label>
+                    <label><input type="radio" name="soru39" value="5"> Gayri resmi takip</label>
+                    <label><input type="radio" name="soru39" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>40. Çalışanlara kalite farkındalığı eğitimi veriliyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru40" value="10"> Evet, düzenli eğitim var</label>
+                    <label><input type="radio" name="soru40" value="5"> Bir kez verildi</label>
+                    <label><input type="radio" name="soru40" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <!-- KATEGORİ 5 -->
+            <h2 style="color: #00b4d8; margin-top: 40px; margin-bottom: 20px; border-bottom: 2px solid #00b4d8; padding-bottom: 10px;">Kategori 5: Tasarım ve Ar-Ge</h2>
+
+            <div class="soru">
+                <label>41. Ürün tasarım süreciniz yazılı prosedürlerle tanımlı mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru41" value="10"> Evet, tüm süreç yazılı</label>
+                    <label><input type="radio" name="soru41" value="5"> Kısmen yazılı</label>
+                    <label><input type="radio" name="soru41" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>42. Tasarım girdileri (müşteri istekleri, standartlar) yazılı olarak toplanıyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru42" value="10"> Evet, sistematik olarak</label>
+                    <label><input type="radio" name="soru42" value="5"> Bazen</label>
+                    <label><input type="radio" name="soru42" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>43. Tasarım çıktıları (çizimler, spesifikasyonlar) gözden geçiriliyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru43" value="10"> Evet, her aşamada</label>
+                    <label><input type="radio" name="soru43" value="5"> Sadece son aşamada</label>
+                    <label><input type="radio" name="soru43" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>44. Tasarım değişiklikleri kontrol altında mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru44" value="10"> Evet, yazılı değişiklik prosedürü var</label>
+                    <label><input type="radio" name="soru44" value="5"> Kısmen</label>
+                    <label><input type="radio" name="soru44" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>45. Tasarım doğrulama ve geçerli kılma yapılıyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru45" value="10"> Evet, her proje için</label>
+                    <label><input type="radio" name="soru45" value="5"> Bazı projeler için</label>
+                    <label><input type="radio" name="soru45" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>46. Ar-Ge çalışmalarınız için ayrı bütçe var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru46" value="10"> Evet, yıllık bütçe ayrılıyor</label>
+                    <label><input type="radio" name="soru46" value="5"> Proje bazlı bütçe var</label>
+                    <label><input type="radio" name="soru46" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>47. Tasarım riskleri analiz ediliyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru47" value="10"> Evet, FMEA veya benzeri yöntemle</label>
+                    <label><input type="radio" name="soru47" value="5"> Gayri resmi olarak</label>
+                    <label><input type="radio" name="soru47" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>48. Tasarım ekibiniz yetkin mi?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru48" value="10"> Evet, mühendis kadrosu var</label>
+                    <label><input type="radio" name="soru48" value="5"> Dışarıdan destek alınıyor</label>
+                    <label><input type="radio" name="soru48" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>49. Müşteriyle tasarım gözden geçirme toplantıları yapılıyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru49" value="10"> Evet, düzenli olarak</label>
+                    <label><input type="radio" name="soru49" value="5"> Bazen</label>
+                    <label><input type="radio" name="soru49" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>50. Tasarım kayıtları arşivleniyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru50" value="10"> Evet, dijital arşiv var</label>
+                    <label><input type="radio" name="soru50" value="5"> Kağıt arşiv var</label>
+                    <label><input type="radio" name="soru50" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <!-- KATEGORİ 6 -->
+            <h2 style="color: #00b4d8; margin-top: 40px; margin-bottom: 20px; border-bottom: 2px solid #00b4d8; padding-bottom: 10px;">Kategori 6: Kurumsallaşma</h2>
+
+            <div class="soru">
+                <label>51. Organizasyon şemanız yazılı ve güncel mi?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru51" value="10"> Evet, yazılı ve güncel</label>
+                    <label><input type="radio" name="soru51" value="5"> Var ama güncel değil</label>
+                    <label><input type="radio" name="soru51" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>52. Görev ve sorumluluklar yazılı olarak tanımlı mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru52" value="10"> Evet, tüm pozisyonlar için</label>
+                    <label><input type="radio" name="soru52" value="5"> Bazı pozisyonlar için</label>
+                    <label><input type="radio" name="soru52" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>53. Yönetim gözden geçirme toplantıları düzenli yapılıyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru53" value="10"> Evet, yılda en az bir kez, tutanaklı</label>
+                    <label><input type="radio" name="soru53" value="5"> Bazen, tutanaksız</label>
+                    <label><input type="radio" name="soru53" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>54. Stratejik planınız yazılı mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru54" value="10"> Evet, yazılı ve güncel</label>
+                    <label><input type="radio" name="soru54" value="5"> Var ama güncel değil</label>
+                    <label><input type="radio" name="soru54" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>55. İç iletişim kanallarınız tanımlı mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru55" value="10"> Evet, yazılı prosedür var</label>
+                    <label><input type="radio" name="soru55" value="5"> Gayri resmi olarak</label>
+                    <label><input type="radio" name="soru55" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>56. Kalite politikası tüm çalışanlara duyuruldu mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru56" value="10"> Evet, panolarda ve eğitimlerde</label>
+                    <label><input type="radio" name="soru56" value="5"> Sadece yönetim biliyor</label>
+                    <label><input type="radio" name="soru56" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>57. Müşteri memnuniyeti ölçülüyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru57" value="10"> Evet, düzenli anket yapılıyor</label>
+                    <label><input type="radio" name="soru57" value="5"> Bazen</label>
+                    <label><input type="radio" name="soru57" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>58. Yasal şartlar takip ediliyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru58" value="10"> Evet, sistematik takip var</label>
+                    <label><input type="radio" name="soru58" value="5"> Gayri resmi takip</label>
+                    <label><input type="radio" name="soru58" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>59. Etik davranış politikası var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru59" value="10"> Evet, yazılı ve imzalı</label>
+                    <label><input type="radio" name="soru59" value="5"> Sözlü olarak</label>
+                    <label><input type="radio" name="soru59" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>60. Süreç performansı düzenli ölçülüyor mu?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru60" value="10"> Evet, KPI'lar takip ediliyor</label>
+                    <label><input type="radio" name="soru60" value="5"> Bazı süreçler</label>
+                    <label><input type="radio" name="soru60" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <!-- KATEGORİ 7 -->
+            <h2 style="color: #00b4d8; margin-top: 40px; margin-bottom: 20px; border-bottom: 2px solid #00b4d8; padding-bottom: 10px;">Kategori 7: Tedarikçi Yönetimi</h2>
+
+            <div class="soru">
+                <label>61. Onaylı tedarikçi listeniz var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru61" value="10"> Evet, yazılı ve güncel</label>
+                    <label><input type="radio" name="soru61" value="5"> Var ama güncel değil</label>
+                    <label><input type="radio" name="soru61" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>62. Tedarikçi seçim kriterleriniz yazılı mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru62" value="10"> Evet, yazılı kriterler var</label>
+                    <label><input type="radio" name="soru62" value="5"> Gayri resmi kriterler</label>
+                    <label><input type="radio" name="soru62" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>63. Tedarikçilerinizi düzenli olarak değerlendiriyor musunuz?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru63" value="10"> Evet, yıllık değerlendirme var</label>
+                    <label><input type="radio" name="soru63" value="5"> Bazen</label>
+                    <label><input type="radio" name="soru63" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>64. Tedarikçilerinizden kalite belgeleri talep ediyor musunuz?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru64" value="10"> Evet, tüm tedarikçilerden</label>
+                    <label><input type="radio" name="soru64" value="5"> Sadece kritik tedarikçilerden</label>
+                    <label><input type="radio" name="soru64" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>65. Hammadde giriş kontrolü yapıyor musunuz?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru65" value="10"> Evet, her parti için</label>
+                    <label><input type="radio" name="soru65" value="5"> Bazen</label>
+                    <label><input type="radio" name="soru65" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>66. Tedarikçi sertifikalarını (mill cert, CoC) saklıyor musunuz?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru66" value="10"> Evet, her parti için dosyalanmış</label>
+                    <label><input type="radio" name="soru66" value="5"> Bazen</label>
+                    <label><input type="radio" name="soru66" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>67. Alt tedarikçi performansını ölçüyor musunuz?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru67" value="10"> Evet, düzenli KPI takibi</label>
+                    <label><input type="radio" name="soru67" value="5"> Gayri resmi takip</label>
+                    <label><input type="radio" name="soru67" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>68. Tedarikçi şikayetlerini kayıt altına alıyor musunuz?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru68" value="10"> Evet, sistematik kayıt var</label>
+                    <label><input type="radio" name="soru68" value="5"> Sözlü olarak</label>
+                    <label><input type="radio" name="soru68" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>69. Tedarikçi denetimi yapıyor musunuz?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru69" value="10"> Evet, düzenli denetim var</label>
+                    <label><input type="radio" name="soru69" value="5"> Sadece sorun çıkınca</label>
+                    <label><input type="radio" name="soru69" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <div class="soru">
+                <label>70. Sahte parça önleme politikanız var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru70" value="10"> Evet, yazılı politika ve uygulama var</label>
+                    <label><input type="radio" name="soru70" value="5"> Farkındayız ama yazılı değil</label>
+                    <label><input type="radio" name="soru70" value="0"> Hayır</label>
+                </div>
+            </div>
+
+            <button type="button" onclick="formuGonder()">Değerlendirmeyi Tamamla</button>
+        </form>
+
+        <div id="sonuc" style="margin-top: 30px;"></div>
+    </div>
+
+<script src="assessment.js?v=12"></script>
+</body>
+</html>

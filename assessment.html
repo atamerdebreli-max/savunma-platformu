@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AS9100/EYDEP Öz Değerlendirme</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>AS9100/EYDEP Öz Değerlendirme</h1>
+        <p>Bu form, savunma tedarik zincirine girmeye hazır olup olmadığınızı ölçer.</p>
+        
+        <form id="assessmentForm">
+            <!-- Şirket Adı -->
+            <div class="soru">
+                <label>Şirket Adınız:</label>
+                <input type="text" id="sirketAdi" name="sirketAdi" 
+                       style="width: 100%; padding: 12px; border-radius: 8px; 
+                              border: 1px solid rgba(255,255,255,0.2); 
+                              background: rgba(255,255,255,0.05); 
+                              color: white; font-size: 16px;" 
+                       placeholder="Örn: Test Makine A.Ş.">
+            </div>
+
+            <!-- Soru 1 -->
+            <div class="soru">
+                <label>1. Yazılı bir kalite politikası belgeniz var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru1" value="10"> Evet, yazılı ve imzalı</label>
+                    <label><input type="radio" name="soru1" value="5"> Evet, ama yazılı değil</label>
+                    <label><input type="radio" name="soru1" value="0"> Hayır</label>
+                    <label><input type="radio" name="soru1" value="0"> Bilmiyorum</label>
+                </div>
+            </div>
+
+            <!-- Soru 2 -->
+            <div class="soru">
+                <label>2. Üretim süreçleriniz yazılı prosedürlerle tanımlı mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru2" value="10"> Evet, tüm süreçler yazılı</label>
+                    <label><input type="radio" name="soru2" value="5"> Bazı süreçler yazılı</label>
+                    <label><input type="radio" name="soru2" value="0"> Hayır, sözlü olarak yürüyor</label>
+                    <label><input type="radio" name="soru2" value="0"> Bilmiyorum</label>
+                </div>
+            </div>
+
+            <!-- Soru 3 -->
+            <div class="soru">
+                <label>3. Hammadde girişinden sevkiyata kadar izlenebilirlik kaydı tutuyor musunuz?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru3" value="10"> Evet, dijital sistemle</label>
+                    <label><input type="radio" name="soru3" value="5"> Evet, kağıt üzerinde</label>
+                    <label><input type="radio" name="soru3" value="0"> Hayır</label>
+                    <label><input type="radio" name="soru3" value="0"> Bilmiyorum</label>
+                </div>
+            </div>
+
+            <!-- Soru 4 -->
+            <div class="soru">
+                <label>4. Personelinizin yetkinlik belgeleri var mı?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru4" value="10"> Evet, tüm personel için</label>
+                    <label><input type="radio" name="soru4" value="5"> Sadece kritik pozisyonlar için</label>
+                    <label><input type="radio" name="soru4" value="0"> Hayır</label>
+                    <label><input type="radio" name="soru4" value="0"> Bilmiyorum</label>
+                </div>
+            </div>
+
+            <!-- Soru 5 -->
+            <div class="soru">
+                <label>5. Yıllık iç denetim yapıyor musunuz?</label>
+                <div class="secenekler">
+                    <label><input type="radio" name="soru5" value="10"> Evet, düzenli olarak</label>
+                    <label><input type="radio" name="soru5" value="5"> Bazen</label>
+                    <label><input type="radio" name="soru5" value="0"> Hayır</label>
+                    <label><input type="radio" name="soru5" value="0"> Bilmiyorum</label>
+                </div>
+            </div>
+
+            <button type="button" onclick="formuGonder()">Değerlendirmeyi Tamamla</button>
+        </form>
+
+        <div id="sonuc" style="margin-top: 30px;"></div>
+    </div>
+
+    <script>
+        async function formuGonder() {
+            const form = document.getElementById('assessmentForm');
+            const formData = new FormData(form);
+            let cevaplar = {};
+            let cevaplananSoru = 0;
+
+            // Şirket adını al
+            const sirketAdi = document.getElementById('sirketAdi').value.trim();
+            if (!sirketAdi) {
+                document.getElementById('sonuc').innerHTML = 
+                    '<div style="color: #ef4444;">Lütfen şirket adınızı girin.</div>';
+                return;
+            }
+
+            // Cevapları topla
+            for (let i = 1; i <= 5; i++) {
+                const cevap = formData.get('soru' + i);
+                if (cevap !== null) {
+                    cevaplar['soru' + i] = parseInt(cevap);
+                    cevaplananSoru++;
+                }
+            }
+
+            // Tüm sorular cevaplanmış mı?
+            if (cevaplananSoru < 5) {
+                document.getElementById('sonuc').innerHTML = 
+                    '<div style="color: #ef4444;">Lütfen tüm soruları cevaplayın.</div>';
+                return;
+            }
+
+            document.getElementById('sonuc').innerHTML = 
+                '<div style="color: #a8c5e0;">Kaydediliyor...</div>';
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/degerlendirme', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sirket_adi: sirketAdi,
+                        cevaplar: cevaplar
+                    })
+                });
+
+                const data = await response.json();
+                const kayit = data.kayit;
+
+                let renk = '#ef4444';
+                let mesaj = 'Kritik eksikleriniz var. Danışmanlık gerekli.';
+                
+                if (kayit.yuzde >= 70) {
+                    renk = '#4ade80';
+                    mesaj = 'İyi durumdasınız. Küçük eksikler var.';
+                } else if (kayit.yuzde >= 40) {
+                    renk = '#fbbf24';
+                    mesaj = 'Orta seviyedesiniz. Bazı kritik eksikler var.';
+                }
+
+                document.getElementById('sonuc').innerHTML = `
+                    <div style="color: ${renk}; font-size: 24px; font-weight: bold;">
+                        ${kayit.sirket_adi} — AS9100/EYDEP Hazırlık Skoru: %${kayit.yuzde}
+                    </div>
+                    <div style="color: #a8c5e0; margin-top: 10px;">
+                        ${mesaj}
+                    </div>
+                    <div style="margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                        <strong>Toplam Puan:</strong> ${kayit.toplam_puan} / ${kayit.maksimum_puan}<br>
+                        <strong>Kayıt ID:</strong> ${kayit.id}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('sonuc').innerHTML = 
+                    `<div style="color: #ef4444;">Bağlantı hatası: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

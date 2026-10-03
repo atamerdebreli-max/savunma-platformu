@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hatırlatıcılar</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: block !important; padding: 0 !important; }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .panel-baslik {
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .geri-btn {
+            background: rgba(0, 180, 216, 0.2);
+            color: #00b4d8;
+            border: 1px solid #00b4d8;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .geri-btn:hover { background: #00b4d8; color: white; }
+
+        .ekle-kart {
+            background: rgba(255,255,255,0.05);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid #00b4d8;
+        }
+        .ekle-kart h3 {
+            color: #00b4d8;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        .form-grup {
+            margin-bottom: 15px;
+        }
+        .form-grup label {
+            display: block;
+            color: #a8c5e0;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .form-grup input,
+        .form-grup select,
+        .form-grup textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        .form-grup input:focus,
+        .form-grup select:focus,
+        .form-grup textarea:focus {
+            outline: none;
+            border-color: #00b4d8;
+        }
+        .form-grup select option { background: #1a3a5c; color: white; }
+
+        .form-satir {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .ekle-btn {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .ekle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,180,216,0.4);
+        }
+
+        .hatirlatici-kart {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid #fbbf24;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+        .hatirlatici-bilgi h4 {
+            color: #ffffff;
+            font-size: 17px;
+            margin-bottom: 5px;
+        }
+        .hatirlatici-bilgi p {
+            color: #a8c5e0;
+            font-size: 13px;
+            margin: 3px 0;
+        }
+        .hatirlatici-tarih {
+            color: #fbbf24;
+            font-weight: 600;
+        }
+        .hatirlatici-aksiyon {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .btn-kucuk {
+            background: rgba(0, 180, 216, 0.2);
+            color: #00b4d8;
+            border: 1px solid #00b4d8;
+            padding: 8px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-kucuk:hover { background: #00b4d8; color: white; }
+        .btn-kucuk.kirmizi {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+        .btn-kucuk.kirmizi:hover { background: #ef4444; color: white; }
+
+        .bos-mesaj {
+            text-align: center;
+            padding: 40px 20px;
+            color: #a8c5e0;
+        }
+
+        .mesaj-kutu {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: none;
+            font-size: 14px;
+        }
+        .mesaj-kutu.goster { display: block; }
+        .mesaj-basari {
+            background: rgba(74, 222, 128, 0.1);
+            border-left: 4px solid #4ade80;
+            color: #4ade80;
+        }
+        .mesaj-hata {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            color: #ef4444;
+        }
+
+        @media (max-width: 768px) {
+            .panel-header { flex-direction: column; gap: 12px; text-align: center; }
+            .panel-baslik { font-size: 20px; }
+            .form-satir { grid-template-columns: 1fr; }
+            .hatirlatici-kart { flex-direction: column; align-items: flex-start; }
+            .hatirlatici-aksiyon { width: 100%; }
+            .hatirlatici-aksiyon button { flex: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 900px;">
+        <div class="panel-header">
+            <div class="panel-baslik">🔔 Hatırlatıcılar</div>
+            <a href="panel.html" class="geri-btn">← Panele Dön</a>
+        </div>
+
+        <p style="color: #a8c5e0; margin-bottom: 25px; font-size: 15px;">
+            Denetim, kalibrasyon, eğitim gibi önemli tarihleri hatırlatıcı olarak ekleyin. Sistem size otomatik e-posta gönderecek.
+        </p>
+
+        <div id="mesajKutu" class="mesaj-kutu"></div>
+
+        <div class="ekle-kart">
+            <h3>➕ Yeni Hatırlatıcı Ekle</h3>
+            <div class="form-satir">
+                <div class="form-grup">
+                    <label>Başlık *</label>
+                    <input type="text" id="baslik" placeholder="Örn: AS9100 Denetimi">
+                </div>
+                <div class="form-grup">
+                    <label>Tarih *</label>
+                    <input type="date" id="tarih">
+                </div>
+            </div>
+            <div class="form-satir">
+                <div class="form-grup">
+                    <label>Tip</label>
+                    <select id="tip">
+                        <option value="denetim">🔍 Denetim</option>
+                        <option value="kalibrasyon">📏 Kalibrasyon</option>
+                        <option value="egitim">🎓 Eğitim</option>
+                        <option value="toplanti">👥 Toplantı</option>
+                        <option value="diger">📌 Diğer</option>
+                    </select>
+                </div>
+                <div class="form-grup">
+                    <label>Açıklama (opsiyonel)</label>
+                    <input type="text" id="aciklama" placeholder="Kısa açıklama">
+                </div>
+            </div>
+            <button class="ekle-btn" onclick="hatirlaticiEkle()">🔔 Hatırlatıcı Ekle</button>
+        </div>
+
+        <h3 style="color: #00b4d8; margin: 25px 0 15px 0;">📋 Mevcut Hatırlatıcılar</h3>
+        <div id="hatirlaticiListesi">
+            <div class="bos-mesaj">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <script>
+        let kullaniciEmail = "";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const kullaniciStr = localStorage.getItem('kullanici');
+            if (!kullaniciStr) {
+                window.location.href = 'giris.html';
+                return;
+            }
+            try {
+                const kullanici = JSON.parse(kullaniciStr);
+                kullaniciEmail = kullanici.email;
+                hatirlaticilariYukle();
+            } catch (e) {
+                window.location.href = 'giris.html';
+            }
+        });
+
+        async function hatirlaticilariYukle() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/hatirlaticilar?email=' + encodeURIComponent(kullaniciEmail));
+                const data = await response.json();
+
+                if (data.toplam === 0) {
+                    document.getElementById('hatirlaticiListesi').innerHTML = 
+                        '<div class="bos-mesaj">Henüz hatırlatıcı eklenmemiş.<br>Yukarıdaki formu kullanarak ilk hatırlatıcınızı ekleyin.</div>';
+                    return;
+                }
+
+                let html = '';
+                data.hatirlaticilar.forEach(h => {
+                    const tipIkon = {
+                        'denetim': '🔍',
+                        'kalibrasyon': '📏',
+                        'egitim': '🎓',
+                        'toplanti': '👥',
+                        'diger': '📌'
+                    }[h.tip] || '📌';
+
+                    const tarihObj = new Date(h.tarih);
+                    const bugun = new Date();
+                    const gunFark = Math.ceil((tarihObj - bugun) / (1000 * 60 * 60 * 24));
+                    
+                    let kalanYazi = "";
+                    let kalanRenk = "#a8c5e0";
+                    if (gunFark > 30) {
+                        kalanYazi = gunFark + " gün kaldı";
+                    } else if (gunFark > 0) {
+                        kalanYazi = gunFark + " gün kaldı!";
+                        kalanRenk = "#fbbf24";
+                    } else if (gunFark === 0) {
+                        kalanYazi = "Bugün!";
+                        kalanRenk = "#ef4444";
+                    } else {
+                        kalanYazi = Math.abs(gunFark) + " gün geçti";
+                        kalanRenk = "#ef4444";
+                    }
+
+                    html += '<div class="hatirlatici-kart">';
+                    html += '<div class="hatirlatici-bilgi">';
+                    html += '<h4>' + tipIkon + ' ' + h.baslik + '</h4>';
+                    html += '<p class="hatirlatici-tarih">📅 ' + h.tarih + ' <span style="color: ' + kalanRenk + '; margin-left: 10px;">(' + kalanYazi + ')</span></p>';
+                    if (h.aciklama) html += '<p>' + h.aciklama + '</p>';
+                    html += '</div>';
+                    html += '<div class="hatirlatici-aksiyon">';
+                    html += '<button class="btn-kucuk" onclick="testGonder(' + h.id + ')">📧 Test Gönder</button>';
+                    html += '<button class="btn-kucuk kirmizi" onclick="hatirlaticiSil(' + h.id + ')">🗑️ Sil</button>';
+                    html += '</div>';
+                    html += '</div>';
+                });
+
+                document.getElementById('hatirlaticiListesi').innerHTML = html;
+            } catch (error) {
+                document.getElementById('hatirlaticiListesi').innerHTML = 
+                    '<div class="bos-mesaj" style="color: #ef4444;">Hata: ' + error.message + '</div>';
+            }
+        }
+
+        async function hatirlaticiEkle() {
+            const baslik = document.getElementById('baslik').value.trim();
+            const tarih = document.getElementById('tarih').value;
+            const tip = document.getElementById('tip').value;
+            const aciklama = document.getElementById('aciklama').value.trim();
+
+            if (!baslik || !tarih) {
+                mesajGoster('Lütfen başlık ve tarih girin.', 'hata');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/hatirlatici-ekle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        kullanici_email: kullaniciEmail,
+                        baslik: baslik,
+                        aciklama: aciklama,
+                        tarih: tarih,
+                        tip: tip
+                    })
+                });
+
+                if (!response.ok) throw new Error('Hatırlatıcı eklenemedi');
+
+                mesajGoster('✅ Hatırlatıcı eklendi!', 'basari');
+                document.getElementById('baslik').value = '';
+                document.getElementById('tarih').value = '';
+                document.getElementById('aciklama').value = '';
+                hatirlaticilariYukle();
+            } catch (error) {
+                mesajGoster('❌ Hata: ' + error.message, 'hata');
+            }
+        }
+
+        async function testGonder(id) {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/hatirlatici-test-gonder/' + id, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    mesajGoster('📧 Test e-postası gönderildi! Gmail kutunuzu kontrol edin.', 'basari');
+                } else {
+                    mesajGoster('❌ Test e-postası gönderilemedi.', 'hata');
+                }
+            } catch (error) {
+                mesajGoster('❌ Hata: ' + error.message, 'hata');
+            }
+        }
+
+        async function hatirlaticiSil(id) {
+            if (!confirm('Bu hatırlatıcıyı silmek istediğinizden emin misiniz?')) return;
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/hatirlatici-sil/' + id, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    mesajGoster('🗑️ Hatırlatıcı silindi.', 'basari');
+                    hatirlaticilariYukle();
+                }
+            } catch (error) {
+                mesajGoster('❌ Hata: ' + error.message, 'hata');
+            }
+        }
+
+        function mesajGoster(mesaj, tip) {
+            const kutu = document.getElementById('mesajKutu');
+            kutu.className = 'mesaj-kutu goster mesaj-' + tip;
+            kutu.textContent = mesaj;
+            setTimeout(() => {
+                kutu.classList.remove('goster');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
