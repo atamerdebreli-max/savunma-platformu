@@ -58,17 +58,17 @@ def email_gonder(konu: str, icerik: str):
         msg['Subject'] = konu
         msg.attach(MIMEText(icerik, 'plain', 'utf-8'))
 
-              server = smtplib.SMTP('smtp.gmail.com', 587, timeout=5)
+        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=5)
         server.starttls()
         server.login(gmail_adres, gmail_sifre)
         server.send_message(msg)
         server.quit()
+
         print(f"E-posta gönderildi: {konu}")
         return True
     except Exception as e:
         print(f"E-posta hatası: {e}")
         return False
-
 
 # ==================== FASTAPI ====================
 
@@ -154,7 +154,7 @@ def kayit(girdi: KullaniciKayit, db: Session = Depends(get_db)):
     mevcut = db.query(Kullanici).filter(Kullanici.email == girdi.email).first()
     if mevcut:
         raise HTTPException(status_code=400, detail="Bu email zaten kayıtlı")
-    
+
     yeni = Kullanici(
         email=girdi.email,
         sifre_hash=sifre_hashle(girdi.sifre),
@@ -165,8 +165,7 @@ def kayit(girdi: KullaniciKayit, db: Session = Depends(get_db)):
     db.add(yeni)
     db.commit()
     db.refresh(yeni)
-    
-        
+
     return {
         "mesaj": "Kullanıcı kaydedildi",
         "kullanici": {
