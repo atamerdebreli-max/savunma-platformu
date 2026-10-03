@@ -58,7 +58,7 @@ def email_gonder(konu: str, icerik: str):
         msg['Subject'] = konu
         msg.attach(MIMEText(icerik, 'plain', 'utf-8'))
 
-        server = smtplib.SMTP('smtp.gmail.com', 587)
+              server = smtplib.SMTP('smtp.gmail.com', 587, timeout=5)
         server.starttls()
         server.login(gmail_adres, gmail_sifre)
         server.send_message(msg)
@@ -166,11 +166,7 @@ def kayit(girdi: KullaniciKayit, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(yeni)
     
-    email_gonder(
-        konu=f"Yeni Kayıt: {girdi.sirket_adi}",
-        icerik=f"Yeni KOBİ: {girdi.sirket_adi}\nE-posta: {girdi.email}\n"
-    )
-    
+        
     return {
         "mesaj": "Kullanıcı kaydedildi",
         "kullanici": {
