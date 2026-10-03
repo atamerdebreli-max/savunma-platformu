@@ -117,7 +117,7 @@
 
         async function raporlariYukle(email) {
             try {
-                const response = await fetch('http://127.0.0.1:8000/kullanicinin-degerlendirmeleri?email=' + encodeURIComponent(email));
+                const response = await fetch('/kullanicinin-degerlendirmeleri?email=' + encodeURIComponent(email));
                 const data = await response.json();
 
                 document.getElementById('yukleniyor').style.display = 'none';

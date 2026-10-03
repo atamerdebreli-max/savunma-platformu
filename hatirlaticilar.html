@@ -253,7 +253,7 @@
 
         async function hatirlaticilariYukle() {
             try {
-                const response = await fetch('http://127.0.0.1:8000/hatirlaticilar?email=' + encodeURIComponent(kullaniciEmail));
+                const response = await fetch('/hatirlaticilar?email=' + encodeURIComponent(kullaniciEmail));
                 const data = await response.json();
 
                 if (data.toplam === 0) {
@@ -323,7 +323,7 @@
             }
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/hatirlatici-ekle', {
+                const response = await fetch('/hatirlatici-ekle', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -349,7 +349,7 @@
 
         async function testGonder(id) {
             try {
-                const response = await fetch('http://127.0.0.1:8000/hatirlatici-test-gonder/' + id, {
+                const response = await fetch('/hatirlatici-test-gonder/' + id, {
                     method: 'POST'
                 });
                 
@@ -367,7 +367,7 @@
             if (!confirm('Bu hatırlatıcıyı silmek istediğinizden emin misiniz?')) return;
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/hatirlatici-sil/' + id, {
+                const response = await fetch('/hatirlatici-sil/' + id, {
                     method: 'DELETE'
                 });
 

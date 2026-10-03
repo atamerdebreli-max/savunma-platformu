@@ -314,7 +314,7 @@
                 JSON.parse(localStorage.getItem('kullanici')).email : '');
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/dokuman-tara', {
+                const response = await fetch('/dokuman-tara', {
                     method: 'POST',
                     body: formData
                 });

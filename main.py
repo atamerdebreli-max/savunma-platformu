@@ -970,7 +970,7 @@ def odeme_baslat(email: str, plan: str = "profesyonel"):
             'currency': 'TRY',
             'basketId': 'B' + str(int(datetime.now().timestamp())),
             'paymentGroup': 'PRODUCT',
-            'callbackUrl': 'http://127.0.0.1:8000/odeme-callback',
+            'callbackUrl': '/odeme-callback',
             'enabledInstallments': [1, 2, 3, 6],
             'buyer': {
                 'id': str(kullanici_id),

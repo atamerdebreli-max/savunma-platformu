@@ -234,7 +234,7 @@
 
         async function yolHaritasiYukle() {
             try {
-                const response = await fetch('http://127.0.0.1:8000/yol-haritasi/' + encodeURIComponent(kullaniciEmail));
+                const response = await fetch('/yol-haritasi/' + encodeURIComponent(kullaniciEmail));
                 const data = await response.json();
 
                 document.getElementById('yukleniyor').style.display = 'none';
@@ -301,7 +301,7 @@
         async function adimDegistir(adimId, suAnTamamlandi) {
             try {
                 const endpoint = suAnTamamlandi ? 'geri-al' : 'tamamla';
-                const response = await fetch('http://127.0.0.1:8000/yol-haritasi/' + endpoint + '?email=' + 
+                const response = await fetch('/yol-haritasi/' + endpoint + '?email=' + 
                     encodeURIComponent(kullaniciEmail) + '&adim_id=' + adimId, {
                     method: 'POST'
                 });

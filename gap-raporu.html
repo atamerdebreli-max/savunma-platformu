@@ -222,7 +222,7 @@
 
         async function raporYukle(id) {
             try {
-                const response = await fetch(`http://127.0.0.1:8000/gap-analizi/${id}`);
+                const response = await fetch(`/gap-analizi/${id}`);
                 
                 if (!response.ok) {
                     throw new Error('Kayıt bulunamadı (ID: ' + id + ')');

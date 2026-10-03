@@ -400,7 +400,7 @@
 
         async function kalibrasyonlariYukle() {
             try {
-                const response = await fetch('http://127.0.0.1:8000/kalibrasyonlar?email=' + encodeURIComponent(kullaniciEmail));
+                const response = await fetch('/kalibrasyonlar?email=' + encodeURIComponent(kullaniciEmail));
                 const data = await response.json();
 
                 // Özet sayıları
@@ -471,7 +471,7 @@
             }
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/kalibrasyon-ekle', {
+                const response = await fetch('/kalibrasyon-ekle', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -534,7 +534,7 @@
             }
 
             try {
-                const url = 'http://127.0.0.1:8000/kalibrasyon-guncelle/' + guncellenecekId + 
+                const url = '/kalibrasyon-guncelle/' + guncellenecekId + 
                     '?son_kalibrasyon=' + encodeURIComponent(sonKal) + 
                     '&sonraki_kalibrasyon=' + encodeURIComponent(sonrakiKal) + 
                     '&sertifika_no=' + encodeURIComponent(sertifika);
@@ -555,7 +555,7 @@
             if (!confirm('Bu ekipmanı silmek istediğinizden emin misiniz?')) return;
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/kalibrasyon-sil/' + id, {
+                const response = await fetch('/kalibrasyon-sil/' + id, {
                     method: 'DELETE'
                 });
 

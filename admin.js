@@ -23,7 +23,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function ozetYukle() {
     try {
-        const response = await fetch('http://127.0.0.1:8000/admin/ozet');
+        const response = await fetch('/admin/ozet');
         const data = await response.json();
         document.getElementById('toplamKullanici').textContent = data.toplam_kullanici;
         document.getElementById('toplamAssessment').textContent = data.toplam_assessment;
@@ -43,15 +43,15 @@ async function sekmeGoster(tip, btn) {
 
     try {
         if (tip === 'kullanicilar') {
-            const r = await fetch('http://127.0.0.1:8000/admin/kullanicilar');
+            const r = await fetch('/admin/kullanicilar');
             const data = await r.json();
             kullanicilariGoster(data);
         } else if (tip === 'assessmentlar') {
-            const r = await fetch('http://127.0.0.1:8000/admin/tum-assessmentlar');
+            const r = await fetch('/admin/tum-assessmentlar');
             const data = await r.json();
             assessmentlariGoster(data);
         } else if (tip === 'talepler') {
-            const r = await fetch('http://127.0.0.1:8000/danismanlik-talepleri');
+            const r = await fetch('/danismanlik-talepleri');
             const data = await r.json();
             talepleriGoster(data);
         }
