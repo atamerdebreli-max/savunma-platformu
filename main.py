@@ -1,3 +1,4 @@
+import requests
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -44,32 +45,37 @@ iyzico_options = {
 
 def email_gonder(konu: str, icerik: str):
     try:
-        gmail_adres = os.getenv("GMAIL_ADRESIN")
-        gmail_sifre = os.getenv("GMAIL_UYGULAMA_SIFRESI")
+        api_key = os.getenv("RESEND_API_KEY")
         alici = os.getenv("BILDIRIM_ALICISI")
-
-        if not all([gmail_adres, gmail_sifre, alici]):
+        
+        if not api_key or not alici:
             print("E-posta ayarları eksik.")
             return False
-
-        msg = MIMEMultipart()
-        msg['From'] = gmail_adres
-        msg['To'] = alici
-        msg['Subject'] = konu
-        msg.attach(MIMEText(icerik, 'plain', 'utf-8'))
-
-        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=5)
-        server.starttls()
-        server.login(gmail_adres, gmail_sifre)
-        server.send_message(msg)
-        server.quit()
-
-        print(f"E-posta gönderildi: {konu}")
-        return True
+        
+        response = requests.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "from": "SavunmaPlatform <onboarding@resend.dev>",
+                "to": [alici],
+                "subject": konu,
+                "text": icerik
+            },
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            print(f"E-posta gönderildi: {konu}")
+            return True
+        else:
+            print(f"E-posta hatası: {response.status_code} - {response.text}")
+            return False
     except Exception as e:
         print(f"E-posta hatası: {e}")
         return False
-
 # ==================== FASTAPI ====================
 
 app = FastAPI(

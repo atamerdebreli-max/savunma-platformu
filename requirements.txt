@@ -12,3 +12,4 @@ pypdf
 python-docx
 iyzipay
 psycopg[binary]
+requests
