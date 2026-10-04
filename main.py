@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import OAuth2PasswordRequestForm
@@ -150,7 +150,7 @@ def saglik():
 # ==================== KULLANICI ====================
 
 @app.post("/kayit")
-def kayit(girdi: KullaniciKayit, db: Session = Depends(get_db)):
+def kayit(girdi: KullaniciKayit, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     mevcut = db.query(Kullanici).filter(Kullanici.email == girdi.email).first()
     if mevcut:
         raise HTTPException(status_code=400, detail="Bu email zaten kayıtlı")
@@ -166,6 +166,13 @@ def kayit(girdi: KullaniciKayit, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(yeni)
 
+    # Email'i arka planda gönder (kayıt bloke olmasın)
+    background_tasks.add_task(
+        email_gonder,
+        konu=f"Yeni Kayıt: {girdi.sirket_adi}",
+        icerik=f"Yeni KOBİ kayıt oldu!\n\nŞirket: {girdi.sirket_adi}\nE-posta: {girdi.email}\n"
+    )
+
     return {
         "mesaj": "Kullanıcı kaydedildi",
         "kullanici": {
@@ -173,7 +180,6 @@ def kayit(girdi: KullaniciKayit, db: Session = Depends(get_db)):
             "sirket_adi": yeni.sirket_adi, "rol": yeni.rol, "plan": yeni.plan
         }
     }
-
 @app.post("/giris")
 def giris(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     kullanici = db.query(Kullanici).filter(Kullanici.email == form_data.username).first()
