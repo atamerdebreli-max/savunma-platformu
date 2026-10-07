@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YETEN Portal Yönetimi - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .kapsayici { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 32px; margin-bottom: 10px; }
+        .alt-baslik { color: #a8c5e0; margin-bottom: 30px; }
+
+        .giris-kutu {
+            background: rgba(0,180,216,0.08);
+            border: 1px solid rgba(0,180,216,0.3);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+        .giris-kutu label { display: block; color: #a8c5e0; font-size: 14px; margin-bottom: 8px; }
+        .giris-kutu input {
+            width: 100%;
+            padding: 13px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .giris-kutu button {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            padding: 13px 30px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .ozet-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .ozet-kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+        .ozet-sayi { font-size: 32px; font-weight: 800; margin-bottom: 5px; }
+        .ozet-sayi.iyi { color: #4ade80; }
+        .ozet-sayi.orta { color: #fbbf24; }
+        .ozet-sayi.kotu { color: #ef4444; }
+        .ozet-etiket { color: #a8c5e0; font-size: 13px; }
+
+        .ilerleme-bar {
+            background: rgba(255,255,255,0.08);
+            height: 12px;
+            border-radius: 50px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        .ilerleme-dolgu {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            height: 100%;
+            transition: width 0.5s;
+        }
+
+        .kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .kart h2 { font-size: 18px; margin-bottom: 20px; color: #00b4d8; }
+
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .form-grup { margin-bottom: 15px; }
+        .form-grup label { display: block; color: #a8c5e0; font-size: 13px; margin-bottom: 6px; }
+        .form-grup input, .form-grup textarea, .form-grup select {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+        }
+        .form-grup textarea { min-height: 80px; resize: vertical; }
+        .form-grup select option { background: #0f2742; }
+
+        .btn {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            padding: 14px 35px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 15px;
+            margin-top: 10px;
+        }
+        .btn.ikincil {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .eksik-listesi {
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        .eksik-listesi h3 { color: #ef4444; margin-bottom: 12px; font-size: 15px; }
+        .eksik-listesi ul { list-style: none; padding: 0; }
+        .eksik-listesi li {
+            padding: 6px 0;
+            color: #d1e3f0;
+            font-size: 14px;
+        }
+        .eksik-listesi li:before { content: "⚠️ "; }
+
+        .kopyala-kutu {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+            color: #d1e3f0;
+        }
+
+        .basari {
+            background: rgba(74,222,128,0.1);
+            border: 1px solid rgba(74,222,128,0.3);
+            color: #4ade80;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <a href="panel.html">Panel</a>
+            <a href="egitimler.html">Eğitimler</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici">
+        <h1>YETEN Portal Yönetimi</h1>
+        <p class="alt-baslik">YETEN bilgilerinizi platformda saklayın, güncelleme hatırlatmaları alın, kopyala-yapıştır formatında hazırlayın.</p>
+
+        <div class="giris-kutu" id="giris-kutu">
+            <label>E-posta adresinizi girin:</label>
+            <input type="email" id="email-input" placeholder="ornek@email.com">
+            <button onclick="panelYukle()">Panele Gir</button>
+        </div>
+
+        <div id="panel" style="display:none;">
+            <div class="basari" id="basari"></div>
+
+            <div class="ozet-grid">
+                <div class="ozet-kart">
+                    <div class="ozet-sayi" id="tamamlanma-sayi">0%</div>
+                    <div class="ozet-etiket">Bilgi Tamamlanma</div>
+                </div>
+                <div class="ozet-kart">
+                    <div class="ozet-sayi" id="eksik-sayi">0</div>
+                    <div class="ozet-etiket">Eksik Bilgi</div>
+                </div>
+                <div class="ozet-kart">
+                    <div class="ozet-sayi" id="eydep-seviye">—</div>
+                    <div class="ozet-etiket">EYDEP Seviye</div>
+                </div>
+            </div>
+
+            <div class="ilerleme-bar">
+                <div class="ilerleme-dolgu" id="ilerleme-dolgu" style="width: 0%"></div>
+            </div>
+
+            <div id="eksikler-kutu"></div>
+
+            <div class="kart">
+                <h2>📋 YETEN Bilgileri</h2>
+                <div class="form-grid">
+                    <div class="form-grup">
+                        <label>Firma Adı</label>
+                        <input type="text" id="firma_adi">
+                    </div>
+                    <div class="form-grup">
+                        <label>Vergi No</label>
+                        <input type="text" id="vergi_no">
+                    </div>
+                    <div class="form-grup">
+                        <label>Ticaret Sicil No</label>
+                        <input type="text" id="ticaret_sicil_no">
+                    </div>
+                    <div class="form-grup">
+                        <label>Sektör</label>
+                        <input type="text" id="sektor">
+                    </div>
+                    <div class="form-grup">
+                        <label>Yetkili Adı</label>
+                        <input type="text" id="yetkili_adi">
+                    </div>
+                    <div class="form-grup">
+                        <label>Telefon</label>
+                        <input type="tel" id="telefon">
+                    </div>
+                    <div class="form-grup">
+                        <label>E-posta</label>
+                        <input type="email" id="email">
+                    </div>
+                    <div class="form-grup">
+                        <label>Web Sitesi</label>
+                        <input type="url" id="website">
+                    </div>
+                    <div class="form-grup">
+                        <label>Çalışan Sayısı</label>
+                        <input type="number" id="calisan_sayisi">
+                    </div>
+                    <div class="form-grup">
+                        <label>Mühendis Sayısı</label>
+                        <input type="number" id="muhendis_sayisi">
+                    </div>
+                    <div class="form-grup">
+                        <label>Ar-Ge Personel Sayısı</label>
+                        <input type="number" id="arge_personel_sayisi">
+                    </div>
+                    <div class="form-grup">
+                        <label>Son Yıl Cirosu (TL)</label>
+                        <input type="number" id="ciro_son_yil">
+                    </div>
+                    <div class="form-grup">
+                        <label>2 Yıl Önceki Ciro (TL)</label>
+                        <input type="number" id="ciro_2_yil_once">
+                    </div>
+                    <div class="form-grup">
+                        <label>3 Yıl Önceki Ciro (TL)</label>
+                        <input type="number" id="ciro_3_yil_once">
+                    </div>
+                </div>
+
+                <div class="form-grup">
+                    <label>Makine Parkı</label>
+                    <textarea id="makine_parki" placeholder="Örn: 3x CNC, 2x Torna, 1x CMM..."></textarea>
+                </div>
+                <div class="form-grup">
+                    <label>Sertifikalar</label>
+                    <textarea id="sertifikalar" placeholder="Örn: ISO 9001, AS9100, NADCAP..."></textarea>
+                </div>
+                <div class="form-grup">
+                    <label>Ürünler</label>
+                    <textarea id="urunler" placeholder="Örn: İnsansız hava aracı parçaları, motor bileşenleri..."></textarea>
+                </div>
+                <div class="form-grup">
+                    <label>Ar-Ge Projeleri</label>
+                    <textarea id="arge_projeleri" placeholder="Örn: TÜBİTAK 1501 projesi, SSB Ar-Ge..."></textarea>
+                </div>
+                <div class="form-grup">
+                    <label>Patentler</label>
+                    <textarea id="patentler" placeholder="Örn: 2 adet faydalı model..."></textarea>
+                </div>
+
+                <button class="btn" onclick="bilgileriKaydet()">💾 Bilgileri Kaydet</button>
+                <button class="btn ikincil" onclick="kopyalaFormat()">📋 Kopyala Formatını Gör</button>
+            </div>
+
+            <div class="kart" id="kopyala-kart" style="display:none;">
+                <h2>📋 YETEN Portalına Kopyala-Yapıştır</h2>
+                <p style="color:#a8c5e0; margin-bottom:15px; font-size:14px;">
+                    Aşağıdaki metni kopyalayıp YETEN portalına yapıştırabilirsiniz.
+                </p>
+                <button class="btn" onclick="metniKopyala()">📋 Metni Kopyala</button>
+                <div class="kopyala-kutu" id="kopyala-metin"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+        let mevcutEmail = '';
+
+        async function panelYukle() {
+            const email = document.getElementById('email-input').value.trim();
+            if (!email) {
+                alert('Lütfen e-posta adresinizi girin.');
+                return;
+            }
+
+            mevcutEmail = email;
+            localStorage.setItem('kullanici_email', email);
+
+            try {
+                const r = await fetch(API + '/yeten-bilgi/' + encodeURIComponent(email));
+                const data = await r.json();
+
+                document.getElementById('giris-kutu').style.display = 'none';
+                document.getElementById('panel').style.display = 'block';
+
+                if (data.var) {
+                    const b = data.bilgi;
+                    document.getElementById('firma_adi').value = b.firma_adi || '';
+                    document.getElementById('vergi_no').value = b.vergi_no || '';
+                    document.getElementById('ticaret_sicil_no').value = b.ticaret_sicil_no || '';
+                    document.getElementById('sektor').value = b.sektor || '';
+                    document.getElementById('yetkili_adi').value = b.yetkili_adi || '';
+                    document.getElementById('telefon').value = b.telefon || '';
+                    document.getElementById('email').value = b.email || '';
+                    document.getElementById('website').value = b.website || '';
+                    document.getElementById('calisan_sayisi').value = b.calisan_sayisi || '';
+                    document.getElementById('muhendis_sayisi').value = b.muhendis_sayisi || '';
+                    document.getElementById('arge_personel_sayisi').value = b.arge_personel_sayisi || '';
+                    document.getElementById('ciro_son_yil').value = b.ciro_son_yil || '';
+                    document.getElementById('ciro_2_yil_once').value = b.ciro_2_yil_once || '';
+                    document.getElementById('ciro_3_yil_once').value = b.ciro_3_yil_once || '';
+                    document.getElementById('makine_parki').value = b.makine_parki || '';
+                    document.getElementById('sertifikalar').value = b.sertifikalar || '';
+                    document.getElementById('urunler').value = b.urunler || '';
+                    document.getElementById('arge_projeleri').value = b.arge_projeleri || '';
+                    document.getElementById('patentler').value = b.patentler || '';
+                    document.getElementById('eydep-seviye').textContent = b.eydep_seviye === 'yok' ? '—' : b.eydep_seviye;
+                } else {
+                    document.getElementById('email').value = email;
+                }
+
+                kontrolListesiYukle();
+            } catch (e) {
+                alert('Panel yüklenemedi.');
+            }
+        }
+
+        async function kontrolListesiYukle() {
+            try {
+                const r = await fetch(API + '/yeten-kontrol-listesi/' + encodeURIComponent(mevcutEmail));
+                const data = await r.json();
+
+                if (!data.var) return;
+
+                const tamamlanma = data.tamamlanma || 0;
+                document.getElementById('tamamlanma-sayi').textContent = tamamlanma + '%';
+                document.getElementById('tamamlanma-sayi').className = 'ozet-sayi ' + 
+                    (tamamlanma >= 80 ? 'iyi' : tamamlanma >= 50 ? 'orta' : 'kotu');
+                document.getElementById('eksik-sayi').textContent = data.toplam_eksik || 0;
+                document.getElementById('ilerleme-dolgu').style.width = tamamlanma + '%';
+
+                const eksikler = data.eksikler || {};
+                const toplamEksik = data.toplam_eksik || 0;
+                const eksikKutu = document.getElementById('eksikler-kutu');
+
+                if (toplamEksik === 0) {
+                    eksikKutu.innerHTML = `
+                        <div class="kart" style="background:rgba(74,222,128,0.08); border-color:rgba(74,222,128,0.3);">
+                            <h2 style="color:#4ade80;">✅ Tebrikler! Tüm bilgiler tamamlandı.</h2>
+                            <p style="color:#d1e3f0;">YETEN portalına kopyala-yapıştır formatını kullanabilirsiniz.</p>
+                        </div>
+                    `;
+                } else {
+                    let html = '<div class="eksik-listesi"><h3>⚠️ Eksik Bilgiler (' + toplamEksik + ')</h3>';
+                    for (const [kat, liste] of Object.entries(eksikler)) {
+                        if (liste.length > 0) {
+                            html += `<div style="margin-bottom:12px;"><strong style="color:#00b4d8;">${kat.toUpperCase()}:</strong><ul>`;
+                            liste.forEach(e => html += `<li>${e}</li>`);
+                            html += '</ul></div>';
+                        }
+                    }
+                    html += '</div>';
+                    eksikKutu.innerHTML = html;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function bilgileriKaydet() {
+            const veri = {
+                kullanici_email: mevcutEmail,
+                firma_adi: document.getElementById('firma_adi').value,
+                vergi_no: document.getElementById('vergi_no').value,
+                ticaret_sicil_no: document.getElementById('ticaret_sicil_no').value,
+                sektor: document.getElementById('sektor').value,
+                yetkili_adi: document.getElementById('yetkili_adi').value,
+                telefon: document.getElementById('telefon').value,
+                email: document.getElementById('email').value,
+                website: document.getElementById('website').value,
+                calisan_sayisi: parseInt(document.getElementById('calisan_sayisi').value) || 0,
+                muhendis_sayisi: parseInt(document.getElementById('muhendis_sayisi').value) || 0,
+                arge_personel_sayisi: parseInt(document.getElementById('arge_personel_sayisi').value) || 0,
+                ciro_son_yil: parseFloat(document.getElementById('ciro_son_yil').value) || 0,
+                ciro_2_yil_once: parseFloat(document.getElementById('ciro_2_yil_once').value) || 0,
+                ciro_3_yil_once: parseFloat(document.getElementById('ciro_3_yil_once').value) || 0,
+                makine_parki: document.getElementById('makine_parki').value,
+                sertifikalar: document.getElementById('sertifikalar').value,
+                urunler: document.getElementById('urunler').value,
+                arge_projeleri: document.getElementById('arge_projeleri').value,
+                patentler: document.getElementById('patentler').value
+            };
+
+            try {
+                const r = await fetch(API + '/yeten-bilgi-kaydet', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(veri)
+                });
+                const data = await r.json();
+                if (r.ok) {
+                    const basari = document.getElementById('basari');
+                    basari.textContent = '✅ ' + data.mesaj;
+                    basari.style.display = 'block';
+                    setTimeout(() => basari.style.display = 'none', 3000);
+                    kontrolListesiYukle();
+                }
+            } catch (e) {
+                alert('Kaydedilemedi.');
+            }
+        }
+
+        async function kopyalaFormat() {
+            try {
+                const r = await fetch(API + '/yeten-kopyala-format/' + encodeURIComponent(mevcutEmail));
+                const data = await r.json();
+                if (r.ok) {
+                    document.getElementById('kopyala-kart').style.display = 'block';
+                    document.getElementById('kopyala-metin').textContent = data.metin;
+                    document.getElementById('kopyala-kart').scrollIntoView({behavior: 'smooth'});
+                }
+            } catch (e) {
+                alert('Format alınamadı.');
+            }
+        }
+
+        function metniKopyala() {
+            const metin = document.getElementById('kopyala-metin').textContent;
+            navigator.clipboard.writeText(metin).then(() => {
+                alert('✅ Metin kopyalandı! YETEN portalına yapıştırabilirsiniz.');
+            });
+        }
+
+        document.getElementById('email-input').addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') panelYukle();
+        });
+    </script>
+</body>
+</html>
