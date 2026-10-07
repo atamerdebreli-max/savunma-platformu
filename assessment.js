@@ -89,7 +89,7 @@ async function formuGonder() {
         // Sonuç HTML'i
         let html = '';
         html += '<div style="color: ' + renk + '; font-size: 24px; font-weight: bold;">';
-        html += kayit.sirket_adi + ' — AS9100/EYDEP Hazırlık Skoru: %' + kayit.yuzde;
+        html += kayit.sirket_adi + ' — UyumOS Hazırlık Skoru: %' + kayit.yuzde;
         html += '</div>';
         html += '<div style="color: #a8c5e0; margin-top: 10px;">' + mesaj + '</div>';
         html += '<div style="margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 10px;">';
