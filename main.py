@@ -31,7 +31,12 @@ from openai import OpenAI
 from pypdf import PdfReader
 import docx
 import iyzipay
-
+from database import (
+    Degerlendirme, Kullanici, DanismanlikTalebi, YolHaritasi,
+    Hatirlatici, Kalibrasyon, get_db, SessionLocal,
+    Uzman, Randevu, UzmanOdeme, UzmanYorum,
+    AnaYuklenici
+)
 load_dotenv()
 
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -263,6 +268,12 @@ def degerlendirme_kaydet(girdi: DegerlendirmeGirdi, db: Session = Depends(get_db
         cevaplar=girdi.cevaplar,
         toplam_puan=toplam, maksimum_puan=maks, yuzde=yuzde
     )
+        # EYDEP seviyesini güncelle
+    if girdi.kullanici_email:
+        kullanici = db.query(Kullanici).filter(Kullanici.email == girdi.kullanici_email).first()
+        if kullanici:
+            kullanici.eydep_seviye = eydep_seviye_hesapla(yuzde)
+            kullanici.eydep_skor = yuzde
     db.add(yeni)
     db.commit()
     db.refresh(yeni)
@@ -1439,6 +1450,194 @@ def admin_uzman_onay(uzman_id: int, onay: str = "onayli", db: Session = Depends(
     
     return {"mesaj": f"Uzman durumu '{onay}' olarak güncellendi"}
 
+# ==================== ANA YÜKLENİCİ MODÜLÜ ====================
 
+class AnaYukleniciKayit(BaseModel):
+    sirket_adi: str
+    email: str
+    sifre: str
+    yetkili_adi: str = ""
+    telefon: str = ""
+    website: str = ""
+
+
+def eydep_seviye_hesapla(yuzde: int) -> str:
+    if yuzde >= 85:
+        return "A"
+    elif yuzde >= 70:
+        return "B"
+    elif yuzde >= 50:
+        return "C"
+    elif yuzde >= 30:
+        return "D"
+    else:
+        return "yok"
+
+
+@app.post("/ana-yuklenici/kayit")
+def ana_yuklenici_kayit(girdi: AnaYukleniciKayit, db: Session = Depends(get_db)):
+    mevcut = db.query(AnaYuklenici).filter(AnaYuklenici.email == girdi.email).first()
+    if mevcut:
+        raise HTTPException(status_code=400, detail="Bu email zaten kayıtlı")
+
+    yeni = AnaYuklenici(
+        sirket_adi=girdi.sirket_adi,
+        email=girdi.email,
+        sifre_hash=sifre_hashle(girdi.sifre),
+        yetkili_adi=girdi.yetkili_adi,
+        telefon=girdi.telefon,
+        website=girdi.website,
+        onay_durumu="beklemede"
+    )
+    db.add(yeni)
+    db.commit()
+    db.refresh(yeni)
+
+    email_gonder(
+        konu=f"Yeni Ana Yüklenici Başvurusu: {girdi.sirket_adi}",
+        icerik=f"Şirket: {girdi.sirket_adi}\nEmail: {girdi.email}\nYetkili: {girdi.yetkili_adi}"
+    )
+
+    return {"mesaj": "Başvurunuz alındı. Onay sonrası giriş yapabilirsiniz.", "id": yeni.id}
+
+
+@app.post("/ana-yuklenici/giris")
+def ana_yuklenici_giris(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    ana = db.query(AnaYuklenici).filter(AnaYuklenici.email == form_data.username).first()
+    if not ana or not sifre_dogrula(form_data.password, ana.sifre_hash):
+        raise HTTPException(status_code=401, detail="Email veya şifre hatalı")
+    if ana.onay_durumu != "onayli":
+        raise HTTPException(status_code=403, detail="Hesabınız henüz onaylanmadı")
+
+    token = token_olustur(data={"sub": ana.email, "rol": "ana_yuklenici"})
+
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "ana_yuklenici": {
+            "id": ana.id, "sirket_adi": ana.sirket_adi,
+            "email": ana.email, "yetkili_adi": ana.yetkili_adi
+        }
+    }
+
+
+@app.get("/ana-yuklenici/dashboard/{ana_id}")
+def ana_yuklenici_dashboard(ana_id: int, db: Session = Depends(get_db)):
+    ana = db.query(AnaYuklenici).filter(AnaYuklenici.id == ana_id).first()
+    if not ana:
+        raise HTTPException(status_code=404, detail="Ana yüklenici bulunamadı")
+
+    tedarikciler = db.query(Kullanici).filter(Kullanici.ana_yuklenici_id == ana_id).all()
+
+    toplam = len(tedarikciler)
+    eydep_a = len([t for t in tedarikciler if t.eydep_seviye == "A"])
+    eydep_b = len([t for t in tedarikciler if t.eydep_seviye == "B"])
+    eydep_c = len([t for t in tedarikciler if t.eydep_seviye == "C"])
+    eydep_d = len([t for t in tedarikciler if t.eydep_seviye == "D"])
+    eydep_yok = len([t for t in tedarikciler if t.eydep_seviye == "yok"])
+
+    return {
+        "ana_yuklenici": {
+            "id": ana.id, "sirket_adi": ana.sirket_adi,
+            "email": ana.email, "yetkili_adi": ana.yetkili_adi
+        },
+        "ozet": {
+            "toplam_tedarikci": toplam,
+            "eydep_a": eydep_a, "eydep_b": eydep_b,
+            "eydep_c": eydep_c, "eydep_d": eydep_d,
+            "eydep_yok": eydep_yok
+        },
+        "tedarikciler": [{
+            "id": t.id, "sirket_adi": t.sirket_adi,
+            "email": t.email, "eydep_seviye": t.eydep_seviye,
+            "eydep_skor": t.eydep_skor,
+            "plan": t.plan, "rol": t.rol
+        } for t in tedarikciler]
+    }
+
+
+@app.post("/ana-yuklenici/tedarikci-ekle")
+def tedarikci_ekle(ana_id: int, tedarikci_email: str, db: Session = Depends(get_db)):
+    ana = db.query(AnaYuklenici).filter(AnaYuklenici.id == ana_id).first()
+    if not ana:
+        raise HTTPException(status_code=404, detail="Ana yüklenici bulunamadı")
+
+    tedarikci = db.query(Kullanici).filter(Kullanici.email == tedarikci_email).first()
+    if not tedarikci:
+        raise HTTPException(status_code=404, detail="Tedarikçi bulunamadı")
+
+    tedarikci.ana_yuklenici_id = ana_id
+    db.commit()
+
+    return {"mesaj": f"{tedarikci.sirket_adi} tedarikçi ağınıza eklendi"}
+
+
+@app.delete("/ana-yuklenici/tedarikci-cikar")
+def tedarikci_cikar(ana_id: int, tedarikci_email: str, db: Session = Depends(get_db)):
+    tedarikci = db.query(Kullanici).filter(
+        Kullanici.email == tedarikci_email,
+        Kullanici.ana_yuklenici_id == ana_id
+    ).first()
+    if not tedarikci:
+        raise HTTPException(status_code=404, detail="Tedarikçi bulunamadı")
+    tedarikci.ana_yuklenici_id = None
+    db.commit()
+    return {"mesaj": "Tedarikçi çıkarıldı"}
+
+
+@app.get("/ana-yuklenici/eydep-dagilimi/{ana_id}")
+def eydep_dagilimi(ana_id: int, db: Session = Depends(get_db)):
+    """Ana yüklenicinin tedarikçi ağının EYDEP seviye dağılımı"""
+    tedarikciler = db.query(Kullanici).filter(Kullanici.ana_yuklenici_id == ana_id).all()
+
+    return {
+        "toplam": len(tedarikciler),
+        "seviyeler": {
+            "A": [{"sirket_adi": t.sirket_adi, "email": t.email, "skor": t.eydep_skor}
+                  for t in tedarikciler if t.eydep_seviye == "A"],
+            "B": [{"sirket_adi": t.sirket_adi, "email": t.email, "skor": t.eydep_skor}
+                  for t in tedarikciler if t.eydep_seviye == "B"],
+            "C": [{"sirket_adi": t.sirket_adi, "email": t.email, "skor": t.eydep_skor}
+                  for t in tedarikciler if t.eydep_seviye == "C"],
+            "D": [{"sirket_adi": t.sirket_adi, "email": t.email, "skor": t.eydep_skor}
+                  for t in tedarikciler if t.eydep_seviye == "D"],
+            "yok": [{"sirket_adi": t.sirket_adi, "email": t.email, "skor": t.eydep_skor}
+                    for t in tedarikciler if t.eydep_seviye == "yok"]
+        }
+    }
+
+
+@app.get("/admin/ana-yukleniciler")
+def admin_ana_yukleniciler(db: Session = Depends(get_db)):
+    liste = db.query(AnaYuklenici).order_by(AnaYuklenici.olusturma_tarihi.desc()).all()
+    return {
+        "toplam": len(liste),
+        "ana_yukleniciler": [{
+            "id": a.id, "sirket_adi": a.sirket_adi, "email": a.email,
+            "yetkili_adi": a.yetkili_adi, "telefon": a.telefon,
+            "website": a.website, "onay_durumu": a.onay_durumu,
+            "olusturma_tarihi": a.olusturma_tarihi.isoformat()
+        } for a in liste]
+    }
+
+
+@app.post("/admin/ana-yuklenici-onay/{ana_id}")
+def admin_ana_yuklenici_onay(ana_id: int, onay: str = "onayli", db: Session = Depends(get_db)):
+    ana = db.query(AnaYuklenici).filter(AnaYuklenici.id == ana_id).first()
+    if not ana:
+        raise HTTPException(status_code=404, detail="Ana yüklenici bulunamadı")
+    ana.onay_durumu = onay
+    db.commit()
+
+    if onay == "onayli":
+        email_gonder(
+            konu="Ana Yüklenici Başvurunuz Onaylandı",
+            icerik=f"Sayın {ana.yetkili_adi or ana.sirket_adi}, hesabınız onaylandı. Panele giriş yapabilirsiniz."
+        )
+
+    return {"mesaj": f"Ana yüklenici durumu '{onay}' olarak güncellendi"}
+
+
+# Değerlendirme kaydedilirken EYDEP seviyesini de güncelle
 # ==================== STATİK ====================
 app.mount("/static", StaticFiles(directory=".", html=True), name="static")

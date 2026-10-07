@@ -170,7 +170,21 @@ class UzmanYorum(Base):
 # ==================== TABLOLARI OLUŞTUR ====================
 Base.metadata.create_all(bind=engine)
 
+# ==================== ANA YÜKLENİCİ MODÜLÜ ====================
 
+class AnaYuklenici(Base):
+    __tablename__ = "ana_yukleniciler"
+
+    id = Column(Integer, primary_key=True, index=True)
+    sirket_adi = Column(String, nullable=False)
+    email = Column(String, unique=True, index=True)
+    sifre_hash = Column(String)
+    yetkili_adi = Column(String, default="")
+    telefon = Column(String, default="")
+    website = Column(String, default="")
+    logo_url = Column(String, default="")
+    onay_durumu = Column(String, default="beklemede")  # beklemede, onayli, reddedildi
+    olusturma_tarihi = Column(DateTime, default=datetime.utcnow)
 # ==================== VERİTABANI OTURUMU ====================
 def get_db():
     db = SessionLocal()
