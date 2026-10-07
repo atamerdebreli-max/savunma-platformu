@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, JSON
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, JSON, Float, Text, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
@@ -69,6 +69,7 @@ class YolHaritasi(Base):
     tamamlandi = Column(Integer, default=0)
     tamamlanma_tarihi = Column(DateTime, default=datetime.utcnow)
 
+
 # Hatırlatıcı tablosu
 class Hatirlatici(Base):
     __tablename__ = "hatirlaticilar"
@@ -81,7 +82,9 @@ class Hatirlatici(Base):
     tip = Column(String)  # denetim, kalibrasyon, egitim, toplanti
     aktif = Column(Integer, default=1)
     olusturma_tarihi = Column(DateTime, default=datetime.utcnow)
-    # Kalibrasyon tablosu
+
+
+# Kalibrasyon tablosu
 class Kalibrasyon(Base):
     __tablename__ = "kalibrasyonlar"
 
@@ -98,7 +101,72 @@ class Kalibrasyon(Base):
     durum = Column(String, default="aktif")  # aktif, pasif
     notlar = Column(String, default="")
     olusturma_tarihi = Column(DateTime, default=datetime.utcnow)
-    
+
+
+# ==================== UZMAN DANIŞMAN AĞI ====================
+
+# Uzman tablosu
+class Uzman(Base):
+    __tablename__ = "uzmanlar"
+
+    id = Column(Integer, primary_key=True, index=True)
+    ad_soyad = Column(String, nullable=False)
+    email = Column(String, unique=True, index=True)
+    telefon = Column(String, default="")
+    uzmanlik_alani = Column(String)  # FAI, FOD, YETEN, AS9100, EYDEP
+    deneyim_yili = Column(Integer, default=0)
+    sertifikalar = Column(Text, default="")
+    referanslar = Column(Text, default="")
+    fiyat_araligi = Column(String, default="")
+    sehir = Column(String, default="")
+    profil_fotografi = Column(String, default="")
+    onay_durumu = Column(String, default="beklemede")  # beklemede, onayli, reddedildi
+    puan = Column(Float, default=0)
+    toplam_is = Column(Integer, default=0)
+    olusturma_tarihi = Column(DateTime, default=datetime.utcnow)
+
+
+# Randevu tablosu
+class Randevu(Base):
+    __tablename__ = "randevular"
+
+    id = Column(Integer, primary_key=True, index=True)
+    kobi_email = Column(String, index=True)
+    uzman_id = Column(Integer, ForeignKey("uzmanlar.id"))
+    hizmet_turu = Column(String)  # FAI egitimi, FOD egitimi, YETEN destegi
+    tarih = Column(String)
+    saat = Column(String)
+    durum = Column(String, default="beklemede")  # beklemede, onaylandi, tamamlandi, iptal
+    olusturma_tarihi = Column(DateTime, default=datetime.utcnow)
+
+
+# Uzman Ödeme tablosu
+class UzmanOdeme(Base):
+    __tablename__ = "uzman_odemeler"
+
+    id = Column(Integer, primary_key=True, index=True)
+    randevu_id = Column(Integer, ForeignKey("randevular.id"))
+    tutar = Column(Float)
+    komisyon_orani = Column(Float, default=15.0)
+    komisyon_tutari = Column(Float)
+    iyzico_islem_id = Column(String, default="")
+    odeme_durumu = Column(String, default="beklemede")
+    olusturma_tarihi = Column(DateTime, default=datetime.utcnow)
+
+
+# Uzman Yorum tablosu
+class UzmanYorum(Base):
+    __tablename__ = "uzman_yorumlar"
+
+    id = Column(Integer, primary_key=True, index=True)
+    randevu_id = Column(Integer, ForeignKey("randevular.id"))
+    kobi_email = Column(String, index=True)
+    uzman_id = Column(Integer, ForeignKey("uzmanlar.id"))
+    puan = Column(Integer)  # 1-5
+    yorum = Column(Text, default="")
+    olusturma_tarihi = Column(DateTime, default=datetime.utcnow)
+
+
 # ==================== TABLOLARI OLUŞTUR ====================
 Base.metadata.create_all(bind=engine)
 
