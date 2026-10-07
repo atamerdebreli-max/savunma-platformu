@@ -79,8 +79,8 @@ def email_gonder(konu: str, icerik: str):
 # ==================== FASTAPI ====================
 
 app = FastAPI(
-    title="UyumOS — Uyumluluk İşletim Sistemi"
-    description="UyumOS — KOBİ'ler için Uyumluluk İşletim Sistemi"
+    title="UyumOS",
+    description="KOBİ'ler için Uyumluluk İşletim Sistemi",
     version="0.1.0"
 )
 
