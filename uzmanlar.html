@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uzman Danışmanlar - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+            backdrop-filter: blur(10px);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .navbar-links a:hover { color: #00b4d8; }
+
+        .kapsayici { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 36px; margin-bottom: 10px; }
+        .alt-baslik { color: #a8c5e0; margin-bottom: 30px; }
+
+        .filtreler {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .filtreler input, .filtreler select {
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+            min-width: 200px;
+        }
+        .filtreler button {
+            padding: 12px 25px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .uzman-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+        .uzman-kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.3s;
+        }
+        .uzman-kart:hover {
+            border-color: rgba(0,180,216,0.4);
+            transform: translateY(-5px);
+        }
+        .uzman-ust {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .uzman-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .uzman-isim { font-size: 18px; font-weight: 700; }
+        .uzman-sehir { color: #a8c5e0; font-size: 13px; }
+        .uzman-uzmanlik {
+            display: inline-block;
+            background: rgba(0,180,216,0.15);
+            color: #00b4d8;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .uzman-bilgi {
+            color: #a8c5e0;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .uzman-puan {
+            color: #fbbf24;
+            font-size: 16px;
+            margin: 12px 0;
+        }
+        .uzman-btn {
+            display: block;
+            text-align: center;
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            padding: 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        .bos-mesaj {
+            text-align: center;
+            color: #a8c5e0;
+            padding: 60px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <a href="panel.html">Panel</a>
+            <a href="uzmanlar.html">Uzmanlar</a>
+            <a href="uzman-basvuru.html">Uzman Ol</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici">
+        <h1>Uzman Danışmanlar</h1>
+        <p class="alt-baslik">FAI, FOD, YETEN ve AS9100 konularında onaylı uzmanlarla eşleşin.</p>
+
+        <div class="filtreler">
+            <input type="text" id="arama" placeholder="Uzman adı ara...">
+            <select id="uzmanlik">
+                <option value="">Tüm Uzmanlıklar</option>
+                <option value="FAI">FAI</option>
+                <option value="FOD">FOD</option>
+                <option value="YETEN">YETEN</option>
+                <option value="AS9100">AS9100</option>
+                <option value="EYDEP">EYDEP</option>
+            </select>
+            <select id="sehir">
+                <option value="">Tüm Şehirler</option>
+                <option value="İstanbul">İstanbul</option>
+                <option value="Ankara">Ankara</option>
+                <option value="İzmir">İzmir</option>
+                <option value="Bursa">Bursa</option>
+                <option value="Kocaeli">Kocaeli</option>
+            </select>
+            <button onclick="filtrele()">Filtrele</button>
+        </div>
+
+        <div class="uzman-grid" id="uzman-grid">
+            <div class="bos-mesaj">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+
+        async function uzmanlariYukle() {
+            const grid = document.getElementById('uzman-grid');
+            const arama = document.getElementById('arama').value.toLowerCase();
+            const uzmanlik = document.getElementById('uzmanlik').value;
+            const sehir = document.getElementById('sehir').value;
+
+            let url = API + '/uzmanlar?';
+            if (uzmanlik) url += 'uzmanlik=' + uzmanlik + '&';
+            if (sehir) url += 'sehir=' + sehir + '&';
+
+            try {
+                const r = await fetch(url);
+                const data = await r.json();
+
+                let uzmanlar = data.uzmanlar || [];
+
+                if (arama) {
+                    uzmanlar = uzmanlar.filter(u => 
+                        u.ad_soyad.toLowerCase().includes(arama)
+                    );
+                }
+
+                if (uzmanlar.length === 0) {
+                    grid.innerHTML = '<div class="bos-mesaj">Henüz onaylı uzman yok. Yakında eklenecek.</div>';
+                    return;
+                }
+
+                grid.innerHTML = uzmanlar.map(u => `
+                    <div class="uzman-kart">
+                        <div class="uzman-ust">
+                            <div class="uzman-avatar">${u.ad_soyad.charAt(0)}</div>
+                            <div>
+                                <div class="uzman-isim">${u.ad_soyad}</div>
+                                <div class="uzman-sehir">📍 ${u.sehir || '—'}</div>
+                            </div>
+                        </div>
+                        <div class="uzman-uzmanlik">${u.uzmanlik_alani}</div>
+                        <div class="uzman-bilgi">💼 ${u.deneyim_yili} yıl deneyim</div>
+                        <div class="uzman-bilgi">💰 ${u.fiyat_araligi || 'Fiyat için iletişim'}</div>
+                        <div class="uzman-puan">⭐ ${u.puan || 'Yeni'} ${u.toplam_is > 0 ? '(' + u.toplam_is + ' iş)' : ''}</div>
+                        <a href="uzman-profil.html?id=${u.id}" class="uzman-btn">Profili Gör →</a>
+                    </div>
+                `).join('');
+            } catch (e) {
+                grid.innerHTML = '<div class="bos-mesaj">Uzmanlar yüklenemedi.</div>';
+            }
+        }
+
+        function filtrele() {
+            uzmanlariYukle();
+        }
+
+        document.getElementById('arama').addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') filtrele();
+        });
+
+        uzmanlariYukle();
+    </script>
+</body>
+</html>

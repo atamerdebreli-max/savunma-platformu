@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uzman Profili - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .kapsayici { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 25px;
+        }
+        .profil-ust {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: 700;
+        }
+        .isim { font-size: 28px; font-weight: 700; }
+        .uzmanlik {
+            display: inline-block;
+            background: rgba(0,180,216,0.15);
+            color: #00b4d8;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .bilgi-satir {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .bilgi-satir:last-child { border-bottom: none; }
+        .bilgi-etiket { color: #a8c5e0; }
+        .bilgi-deger { font-weight: 600; }
+        .puan { color: #fbbf24; font-size: 20px; }
+        h2 { font-size: 22px; margin: 30px 0 15px; }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            padding: 15px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .btn:hover { opacity: 0.9; }
+        .yorum {
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border-left: 3px solid #00b4d8;
+        }
+        .yorum-puan { color: #fbbf24; margin-bottom: 5px; }
+        .yorum-metin { color: #d1e3f0; font-size: 14px; }
+        .yorum-tarih { color: #6b8ba3; font-size: 12px; margin-top: 5px; }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.aktif { display: flex; }
+        .modal-icerik {
+            background: #0f2742;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+        }
+        .modal-icerik h3 { margin-bottom: 20px; }
+        .modal-icerik input, .modal-icerik select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+        }
+        .modal-btnler { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-btnler button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .modal-iptal { background: rgba(255,255,255,0.1); color: #fff; }
+        .modal-onay { background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%); color: #fff; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <a href="panel.html">Panel</a>
+            <a href="uzmanlar.html">← Uzmanlara Dön</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici" id="icerik">
+        <div class="kart">Yükleniyor...</div>
+    </div>
+
+    <!-- RANDEVU MODAL -->
+    <div class="modal" id="randevu-modal">
+        <div class="modal-icerik">
+            <h3>Randevu Talebi</h3>
+            <input type="email" id="kobi_email" placeholder="E-posta adresiniz">
+            <select id="hizmet_turu">
+                <option value="FAI Eğitimi">FAI Eğitimi</option>
+                <option value="FOD Eğitimi">FOD Eğitimi</option>
+                <option value="YETEN Desteği">YETEN Desteği</option>
+                <option value="Denetim Desteği">Denetim Desteği</option>
+            </select>
+            <input type="date" id="tarih">
+            <input type="time" id="saat">
+            <div class="modal-btnler">
+                <button class="modal-iptal" onclick="modalKapat()">İptal</button>
+                <button class="modal-onay" onclick="randevuGonder()">Gönder</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+        const params = new URLSearchParams(window.location.search);
+        const uzmanId = params.get('id');
+
+        async function profilYukle() {
+            if (!uzmanId) {
+                document.getElementById('icerik').innerHTML = '<div class="kart">Uzman bulunamadı.</div>';
+                return;
+            }
+
+            try {
+                const r = await fetch(API + '/uzman/' + uzmanId);
+                const data = await r.json();
+                const u = data.uzman;
+                const yorumlar = data.yorumlar || [];
+
+                document.getElementById('icerik').innerHTML = `
+                    <div class="kart">
+                        <div class="profil-ust">
+                            <div class="avatar">${u.ad_soyad.charAt(0)}</div>
+                            <div>
+                                <div class="isim">${u.ad_soyad}</div>
+                                <div class="uzmanlik">${u.uzmanlik_alani}</div>
+                            </div>
+                        </div>
+                        <div class="bilgi-satir">
+                            <span class="bilgi-etiket">📍 Şehir</span>
+                            <span class="bilgi-deger">${u.sehir || '—'}</span>
+                        </div>
+                        <div class="bilgi-satir">
+                            <span class="bilgi-etiket">💼 Deneyim</span>
+                            <span class="bilgi-deger">${u.deneyim_yili} yıl</span>
+                        </div>
+                        <div class="bilgi-satir">
+                            <span class="bilgi-etiket">💰 Fiyat Aralığı</span>
+                            <span class="bilgi-deger">${u.fiyat_araligi || 'İletişime geçin'}</span>
+                        </div>
+                        <div class="bilgi-satir">
+                            <span class="bilgi-etiket">⭐ Puan</span>
+                            <span class="bilgi-deger puan">${u.puan || 'Yeni'} ${u.toplam_is > 0 ? '(' + u.toplam_is + ' iş)' : ''}</span>
+                        </div>
+                        <div class="bilgi-satir">
+                            <span class="bilgi-etiket">📜 Sertifikalar</span>
+                            <span class="bilgi-deger">${u.sertifikalar || '—'}</span>
+                        </div>
+                        <div class="bilgi-satir">
+                            <span class="bilgi-etiket">🏢 Referanslar</span>
+                            <span class="bilgi-deger">${u.referanslar || '—'}</span>
+                        </div>
+                        <button class="btn" onclick="modalAc()">Randevu Al →</button>
+                    </div>
+                    <div class="kart">
+                        <h2>Yorumlar (${yorumlar.length})</h2>
+                        ${yorumlar.length === 0 ? '<p style="color:#a8c5e0;">Henüz yorum yok.</p>' : 
+                            yorumlar.map(y => `
+                                <div class="yorum">
+                                    <div class="yorum-puan">${'⭐'.repeat(y.puan)}</div>
+                                    <div class="yorum-metin">${y.yorum || 'Yorum yapılmadı'}</div>
+                                    <div class="yorum-tarih">${new Date(y.tarih).toLocaleDateString('tr-TR')}</div>
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                `;
+            } catch (e) {
+                document.getElementById('icerik').innerHTML = '<div class="kart">Profil yüklenemedi.</div>';
+            }
+        }
+
+        function modalAc() {
+            document.getElementById('randevu-modal').classList.add('aktif');
+        }
+        function modalKapat() {
+            document.getElementById('randevu-modal').classList.remove('aktif');
+        }
+
+        async function randevuGonder() {
+            const kobi_email = document.getElementById('kobi_email').value;
+            const hizmet_turu = document.getElementById('hizmet_turu').value;
+            const tarih = document.getElementById('tarih').value;
+            const saat = document.getElementById('saat').value;
+
+            if (!kobi_email || !tarih || !saat) {
+                alert('Lütfen tüm alanları doldurun.');
+                return;
+            }
+
+            try {
+                const r = await fetch(API + '/randevu', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        kobi_email, uzman_id: parseInt(uzmanId),
+                        hizmet_turu, tarih, saat
+                    })
+                });
+                const data = await r.json();
+                if (r.ok) {
+                    alert('✅ Randevu talebiniz alındı! Uzman onayı sonrası bilgilendirileceksiniz.');
+                    modalKapat();
+                } else {
+                    alert('❌ ' + (data.detail || 'Hata oluştu'));
+                }
+            } catch (e) {
+                alert('❌ Bağlantı hatası');
+            }
+        }
+
+        profilYukle();
+    </script>
+</body>
+</html>
