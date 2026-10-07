@@ -59,7 +59,7 @@ def email_gonder(konu: str, icerik: str):
                 "Content-Type": "application/json"
             },
             json={
-                "from": "SavunmaPlatform <onboarding@resend.dev>",
+                "from": "UyumOS <onboarding@resend.dev>",
                 "to": [alici],
                 "subject": konu,
                 "text": icerik
