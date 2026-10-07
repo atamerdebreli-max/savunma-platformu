@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ana Yüklenici Başvurusu - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .kapsayici { max-width: 700px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 32px; margin-bottom: 10px; }
+        .alt-baslik { color: #a8c5e0; margin-bottom: 30px; }
+        .kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 35px;
+        }
+        .form-grup { margin-bottom: 20px; }
+        .form-grup label {
+            display: block;
+            color: #a8c5e0;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .form-grup input {
+            width: 100%;
+            padding: 13px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+        }
+        .form-grup input:focus {
+            outline: none;
+            border-color: #00b4d8;
+        }
+        .satir { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .btn:hover { opacity: 0.9; }
+        .basari, .hata {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .basari { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); color: #4ade80; }
+        .hata { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <a href="uzmanlar.html">Uzmanlar</a>
+            <a href="ana-yuklenici-giris.html">Giriş Yap</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici">
+        <h1>Ana Yüklenici Başvurusu</h1>
+        <p class="alt-baslik">Tedarikçi ağınızı UyumOS üzerinden yönetin. Tedarikçilerinizin EYDEP hazırlık seviyelerini tek ekrandan izleyin.</p>
+
+        <div class="basari" id="basari"></div>
+        <div class="hata" id="hata"></div>
+
+        <div class="kart" id="form-kart">
+            <div class="form-grup">
+                <label>Şirket Adı *</label>
+                <input type="text" id="sirket_adi" placeholder="Örn: TAI, TEI, Roketsan">
+            </div>
+
+            <div class="satir">
+                <div class="form-grup">
+                    <label>Yetkili Adı Soyadı</label>
+                    <input type="text" id="yetkili_adi" placeholder="Örn: Ahmet Yılmaz">
+                </div>
+                <div class="form-grup">
+                    <label>Telefon</label>
+                    <input type="tel" id="telefon" placeholder="+90 312 XXX XX XX">
+                </div>
+            </div>
+
+            <div class="satir">
+                <div class="form-grup">
+                    <label>Kurumsal E-posta *</label>
+                    <input type="email" id="email" placeholder="ornek@sirket.com">
+                </div>
+                <div class="form-grup">
+                    <label>Şifre *</label>
+                    <input type="password" id="sifre" placeholder="En az 6 karakter">
+                </div>
+            </div>
+
+            <div class="form-grup">
+                <label>Website</label>
+                <input type="url" id="website" placeholder="https://www.sirket.com">
+            </div>
+
+            <button class="btn" onclick="basvuruGonder()">Başvuruyu Gönder →</button>
+        </div>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+
+        async function basvuruGonder() {
+            const sirket_adi = document.getElementById('sirket_adi').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const sifre = document.getElementById('sifre').value.trim();
+            const yetkili_adi = document.getElementById('yetkili_adi').value.trim();
+            const telefon = document.getElementById('telefon').value.trim();
+            const website = document.getElementById('website').value.trim();
+
+            const hata = document.getElementById('hata');
+            const basari = document.getElementById('basari');
+            hata.style.display = 'none';
+            basari.style.display = 'none';
+
+            if (!sirket_adi || !email || !sifre) {
+                hata.textContent = 'Lütfen zorunlu alanları doldurun (Şirket Adı, E-posta, Şifre).';
+                hata.style.display = 'block';
+                return;
+            }
+
+            if (sifre.length < 6) {
+                hata.textContent = 'Şifre en az 6 karakter olmalıdır.';
+                hata.style.display = 'block';
+                return;
+            }
+
+            try {
+                const r = await fetch(API + '/ana-yuklenici/kayit', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ sirket_adi, email, sifre, yetkili_adi, telefon, website })
+                });
+                const data = await r.json();
+
+                if (r.ok) {
+                    document.getElementById('form-kart').style.display = 'none';
+                    basari.innerHTML = `
+                        <h2>✅ Başvurunuz Alındı!</h2>
+                        <p style="margin-top:10px;">Başvurunuz incelendikten sonra e-posta ile bilgilendirileceksiniz. Onay sonrası giriş yapabilirsiniz.</p>
+                    `;
+                    basari.style.display = 'block';
+                } else {
+                    hata.textContent = data.detail || 'Başvuru gönderilemedi.';
+                    hata.style.display = 'block';
+                }
+            } catch (e) {
+                hata.textContent = 'Bağlantı hatası. Lütfen tekrar deneyin.';
+                hata.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

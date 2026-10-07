@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ana Yüklenici Paneli - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a, .navbar-links button {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .kapsayici { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 30px; margin-bottom: 5px; }
+        .alt-baslik { color: #a8c5e0; margin-bottom: 30px; }
+
+        .ozet-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+        .ozet-kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+        .ozet-kart.a { border-color: rgba(74,222,128,0.4); }
+        .ozet-kart.b { border-color: rgba(0,180,216,0.4); }
+        .ozet-kart.c { border-color: rgba(251,191,36,0.4); }
+        .ozet-kart.d { border-color: rgba(249,115,22,0.4); }
+        .ozet-kart.yok { border-color: rgba(239,68,68,0.3); }
+        .ozet-sayi { font-size: 30px; font-weight: 800; margin-bottom: 5px; }
+        .ozet-kart.a .ozet-sayi { color: #4ade80; }
+        .ozet-kart.b .ozet-sayi { color: #00b4d8; }
+        .ozet-kart.c .ozet-sayi { color: #fbbf24; }
+        .ozet-kart.d .ozet-sayi { color: #f97316; }
+        .ozet-kart.yok .ozet-sayi { color: #ef4444; }
+        .ozet-etiket { color: #a8c5e0; font-size: 12px; font-weight: 600; }
+
+        .arama-kutu {
+            background: rgba(0,180,216,0.08);
+            border: 1px solid rgba(0,180,216,0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .arama-kutu input {
+            flex: 1;
+            min-width: 200px;
+            padding: 13px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+        }
+        .arama-kutu button {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            padding: 13px 25px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        h2 { font-size: 20px; margin-bottom: 15px; }
+
+        .tedarikci-tablo {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .tedarikci-satir {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr 1fr 1fr;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            align-items: center;
+            font-size: 14px;
+        }
+        .tedarikci-satir:last-child { border-bottom: none; }
+        .tedarikci-satir.baslik {
+            background: rgba(0,180,216,0.1);
+            color: #00b4d8;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .seviye-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+        }
+        .seviye-A { background: rgba(74,222,128,0.15); color: #4ade80; }
+        .seviye-B { background: rgba(0,180,216,0.15); color: #00b4d8; }
+        .seviye-C { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .seviye-D { background: rgba(249,115,22,0.15); color: #f97316; }
+        .seviye-yok { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+        .btn-cikar {
+            background: rgba(239,68,68,0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239,68,68,0.3);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .bos-mesaj {
+            text-align: center;
+            color: #a8c5e0;
+            padding: 50px 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <span id="sirket-adi" style="color:#00b4d8; font-weight:600;"></span>
+            <button onclick="cikisYap()">Çıkış</button>
+        </div>
+    </nav>
+
+    <div class="kapsayici">
+        <h1>Tedarikçi Ağı Paneli</h1>
+        <p class="alt-baslik">Tedarikçilerinizin EYDEP hazırlık seviyelerini tek ekrandan izleyin.</p>
+
+        <div class="ozet-grid">
+            <div class="ozet-kart a">
+                <div class="ozet-sayi" id="sayi-a">0</div>
+                <div class="ozet-etiket">EYDEP-A</div>
+            </div>
+            <div class="ozet-kart b">
+                <div class="ozet-sayi" id="sayi-b">0</div>
+                <div class="ozet-etiket">EYDEP-B</div>
+            </div>
+            <div class="ozet-kart c">
+                <div class="ozet-sayi" id="sayi-c">0</div>
+                <div class="ozet-etiket">EYDEP-C</div>
+            </div>
+            <div class="ozet-kart d">
+                <div class="ozet-sayi" id="sayi-d">0</div>
+                <div class="ozet-etiket">EYDEP-D</div>
+            </div>
+            <div class="ozet-kart yok">
+                <div class="ozet-sayi" id="sayi-yok">0</div>
+                <div class="ozet-etiket">Belgesiz</div>
+            </div>
+        </div>
+
+        <div class="arama-kutu">
+            <input type="email" id="tedarikci-email" placeholder="Tedarikçi e-posta adresi">
+            <button onclick="tedarikciEkle()">+ Tedarikçi Ekle</button>
+        </div>
+
+        <h2>Tedarikçi Listesi (<span id="toplam-tedarikci">0</span>)</h2>
+        <div class="tedarikci-tablo" id="tedarikci-tablo">
+            <div class="bos-mesaj">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+        const anaId = localStorage.getItem('ana_yuklenici_id');
+        const sirketAdi = localStorage.getItem('ana_yuklenici_sirket');
+
+        if (!anaId) {
+            window.location.href = 'ana-yuklenici-giris.html';
+        } else {
+            document.getElementById('sirket-adi').textContent = sirketAdi || '';
+        }
+
+        async function panelYukle() {
+            try {
+                const r = await fetch(API + '/ana-yuklenici/dashboard/' + anaId);
+                const data = await r.json();
+
+                document.getElementById('sayi-a').textContent = data.ozet.eydep_a;
+                document.getElementById('sayi-b').textContent = data.ozet.eydep_b;
+                document.getElementById('sayi-c').textContent = data.ozet.eydep_c;
+                document.getElementById('sayi-d').textContent = data.ozet.eydep_d;
+                document.getElementById('sayi-yok').textContent = data.ozet.eydep_yok;
+                document.getElementById('toplam-tedarikci').textContent = data.ozet.toplam_tedarikci;
+
+                listeyiGoster(data.tedarikciler || []);
+            } catch (e) {
+                document.getElementById('tedarikci-tablo').innerHTML = 
+                    '<div class="bos-mesaj">Panel yüklenemedi.</div>';
+            }
+        }
+
+        function listeyiGoster(tedarikciler) {
+            const tablo = document.getElementById('tedarikci-tablo');
+
+            if (tedarikciler.length === 0) {
+                tablo.innerHTML = '<div class="bos-mesaj">Henüz tedarikçi eklenmemiş. Yukarıdan ekleyin.</div>';
+                return;
+            }
+
+            let html = `
+                <div class="tedarikci-satir baslik">
+                    <div>ŞİRKET</div>
+                    <div>E-POSTA</div>
+                    <div>EYDEP</div>
+                    <div>SKOR</div>
+                    <div>İŞLEM</div>
+                </div>
+            `;
+
+            html += tedarikciler.map(t => `
+                <div class="tedarikci-satir">
+                    <div style="font-weight:600;">${t.sirket_adi}</div>
+                    <div style="color:#a8c5e0; font-size:13px;">${t.email}</div>
+                    <div><span class="seviye-badge seviye-${t.eydep_seviye}">${t.eydep_seviye === 'yok' ? 'YOK' : t.eydep_seviye}</span></div>
+                    <div>${t.eydep_skor || 0}%</div>
+                    <div><button class="btn-cikar" onclick="tedarikciCikar('${t.email}')">Çıkar</button></div>
+                </div>
+            `).join('');
+
+            tablo.innerHTML = html;
+        }
+
+        async function tedarikciEkle() {
+            const email = document.getElementById('tedarikci-email').value.trim();
+            if (!email) {
+                alert('Lütfen tedarikçi e-posta adresini girin.');
+                return;
+            }
+
+            try {
+                const r = await fetch(API + '/ana-yuklenici/tedarikci-ekle?ana_id=' + anaId + '&tedarikci_email=' + encodeURIComponent(email), {
+                    method: 'POST'
+                });
+                const data = await r.json();
+
+                if (r.ok) {
+                    alert('✅ ' + data.mesaj);
+                    document.getElementById('tedarikci-email').value = '';
+                    panelYukle();
+                } else {
+                    alert('❌ ' + (data.detail || 'Tedarikçi eklenemedi.'));
+                }
+            } catch (e) {
+                alert('❌ Bağlantı hatası.');
+            }
+        }
+
+        async function tedarikciCikar(email) {
+            if (!confirm(email + ' tedarikçi ağınızdan çıkarılsın mı?')) return;
+
+            try {
+                const r = await fetch(API + '/ana-yuklenici/tedarikci-cikar?ana_id=' + anaId + '&tedarikci_email=' + encodeURIComponent(email), {
+                    method: 'DELETE'
+                });
+                if (r.ok) {
+                    panelYukle();
+                } else {
+                    alert('Çıkarılamadı.');
+                }
+            } catch (e) {
+                alert('Bağlantı hatası.');
+            }
+        }
+
+        function cikisYap() {
+            localStorage.removeItem('ana_yuklenici_token');
+            localStorage.removeItem('ana_yuklenici_id');
+            localStorage.removeItem('ana_yuklenici_sirket');
+            window.location.href = 'ana-yuklenici-giris.html';
+        }
+
+        panelYukle();
+    </script>
+</body>
+</html>

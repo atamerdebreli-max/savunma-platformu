@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Ana Yükleniciler - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .kapsayici { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 32px; margin-bottom: 10px; }
+        .alt-baslik { color: #a8c5e0; margin-bottom: 30px; }
+
+        .kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 15px;
+        }
+        .kart-ust {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .sirket-adi { font-size: 20px; font-weight: 700; }
+        .email { color: #a8c5e0; font-size: 13px; margin-top: 3px; }
+        .durum {
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .durum-beklemede { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .durum-onayli { background: rgba(74,222,128,0.15); color: #4ade80; }
+        .durum-reddedildi { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+        .bilgi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .bilgi-item {
+            background: rgba(255,255,255,0.03);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+        .bilgi-item strong { color: #00b4d8; display: block; margin-bottom: 3px; font-size: 11px; }
+
+        .btn-grup { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .btn-onayla { background: #4ade80; color: #052e16; }
+        .btn-reddet { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.4); }
+        .bos-mesaj { text-align: center; color: #a8c5e0; padding: 60px 20px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <a href="admin.html">Admin Panel</a>
+            <a href="admin-uzmanlar.html">Uzmanlar</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici">
+        <h1>Ana Yüklenici Başvuruları</h1>
+        <p class="alt-baslik">Savunma sanayi ana yüklenici başvurularını onaylayın.</p>
+
+        <div id="liste"></div>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+
+        async function yukle() {
+            try {
+                const r = await fetch(API + '/admin/ana-yukleniciler');
+                const data = await r.json();
+                const liste = document.getElementById('liste');
+
+                if (!data.ana_yukleniciler || data.ana_yukleniciler.length === 0) {
+                    liste.innerHTML = '<div class="bos-mesaj">Henüz ana yüklenici başvurusu yok.</div>';
+                    return;
+                }
+
+                liste.innerHTML = data.ana_yukleniciler.map(a => `
+                    <div class="kart">
+                        <div class="kart-ust">
+                            <div>
+                                <div class="sirket-adi">${a.sirket_adi}</div>
+                                <div class="email">📧 ${a.email}</div>
+                            </div>
+                            <div class="durum durum-${a.onay_durumu}">
+                                ${a.onay_durumu === 'beklemede' ? '⏳ Beklemede' :
+                                  a.onay_durumu === 'onayli' ? '✅ Onaylı' :
+                                  '❌ Reddedildi'}
+                            </div>
+                        </div>
+                        <div class="bilgi-grid">
+                            <div class="bilgi-item"><strong>YETKİLİ</strong>${a.yetkili_adi || '—'}</div>
+                            <div class="bilgi-item"><strong>TELEFON</strong>${a.telefon || '—'}</div>
+                            <div class="bilgi-item"><strong>WEBSITE</strong>${a.website || '—'}</div>
+                        </div>
+                        <div class="btn-grup">
+                            ${a.onay_durumu === 'beklemede' ? `
+                                <button class="btn btn-onayla" onclick="durumGuncelle(${a.id}, 'onayli')">✅ Onayla</button>
+                                <button class="btn btn-reddet" onclick="durumGuncelle(${a.id}, 'reddedildi')">❌ Reddet</button>
+                            ` : ''}
+                            ${a.onay_durumu === 'onayli' ? `
+                                <button class="btn btn-reddet" onclick="durumGuncelle(${a.id}, 'reddedildi')">Reddet</button>
+                            ` : ''}
+                            ${a.onay_durumu === 'reddedildi' ? `
+                                <button class="btn btn-onayla" onclick="durumGuncelle(${a.id}, 'onayli')">Onayla</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                document.getElementById('liste').innerHTML = 
+                    '<div class="bos-mesaj">Başvurular yüklenemedi.</div>';
+            }
+        }
+
+        async function durumGuncelle(anaId, yeniDurum) {
+            try {
+                const r = await fetch(API + '/admin/ana-yuklenici-onay/' + anaId + '?onay=' + yeniDurum, {
+                    method: 'POST'
+                });
+                if (r.ok) {
+                    yukle();
+                } else {
+                    alert('Güncellenemedi.');
+                }
+            } catch (e) {
+                alert('Bağlantı hatası.');
+            }
+        }
+
+        yukle();
+    </script>
+</body>
+</html>
