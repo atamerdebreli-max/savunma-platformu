@@ -79,8 +79,8 @@ def email_gonder(konu: str, icerik: str):
 # ==================== FASTAPI ====================
 
 app = FastAPI(
-    title="Savunma Tedarik Zinciri Yetkinlik Platformu",
-    description="AS9100 ve EYDEP uyumluluk platformu",
+    title="UyumOS — Uyumluluk İşletim Sistemi"
+    description="UyumOS — KOBİ'ler için Uyumluluk İşletim Sistemi"
     version="0.1.0"
 )
 
@@ -146,7 +146,7 @@ class KalibrasyonGirdi(BaseModel):
 
 @app.get("/")
 def ana_sayfa():
-    return {"mesaj": "Savunma Tedarik Zinciri Yetkinlik Platformu API'si", "durum": "çalışıyor"}
+    return {"mesaj": "UyumOS API'si", "durum": "çalışıyor"}
 
 @app.get("/saglik")
 def saglik():
