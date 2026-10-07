@@ -10,7 +10,8 @@ from typing import Dict, List
 
 from database import (
     Degerlendirme, Kullanici, DanismanlikTalebi, YolHaritasi,
-    Hatirlatici, Kalibrasyon, get_db, SessionLocal
+    Hatirlatici, Kalibrasyon, get_db, SessionLocal,
+    Uzman, Randevu, UzmanOdeme, UzmanYorum
 )
 from auth import (
     sifre_hashle, sifre_dogrula, token_olustur,
@@ -1207,4 +1208,237 @@ def odeme_callback(token: str = Form("")):
         </body>
         </html>
         """, status_code=200)
+# ==================== UZMAN DANIŞMAN AĞI ====================
+
+class UzmanKayitGirdi(BaseModel):
+    ad_soyad: str
+    email: str
+    telefon: str = ""
+    uzmanlik_alani: str
+    deneyim_yili: int = 0
+    sertifikalar: str = ""
+    referanslar: str = ""
+    fiyat_araligi: str = ""
+    sehir: str = ""
+
+
+class RandevuGirdi(BaseModel):
+    kobi_email: str
+    uzman_id: int
+    hizmet_turu: str
+    tarih: str
+    saat: str
+
+
+class YorumGirdi(BaseModel):
+    randevu_id: int
+    kobi_email: str
+    uzman_id: int
+    puan: int
+    yorum: str = ""
+
+
+@app.get("/uzmanlar")
+def uzmanlari_listele(uzmanlik: str = None, sehir: str = None, db: Session = Depends(get_db)):
+    sorgu = db.query(Uzman).filter(Uzman.onay_durumu == "onayli")
+    if uzmanlik:
+        sorgu = sorgu.filter(Uzman.uzmanlik_alani.contains(uzmanlik))
+    if sehir:
+        sorgu = sorgu.filter(Uzman.sehir == sehir)
+    uzmanlar = sorgu.order_by(Uzman.puan.desc()).all()
+    return {
+        "toplam": len(uzmanlar),
+        "uzmanlar": [{
+            "id": u.id, "ad_soyad": u.ad_soyad, "email": u.email,
+            "telefon": u.telefon, "uzmanlik_alani": u.uzmanlik_alani,
+            "deneyim_yili": u.deneyim_yili, "sertifikalar": u.sertifikalar,
+            "referanslar": u.referanslar, "fiyat_araligi": u.fiyat_araligi,
+            "sehir": u.sehir, "puan": u.puan, "toplam_is": u.toplam_is,
+            "profil_fotografi": u.profil_fotografi
+        } for u in uzmanlar]
+    }
+
+
+@app.get("/uzman/{uzman_id}")
+def uzman_detay(uzman_id: int, db: Session = Depends(get_db)):
+    uzman = db.query(Uzman).filter(Uzman.id == uzman_id).first()
+    if not uzman:
+        raise HTTPException(status_code=404, detail="Uzman bulunamadı")
+    
+    yorumlar = db.query(UzmanYorum).filter(
+        UzmanYorum.uzman_id == uzman_id
+    ).order_by(UzmanYorum.olusturma_tarihi.desc()).all()
+    
+    return {
+        "uzman": {
+            "id": uzman.id, "ad_soyad": uzman.ad_soyad, "email": uzman.email,
+            "telefon": uzman.telefon, "uzmanlik_alani": uzman.uzmanlik_alani,
+            "deneyim_yili": uzman.deneyim_yili, "sertifikalar": uzman.sertifikalar,
+            "referanslar": uzman.referanslar, "fiyat_araligi": uzman.fiyat_araligi,
+            "sehir": uzman.sehir, "puan": uzman.puan, "toplam_is": uzman.toplam_is,
+            "profil_fotografi": uzman.profil_fotografi, "onay_durumu": uzman.onay_durumu
+        },
+        "yorumlar": [{
+            "id": y.id, "puan": y.puan, "yorum": y.yorum,
+            "kobi_email": y.kobi_email,
+            "tarih": y.olusturma_tarihi.isoformat()
+        } for y in yorumlar]
+    }
+
+
+@app.post("/uzman/kayit")
+def uzman_kayit(girdi: UzmanKayitGirdi, db: Session = Depends(get_db)):
+    mevcut = db.query(Uzman).filter(Uzman.email == girdi.email).first()
+    if mevcut:
+        raise HTTPException(status_code=400, detail="Bu email zaten kayıtlı")
+    
+    yeni = Uzman(
+        ad_soyad=girdi.ad_soyad, email=girdi.email, telefon=girdi.telefon,
+        uzmanlik_alani=girdi.uzmanlik_alani, deneyim_yili=girdi.deneyim_yili,
+        sertifikalar=girdi.sertifikalar, referanslar=girdi.referanslar,
+        fiyat_araligi=girdi.fiyat_araligi, sehir=girdi.sehir,
+        onay_durumu="beklemede"
+    )
+    db.add(yeni)
+    db.commit()
+    db.refresh(yeni)
+    
+    email_gonder(
+        konu=f"Yeni Uzman Başvurusu: {girdi.ad_soyad}",
+        icerik=f"Ad: {girdi.ad_soyad}\nEmail: {girdi.email}\nUzmanlık: {girdi.uzmanlik_alani}\nŞehir: {girdi.sehir}"
+    )
+    
+    return {"mesaj": "Başvurunuz alındı. Onay sonrası yayına alınacak.", "id": yeni.id}
+
+
+@app.post("/randevu")
+def randevu_olustur(girdi: RandevuGirdi, db: Session = Depends(get_db)):
+    uzman = db.query(Uzman).filter(Uzman.id == girdi.uzman_id).first()
+    if not uzman:
+        raise HTTPException(status_code=404, detail="Uzman bulunamadı")
+    
+    yeni = Randevu(
+        kobi_email=girdi.kobi_email, uzman_id=girdi.uzman_id,
+        hizmet_turu=girdi.hizmet_turu, tarih=girdi.tarih,
+        saat=girdi.saat, durum="beklemede"
+    )
+    db.add(yeni)
+    db.commit()
+    db.refresh(yeni)
+    
+    email_gonder(
+        konu=f"Yeni Randevu Talebi: {girdi.hizmet_turu}",
+        icerik=f"Uzman: {uzman.ad_soyad}\nKOBİ: {girdi.kobi_email}\nTarih: {girdi.tarih} {girdi.saat}"
+    )
+    
+    return {"mesaj": "Randevu talebiniz alındı", "id": yeni.id}
+
+
+@app.get("/randevularim")
+def randevularim(email: str, db: Session = Depends(get_db)):
+    randevular = db.query(Randevu).filter(
+        Randevu.kobi_email == email
+    ).order_by(Randevu.olusturma_tarihi.desc()).all()
+    
+    liste = []
+    for r in randevular:
+        uzman = db.query(Uzman).filter(Uzman.id == r.uzman_id).first()
+        liste.append({
+            "id": r.id, "uzman_id": r.uzman_id,
+            "uzman_adi": uzman.ad_soyad if uzman else "—",
+            "hizmet_turu": r.hizmet_turu, "tarih": r.tarih,
+            "saat": r.saat, "durum": r.durum,
+            "olusturma_tarihi": r.olusturma_tarihi.isoformat()
+        })
+    
+    return {"toplam": len(liste), "randevular": liste}
+
+
+@app.get("/uzman-randevulari/{uzman_id}")
+def uzman_randevulari(uzman_id: int, db: Session = Depends(get_db)):
+    randevular = db.query(Randevu).filter(
+        Randevu.uzman_id == uzman_id
+    ).order_by(Randevu.olusturma_tarihi.desc()).all()
+    
+    return {
+        "toplam": len(randevular),
+        "randevular": [{
+            "id": r.id, "kobi_email": r.kobi_email,
+            "hizmet_turu": r.hizmet_turu, "tarih": r.tarih,
+            "saat": r.saat, "durum": r.durum
+        } for r in randevular]
+    }
+
+
+@app.put("/randevu-durum/{randevu_id}")
+def randevu_durum_guncelle(randevu_id: int, yeni_durum: str, db: Session = Depends(get_db)):
+    randevu = db.query(Randevu).filter(Randevu.id == randevu_id).first()
+    if not randevu:
+        raise HTTPException(status_code=404, detail="Randevu bulunamadı")
+    randevu.durum = yeni_durum
+    db.commit()
+    return {"mesaj": "Durum güncellendi", "durum": yeni_durum}
+
+
+@app.post("/uzman-yorum")
+def uzman_yorum(girdi: YorumGirdi, db: Session = Depends(get_db)):
+    randevu = db.query(Randevu).filter(Randevu.id == girdi.randevu_id).first()
+    if not randevu:
+        raise HTTPException(status_code=404, detail="Randevu bulunamadı")
+    
+    yeni = UzmanYorum(
+        randevu_id=girdi.randevu_id, kobi_email=girdi.kobi_email,
+        uzman_id=girdi.uzman_id, puan=girdi.puan, yorum=girdi.yorum
+    )
+    db.add(yeni)
+    
+    # Uzmanın ortalama puanını güncelle
+    tum_yorumlar = db.query(UzmanYorum).filter(
+        UzmanYorum.uzman_id == girdi.uzman_id
+    ).all()
+    toplam_puan = sum(y.puan for y in tum_yorumlar) + girdi.puan
+    toplam_sayi = len(tum_yorumlar) + 1
+    ortalama = round(toplam_puan / toplam_sayi, 2)
+    
+    uzman = db.query(Uzman).filter(Uzman.id == girdi.uzman_id).first()
+    if uzman:
+        uzman.puan = ortalama
+    
+    db.commit()
+    return {"mesaj": "Yorum eklendi", "ortalama_puan": ortalama}
+
+
+@app.get("/admin/uzmanlar")
+def admin_uzmanlar(db: Session = Depends(get_db)):
+    uzmanlar = db.query(Uzman).order_by(Uzman.olusturma_tarihi.desc()).all()
+    return {
+        "toplam": len(uzmanlar),
+        "uzmanlar": [{
+            "id": u.id, "ad_soyad": u.ad_soyad, "email": u.email,
+            "uzmanlik_alani": u.uzmanlik_alani, "sehir": u.sehir,
+            "onay_durumu": u.onay_durumu, "puan": u.puan,
+            "toplam_is": u.toplam_is,
+            "olusturma_tarihi": u.olusturma_tarihi.isoformat()
+        } for u in uzmanlar]
+    }
+
+
+@app.post("/admin/uzman-onay/{uzman_id}")
+def admin_uzman_onay(uzman_id: int, onay: str = "onayli", db: Session = Depends(get_db)):
+    uzman = db.query(Uzman).filter(Uzman.id == uzman_id).first()
+    if not uzman:
+        raise HTTPException(status_code=404, detail="Uzman bulunamadı")
+    uzman.onay_durumu = onay
+    db.commit()
+    
+    if onay == "onayli":
+        email_gonder(
+            konu="Uzman Başvurunuz Onaylandı",
+            icerik=f"Sayın {uzman.ad_soyad}, başvurunuz onaylandı. Artık platformda görünüyorsunuz."
+        )
+    
+    return {"mesaj": f"Uzman durumu '{onay}' olarak güncellendi"}
+
+
+# ==================== STATİK ====================
 app.mount("/static", StaticFiles(directory=".", html=True), name="static")
