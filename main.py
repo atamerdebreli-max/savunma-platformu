@@ -50,6 +50,14 @@ from database import (
     AnaYuklenici, Egitim, EgitimSoru, EgitimIlerleme,
     YETENBilgi
 )
+from database import (
+    Degerlendirme, Kullanici, DanismanlikTalebi, YolHaritasi,
+    Hatirlatici, Kalibrasyon, get_db, SessionLocal,
+    Uzman, Randevu, UzmanOdeme, UzmanYorum,
+    AnaYuklenici, Egitim, EgitimSoru, EgitimIlerleme,
+    YETENBilgi,
+    RegTechAssessment, RegTechSoru, RegTechSonuc
+)
 load_dotenv()
 
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -2048,5 +2056,268 @@ Patentler: {bilgi.patentler}
 """
 
     return {"metin": metin}
+    # ==================== REGTECH MODÜLÜ ====================
+
+SEKTORLER = {
+    "ai_act": {
+        "ad": "AI Act Uyumluluk",
+        "aciklama": "AB Yapay Zeka Yasası uyumluluk değerlendirmesi",
+        "soru_sayisi": 20,
+        "fiyat": 15000
+    },
+    "medikal_ce": {
+        "ad": "Medikal CE Hazırlık",
+        "aciklama": "Medikal cihaz CE belgesi hazırlık değerlendirmesi",
+        "soru_sayisi": 20,
+        "fiyat": 20000
+    },
+    "karbon": {
+        "ad": "Sürdürülebilirlik / Karbon Ayak İzi",
+        "aciklama": "AB Yeşil Mutabakat karbon raporlama değerlendirmesi",
+        "soru_sayisi": 20,
+        "fiyat": 12000
+    },
+    "nis2": {
+        "ad": "NIS2 Siber Güvenlik",
+        "aciklama": "AB NIS2 Direktifi siber güvenlik uyumluluk değerlendirmesi",
+        "soru_sayisi": 20,
+        "fiyat": 18000
+    },
+    "dpp": {
+        "ad": "Dijital Ürün Pasaportu",
+        "aciklama": "AB DPP (Digital Product Passport) hazırlık değerlendirmesi",
+        "soru_sayisi": 15,
+        "fiyat": 10000
+    },
+    "kyc_aml": {
+        "ad": "KYC / AML Uyumluluk",
+        "aciklama": "Müşterini Tanı ve Kara Para Aklamayla Mücadele değerlendirmesi",
+        "soru_sayisi": 20,
+        "fiyat": 25000
+    }
+}
+
+
+class RegTechGirdi(BaseModel):
+    kullanici_email: str
+    sektor: str
+    sirket_adi: str = ""
+    cevaplar: Dict[str, int]  # {"soru_1": 3, "soru_2": 2, ...}
+
+
+def regtech_seviye_hesapla(yuzde: int) -> str:
+    if yuzde >= 85:
+        return "hazir"
+    elif yuzde >= 70:
+        return "ileri"
+    elif yuzde >= 50:
+        return "gelismekte"
+    else:
+        return "baslangic"
+
+
+@app.get("/regtech/sektorler")
+def regtech_sektorler():
+    return {
+        "toplam": len(SEKTORLER),
+        "sektorler": [
+            {"kod": k, "ad": v["ad"], "aciklama": v["aciklama"],
+             "soru_sayisi": v["soru_sayisi"], "fiyat": v["fiyat"]}
+            for k, v in SEKTORLER.items()
+        ]
+    }
+
+
+@app.get("/regtech/sorular/{sektor}")
+def regtech_sorular(sektor: str, db: Session = Depends(get_db)):
+    if sektor not in SEKTORLER:
+        raise HTTPException(status_code=404, detail="Sektör bulunamadı")
+
+    sorular = db.query(RegTechSoru).filter(
+        RegTechSoru.sektor == sektor
+    ).order_by(RegTechSoru.soru_no).all()
+
+    return {
+        "sektor": sektor,
+        "sektor_adi": SEKTORLER[sektor]["ad"],
+        "toplam": len(sorular),
+        "sorular": [{
+            "id": s.id, "soru_no": s.soru_no, "soru": s.soru,
+            "kategori": s.kategori, "agirlik": s.agirlik,
+            "aciklama": s.aciklama
+        } for s in sorular]
+    }
+
+
+@app.post("/regtech/degerlendirme")
+def regtech_degerlendirme(girdi: RegTechGirdi, db: Session = Depends(get_db)):
+    if girdi.sektor not in SEKTORLER:
+        raise HTTPException(status_code=404, detail="Sektör bulunamadı")
+
+    # Soruları çek ve ağırlıklı puan hesapla
+    sorular = db.query(RegTechSoru).filter(
+        RegTechSoru.sektor == girdi.sektor
+    ).all()
+
+    if not sorular:
+        raise HTTPException(status_code=400, detail="Bu sektör için sorular tanımlanmamış")
+
+    toplam_puan = 0
+    maksimum_puan = 0
+    kategori_skorlar = {}
+    kritik_eksikler = []
+
+    for s in sorular:
+        cevap = girdi.cevaplar.get(f"soru_{s.soru_no}", 0)
+        agirlikli = cevap * s.agirlik
+        toplam_puan += agirlikli
+        maksimum_puan += 10 * s.agirlik
+
+        # Kategori skoru
+        if s.kategori not in kategori_skorlar:
+            kategori_skorlar[s.kategori] = {"puan": 0, "maks": 0}
+        kategori_skorlar[s.kategori]["puan"] += agirlikli
+        kategori_skorlar[s.kategori]["maks"] += 10 * s.agirlik
+
+        # Kritik eksik (ağırlık 3 ve puan 0-3)
+        if s.agirlik == 3 and cevap <= 3:
+            kritik_eksikler.append({
+                "soru_no": s.soru_no, "soru": s.soru,
+                "kategori": s.kategori, "puan": cevap
+            })
+
+    yuzde = round((toplam_puan / maksimum_puan) * 100) if maksimum_puan > 0 else 0
+    seviye = regtech_seviye_hesapla(yuzde)
+
+    # Kaydet
+    yeni = RegTechAssessment(
+        kullanici_email=girdi.kullanici_email,
+        sektor=girdi.sektor,
+        sirket_adi=girdi.sirket_adi,
+        cevaplar=girdi.cevaplar,
+        toplam_puan=toplam_puan,
+        maksimum_puan=maksimum_puan,
+        yuzde=yuzde,
+        seviye=seviye
+    )
+    db.add(yeni)
+    db.commit()
+    db.refresh(yeni)
+
+    # Kategori bazlı gap raporu
+    kategori_raporu = []
+    for kat, skor in kategori_skorlar.items():
+        kat_yuzde = round((skor["puan"] / skor["maks"]) * 100) if skor["maks"] > 0 else 0
+        kategori_raporu.append({
+            "kategori": kat,
+            "yuzde": kat_yuzde,
+            "durum": "iyi" if kat_yuzde >= 70 else "orta" if kat_yuzde >= 40 else "zayif"
+        })
+
+    # Öneriler
+    oneriler = []
+    if yuzde < 50:
+        oneriler.append("Temel uyumluluk altyapısını kurmak için acil aksiyon planı hazırlayın.")
+    if yuzde < 70:
+        oneriler.append("Kritik eksikleri kapatmak için 3 aylık bir yol haritası oluşturun.")
+    if yuzde < 85:
+        oneriler.append("Uzman danışman desteği alarak eksikleri hızlıca kapatın.")
+    if yuzde >= 85:
+        oneriler.append("Uyumluluk seviyeniz yüksek. Yıllık gözden geçirme ile koruyun.")
+
+    # Sonuç kaydet
+    sonuc = RegTechSonuc(
+        assessment_id=yeni.id,
+        kullanici_email=girdi.kullanici_email,
+        sektor=girdi.sektor,
+        gap_raporu={"kategoriler": kategori_raporu, "kritik_eksikler": kritik_eksikler},
+        oneriler=oneriler
+    )
+    db.add(sonuc)
+    db.commit()
+
+    return {
+        "mesaj": "Değerlendirme tamamlandı",
+        "assessment_id": yeni.id,
+        "sektor": girdi.sektor,
+        "sektor_adi": SEKTORLER[girdi.sektor]["ad"],
+        "toplam_puan": toplam_puan,
+        "maksimum_puan": maksimum_puan,
+        "yuzde": yuzde,
+        "seviye": seviye,
+        "kategoriler": kategori_raporu,
+        "kritik_eksikler": kritik_eksikler,
+        "kritik_eksik_sayisi": len(kritik_eksikler),
+        "oneriler": oneriler
+    }
+
+
+@app.get("/regtech/sonuclar/{email}")
+def regtech_sonuclar(email: str, db: Session = Depends(get_db)):
+    kayitlar = db.query(RegTechAssessment).filter(
+        RegTechAssessment.kullanici_email == email
+    ).order_by(RegTechAssessment.olusturma_tarihi.desc()).all()
+
+    return {
+        "toplam": len(kayitlar),
+        "sonuclar": [{
+            "id": k.id, "sektor": k.sektor,
+            "sektor_adi": SEKTORLER.get(k.sektor, {}).get("ad", k.sektor),
+            "yuzde": k.yuzde, "seviye": k.seviye,
+            "olusturma_tarihi": k.olusturma_tarihi.isoformat()
+        } for k in kayitlar]
+    }
+
+
+@app.get("/regtech/sonuc/{assessment_id}")
+def regtech_sonuc_detay(assessment_id: int, db: Session = Depends(get_db)):
+    kayit = db.query(RegTechAssessment).filter(
+        RegTechAssessment.id == assessment_id
+    ).first()
+    if not kayit:
+        raise HTTPException(status_code=404, detail="Sonuç bulunamadı")
+
+    sonuc = db.query(RegTechSonuc).filter(
+        RegTechSonuc.assessment_id == assessment_id
+    ).first()
+
+    return {
+        "id": kayit.id, "sektor": kayit.sektor,
+        "sektor_adi": SEKTORLER.get(kayit.sektor, {}).get("ad", kayit.sektor),
+        "sirket_adi": kayit.sirket_adi,
+        "yuzde": kayit.yuzde, "seviye": kayit.seviye,
+        "gap_raporu": sonuc.gap_raporu if sonuc else {},
+        "oneriler": sonuc.oneriler if sonuc else [],
+        "olusturma_tarihi": kayit.olusturma_tarihi.isoformat()
+    }
+
+
+@app.post("/admin/regtech-soru-ekle")
+def admin_regtech_soru_ekle(
+    sektor: str, soru_no: int, soru: str, kategori: str,
+    agirlik: int = 1, aciklama: str = "", db: Session = Depends(get_db)
+):
+    yeni = RegTechSoru(
+        sektor=sektor, soru_no=soru_no, soru=soru,
+        kategori=kategori, agirlik=agirlik, aciklama=aciklama
+    )
+    db.add(yeni)
+    db.commit()
+    db.refresh(yeni)
+    return {"mesaj": "Soru eklendi", "id": yeni.id}
+
+
+@app.get("/admin/regtech-sorular/{sektor}")
+def admin_regtech_sorular(sektor: str, db: Session = Depends(get_db)):
+    sorular = db.query(RegTechSoru).filter(
+        RegTechSoru.sektor == sektor
+    ).order_by(RegTechSoru.soru_no).all()
+    return {
+        "sektor": sektor, "toplam": len(sorular),
+        "sorular": [{
+            "id": s.id, "soru_no": s.soru_no, "soru": s.soru,
+            "kategori": s.kategori, "agirlik": s.agirlik
+        } for s in sorular]
+    }
 # ==================== STATİK ====================
 app.mount("/static", StaticFiles(directory=".", html=True), name="static")

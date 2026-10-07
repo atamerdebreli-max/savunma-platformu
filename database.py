@@ -240,6 +240,45 @@ class YETENBilgi(Base):
     son_guncelleme = Column(DateTime, default=datetime.utcnow)
     hatirlatma_tarihi = Column(String, default="")
     olusturma_tarihi = Column(DateTime, default=datetime.utcnow)
+    # ==================== REGTECH MODÜLÜ ====================
+
+class RegTechAssessment(Base):
+    __tablename__ = "regtech_assessments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    kullanici_email = Column(String, index=True)
+    sektor = Column(String)  # ai_act, medikal_ce, karbon, nis2, dpp, kyc_aml
+    sirket_adi = Column(String, default="")
+    cevaplar = Column(JSON)
+    toplam_puan = Column(Integer, default=0)
+    maksimum_puan = Column(Integer, default=0)
+    yuzde = Column(Integer, default=0)
+    seviye = Column(String, default="baslangic")  # baslangic, gelismekte, ileri, hazir
+    olusturma_tarihi = Column(DateTime, default=datetime.utcnow)
+
+
+class RegTechSoru(Base):
+    __tablename__ = "regtech_sorulari"
+
+    id = Column(Integer, primary_key=True, index=True)
+    sektor = Column(String, index=True)  # ai_act, medikal_ce, karbon, vs.
+    soru_no = Column(Integer)
+    soru = Column(Text)
+    kategori = Column(String)  # idari, teknik, operasyonel
+    agirlik = Column(Integer, default=1)  # 1-3
+    aciklama = Column(Text, default="")
+
+
+class RegTechSonuc(Base):
+    __tablename__ = "regtech_sonuclari"
+
+    id = Column(Integer, primary_key=True, index=True)
+    assessment_id = Column(Integer, ForeignKey("regtech_assessments.id"))
+    kullanici_email = Column(String, index=True)
+    sektor = Column(String)
+    gap_raporu = Column(JSON)
+    oneriler = Column(JSON)
+    olusturma_tarihi = Column(DateTime, default=datetime.utcnow)
 Base.metadata.create_all(bind=engine)
 
 # ==================== ANA YÜKLENİCİ MODÜLÜ ====================
