@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uzman Paneli - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .kapsayici { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 32px; margin-bottom: 10px; }
+        .alt-baslik { color: #a8c5e0; margin-bottom: 30px; }
+
+        .ozet-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+        .ozet-kart {
+            background: linear-gradient(135deg, rgba(0,180,216,0.1) 0%, rgba(0,119,182,0.05) 100%);
+            border: 1px solid rgba(0,180,216,0.2);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+        .ozet-sayi {
+            font-size: 36px;
+            font-weight: 800;
+            color: #00b4d8;
+            margin-bottom: 5px;
+        }
+        .ozet-etiket { color: #a8c5e0; font-size: 14px; }
+
+        .giris-kutu {
+            background: rgba(0,180,216,0.08);
+            border: 1px solid rgba(0,180,216,0.3);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+        .giris-kutu label { display: block; color: #a8c5e0; font-size: 14px; margin-bottom: 8px; }
+        .giris-kutu input {
+            width: 100%;
+            padding: 13px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .giris-kutu button {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            padding: 13px 30px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .randevu-kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 22px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .randevu-sol { flex: 1; min-width: 250px; }
+        .kobi-email { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .hizmet {
+            display: inline-block;
+            background: rgba(0,180,216,0.15);
+            color: #00b4d8;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .randevu-bilgi { color: #a8c5e0; font-size: 13px; }
+
+        .durum {
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .durum-beklemede { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .durum-onaylandi { background: rgba(74,222,128,0.15); color: #4ade80; }
+        .durum-tamamlandi { background: rgba(0,180,216,0.15); color: #00b4d8; }
+        .durum-iptal { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+        .btn-grup { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-kucuk {
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .btn-onayla { background: #4ade80; color: #052e16; }
+        .btn-tamamla { background: #00b4d8; color: #fff; }
+        .btn-iptal { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.4); }
+
+        .bos-mesaj {
+            text-align: center;
+            color: #a8c5e0;
+            padding: 60px 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <a href="uzmanlar.html">Uzmanlar</a>
+            <a href="panel.html">Panel</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici">
+        <h1>Uzman Paneli</h1>
+        <p class="alt-baslik">Randevu taleplerinizi yönetin, kazançlarınızı takip edin.</p>
+
+        <div class="giris-kutu" id="giris-kutu">
+            <label>Kayıtlı e-posta adresinizi girin:</label>
+            <input type="email" id="uzman-email" placeholder="uzman@email.com">
+            <button onclick="panelYukle()">Panele Gir</button>
+        </div>
+
+        <div id="panel" style="display:none;">
+            <div class="ozet-grid">
+                <div class="ozet-kart">
+                    <div class="ozet-sayi" id="toplam-randevu">0</div>
+                    <div class="ozet-etiket">Toplam Randevu</div>
+                </div>
+                <div class="ozet-kart">
+                    <div class="ozet-sayi" id="bekleyen-randevu">0</div>
+                    <div class="ozet-etiket">Bekleyen</div>
+                </div>
+                <div class="ozet-kart">
+                    <div class="ozet-sayi" id="tamamlanan-randevu">0</div>
+                    <div class="ozet-etiket">Tamamlanan</div>
+                </div>
+            </div>
+
+            <h2 style="margin-bottom:20px; font-size:22px;">Randevu Talepleri</h2>
+            <div id="randevu-listesi"></div>
+        </div>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+        let uzmanId = null;
+        let randevular = [];
+
+        async function panelYukle() {
+            const email = document.getElementById('uzman-email').value.trim();
+            if (!email) {
+                alert('Lütfen e-posta adresinizi girin.');
+                return;
+            }
+
+            try {
+                // Uzmanı email ile bul
+                const r1 = await fetch(API + '/uzmanlar');
+                const data1 = await r1.json();
+                const uzman = (data1.uzmanlar || []).find(u => u.email === email);
+
+                if (!uzman) {
+                    alert('Bu e-posta ile kayıtlı onaylı uzman bulunamadı.');
+                    return;
+                }
+
+                uzmanId = uzman.id;
+
+                // Randevuları yükle
+                const r2 = await fetch(API + '/uzman-randevulari/' + uzmanId);
+                const data2 = await r2.json();
+                randevular = data2.randevular || [];
+
+                document.getElementById('giris-kutu').style.display = 'none';
+                document.getElementById('panel').style.display = 'block';
+
+                ozetGuncelle();
+                listeyiGoster();
+            } catch (e) {
+                alert('Panel yüklenemedi.');
+            }
+        }
+
+        function ozetGuncelle() {
+            document.getElementById('toplam-randevu').textContent = randevular.length;
+            document.getElementById('bekleyen-randevu').textContent = 
+                randevular.filter(r => r.durum === 'beklemede').length;
+            document.getElementById('tamamlanan-randevu').textContent = 
+                randevular.filter(r => r.durum === 'tamamlandi').length;
+        }
+
+        function listeyiGoster() {
+            const liste = document.getElementById('randevu-listesi');
+
+            if (randevular.length === 0) {
+                liste.innerHTML = '<div class="bos-mesaj">Henüz randevu talebi yok.</div>';
+                return;
+            }
+
+            liste.innerHTML = randevular.map(r => `
+                <div class="randevu-kart">
+                    <div class="randevu-sol">
+                        <div class="kobi-email">📧 ${r.kobi_email}</div>
+                        <div class="hizmet">${r.hizmet_turu}</div>
+                        <div class="randevu-bilgi">📅 ${r.tarih} — ${r.saat}</div>
+                    </div>
+                    <div>
+                        <div class="durum durum-${r.durum}">
+                            ${r.durum === 'beklemede' ? '⏳ Beklemede' :
+                              r.durum === 'onaylandi' ? '✅ Onaylandı' :
+                              r.durum === 'tamamlandi' ? '🎉 Tamamlandı' :
+                              '❌ İptal'}
+                        </div>
+                        <div class="btn-grup">
+                            ${r.durum === 'beklemede' ? `
+                                <button class="btn-kucuk btn-onayla" onclick="durumGuncelle(${r.id}, 'onaylandi')">Onayla</button>
+                                <button class="btn-kucuk btn-iptal" onclick="durumGuncelle(${r.id}, 'iptal')">İptal</button>
+                            ` : ''}
+                            ${r.durum === 'onaylandi' ? `
+                                <button class="btn-kucuk btn-tamamla" onclick="durumGuncelle(${r.id}, 'tamamlandi')">Tamamla</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function durumGuncelle(randevuId, yeniDurum) {
+            try {
+                const r = await fetch(API + '/randevu-durum/' + randevuId + '?yeni_durum=' + yeniDurum, {
+                    method: 'PUT'
+                });
+                if (r.ok) {
+                    const randevu = randevular.find(x => x.id === randevuId);
+                    if (randevu) randevu.durum = yeniDurum;
+                    ozetGuncelle();
+                    listeyiGoster();
+                } else {
+                    alert('Durum güncellenemedi.');
+                }
+            } catch (e) {
+                alert('Bağlantı hatası.');
+            }
+        }
+
+        document.getElementById('uzman-email').addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') panelYukle();
+        });
+    </script>
+</body>
+</html>

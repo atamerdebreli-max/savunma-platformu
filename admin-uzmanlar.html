@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Uzman Yönetimi - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .kapsayici { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 32px; margin-bottom: 10px; }
+        .alt-baslik { color: #a8c5e0; margin-bottom: 30px; }
+
+        .filtre {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .filtre button {
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #a8c5e0;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .filtre button.aktif {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .uzman-kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 15px;
+        }
+        .uzman-ust {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .uzman-isim { font-size: 18px; font-weight: 700; }
+        .uzman-email { color: #a8c5e0; font-size: 13px; margin-top: 3px; }
+
+        .durum {
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .durum-beklemede { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .durum-onayli { background: rgba(74,222,128,0.15); color: #4ade80; }
+        .durum-reddedildi { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+        .uzman-bilgi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .bilgi-item {
+            background: rgba(255,255,255,0.03);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+        .bilgi-item strong { color: #00b4d8; display: block; margin-bottom: 3px; font-size: 11px; }
+
+        .btn-grup { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-kucuk {
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .btn-onayla { background: #4ade80; color: #052e16; }
+        .btn-reddet { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.4); }
+
+        .bos-mesaj {
+            text-align: center;
+            color: #a8c5e0;
+            padding: 60px 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <a href="admin.html">Admin Panel</a>
+            <a href="uzmanlar.html">Uzmanlar</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici">
+        <h1>Uzman Başvuruları</h1>
+        <p class="alt-baslik">Uzman başvurularını inceleyin, onaylayın veya reddedin.</p>
+
+        <div class="filtre">
+            <button class="aktif" onclick="filtrele('hepsi', this)">Tümü</button>
+            <button onclick="filtrele('beklemede', this)">Beklemede</button>
+            <button onclick="filtrele('onayli', this)">Onaylı</button>
+            <button onclick="filtrele('reddedildi', this)">Reddedildi</button>
+        </div>
+
+        <div id="uzman-listesi"></div>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+        let tumUzmanlar = [];
+        let aktifFiltre = 'hepsi';
+
+        async function uzmanlariYukle() {
+            try {
+                const r = await fetch(API + '/admin/uzmanlar');
+                const data = await r.json();
+                tumUzmanlar = data.uzmanlar || [];
+                listeyiGoster();
+            } catch (e) {
+                document.getElementById('uzman-listesi').innerHTML = 
+                    '<div class="bos-mesaj">Uzmanlar yüklenemedi.</div>';
+            }
+        }
+
+        function filtrele(durum, btn) {
+            aktifFiltre = durum;
+            document.querySelectorAll('.filtre button').forEach(b => b.classList.remove('aktif'));
+            btn.classList.add('aktif');
+            listeyiGoster();
+        }
+
+        function listeyiGoster() {
+            const liste = document.getElementById('uzman-listesi');
+            let uzmanlar = tumUzmanlar;
+
+            if (aktifFiltre !== 'hepsi') {
+                uzmanlar = uzmanlar.filter(u => u.onay_durumu === aktifFiltre);
+            }
+
+            if (uzmanlar.length === 0) {
+                liste.innerHTML = '<div class="bos-mesaj">Bu filtrede uzman bulunmuyor.</div>';
+                return;
+            }
+
+            liste.innerHTML = uzmanlar.map(u => `
+                <div class="uzman-kart">
+                    <div class="uzman-ust">
+                        <div>
+                            <div class="uzman-isim">${u.ad_soyad}</div>
+                            <div class="uzman-email">📧 ${u.email}</div>
+                        </div>
+                        <div class="durum durum-${u.onay_durumu}">
+                            ${u.onay_durumu === 'beklemede' ? '⏳ Beklemede' :
+                              u.onay_durumu === 'onayli' ? '✅ Onaylı' :
+                              '❌ Reddedildi'}
+                        </div>
+                    </div>
+                    <div class="uzman-bilgi-grid">
+                        <div class="bilgi-item"><strong>UZMANLIK</strong>${u.uzmanlik_alani || '—'}</div>
+                        <div class="bilgi-item"><strong>ŞEHİR</strong>${u.sehir || '—'}</div>
+                        <div class="bilgi-item"><strong>PUAN</strong>${u.puan || 'Yeni'}</div>
+                        <div class="bilgi-item"><strong>TOPLAM İŞ</strong>${u.toplam_is || 0}</div>
+                    </div>
+                    <div class="btn-grup">
+                        ${u.onay_durumu === 'beklemede' ? `
+                            <button class="btn-kucuk btn-onayla" onclick="durumGuncelle(${u.id}, 'onayli')">✅ Onayla</button>
+                            <button class="btn-kucuk btn-reddet" onclick="durumGuncelle(${u.id}, 'reddedildi')">❌ Reddet</button>
+                        ` : ''}
+                        ${u.onay_durumu === 'onayli' ? `
+                            <button class="btn-kucuk btn-reddet" onclick="durumGuncelle(${u.id}, 'reddedildi')">Reddet</button>
+                        ` : ''}
+                        ${u.onay_durumu === 'reddedildi' ? `
+                            <button class="btn-kucuk btn-onayla" onclick="durumGuncelle(${u.id}, 'onayli')">Onayla</button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function durumGuncelle(uzmanId, yeniDurum) {
+            try {
+                const r = await fetch(API + '/admin/uzman-onay/' + uzmanId + '?onay=' + yeniDurum, {
+                    method: 'POST'
+                });
+                if (r.ok) {
+                    const uzman = tumUzmanlar.find(x => x.id === uzmanId);
+                    if (uzman) uzman.onay_durumu = yeniDurum;
+                    listeyiGoster();
+                } else {
+                    alert('Güncellenemedi.');
+                }
+            } catch (e) {
+                alert('Bağlantı hatası.');
+            }
+        }
+
+        uzmanlariYukle();
+    </script>
+</body>
+</html>
