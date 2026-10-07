@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uzman Başvurusu - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .kapsayici { max-width: 700px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 32px; margin-bottom: 10px; }
+        .alt-baslik { color: #a8c5e0; margin-bottom: 30px; }
+        .kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 35px;
+        }
+        .form-grup { margin-bottom: 20px; }
+        .form-grup label {
+            display: block;
+            color: #a8c5e0;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .form-grup input, .form-grup select, .form-grup textarea {
+            width: 100%;
+            padding: 13px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .form-grup input:focus, .form-grup select:focus, .form-grup textarea:focus {
+            outline: none;
+            border-color: #00b4d8;
+        }
+        .form-grup textarea { min-height: 90px; resize: vertical; }
+        .satir { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .btn:hover { opacity: 0.9; }
+        .basari {
+            background: rgba(74,222,128,0.1);
+            border: 1px solid rgba(74,222,128,0.3);
+            color: #4ade80;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .hata {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.3);
+            color: #ef4444;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <a href="uzmanlar.html">Uzmanlar</a>
+            <a href="panel.html">Panel</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici">
+        <h1>Uzman Danışman Başvurusu</h1>
+        <p class="alt-baslik">FAI, FOD, YETEN, AS9100 veya EYDEP uzmanı olarak platforma katılın. KOBİ'lerle eşleşin, kazanç sağlayın.</p>
+
+        <div class="basari" id="basari"></div>
+        <div class="hata" id="hata"></div>
+
+        <div class="kart" id="form-kart">
+            <div class="form-grup">
+                <label>Ad Soyad *</label>
+                <input type="text" id="ad_soyad" placeholder="Örn: Ahmet Yılmaz">
+            </div>
+
+            <div class="satir">
+                <div class="form-grup">
+                    <label>E-posta *</label>
+                    <input type="email" id="email" placeholder="ornek@email.com">
+                </div>
+                <div class="form-grup">
+                    <label>Telefon</label>
+                    <input type="tel" id="telefon" placeholder="+90 5XX XXX XX XX">
+                </div>
+            </div>
+
+            <div class="satir">
+                <div class="form-grup">
+                    <label>Uzmanlık Alanı *</label>
+                    <select id="uzmanlik_alani">
+                        <option value="">Seçiniz</option>
+                        <option value="FAI">FAI (İlk Ürün Muayenesi)</option>
+                        <option value="FOD">FOD (Yabancı Madde Hasarı Önleme)</option>
+                        <option value="YETEN">YETEN Portal Yönetimi</option>
+                        <option value="AS9100">AS9100 Danışmanlık</option>
+                        <option value="EYDEP">EYDEP Danışmanlık</option>
+                        <option value="AS9100, EYDEP">AS9100 + EYDEP</option>
+                    </select>
+                </div>
+                <div class="form-grup">
+                    <label>Deneyim Yılı</label>
+                    <input type="number" id="deneyim_yili" placeholder="Örn: 10" min="0">
+                </div>
+            </div>
+
+            <div class="satir">
+                <div class="form-grup">
+                    <label>Şehir</label>
+                    <input type="text" id="sehir" placeholder="Örn: Ankara">
+                </div>
+                <div class="form-grup">
+                    <label>Fiyat Aralığı</label>
+                    <input type="text" id="fiyat_araligi" placeholder="Örn: 5.000 - 15.000 TL">
+                </div>
+            </div>
+
+            <div class="form-grup">
+                <label>Sertifikalar</label>
+                <textarea id="sertifikalar" placeholder="Örn: AS9100 Lead Auditor, FOD Trainer, ISO 9001 Baş Denetçi"></textarea>
+            </div>
+
+            <div class="form-grup">
+                <label>Referanslar</label>
+                <textarea id="referanslar" placeholder="Örn: TAI, TEI, Roketsan gibi firmalarda verdiğiniz eğitimler veya çalıştığınız projeler"></textarea>
+            </div>
+
+            <button class="btn" onclick="basvuruGonder()">Başvuruyu Gönder →</button>
+        </div>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+
+        async function basvuruGonder() {
+            const ad_soyad = document.getElementById('ad_soyad').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const telefon = document.getElementById('telefon').value.trim();
+            const uzmanlik_alani = document.getElementById('uzmanlik_alani').value;
+            const deneyim_yili = parseInt(document.getElementById('deneyim_yili').value) || 0;
+            const sehir = document.getElementById('sehir').value.trim();
+            const fiyat_araligi = document.getElementById('fiyat_araligi').value.trim();
+            const sertifikalar = document.getElementById('sertifikalar').value.trim();
+            const referanslar = document.getElementById('referanslar').value.trim();
+
+            const hata = document.getElementById('hata');
+            const basari = document.getElementById('basari');
+            hata.style.display = 'none';
+            basari.style.display = 'none';
+
+            if (!ad_soyad || !email || !uzmanlik_alani) {
+                hata.textContent = 'Lütfen zorunlu alanları doldurun (Ad Soyad, E-posta, Uzmanlık Alanı).';
+                hata.style.display = 'block';
+                return;
+            }
+
+            try {
+                const r = await fetch(API + '/uzman/kayit', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        ad_soyad, email, telefon, uzmanlik_alani,
+                        deneyim_yili, sertifikalar, referanslar,
+                        fiyat_araligi, sehir
+                    })
+                });
+                const data = await r.json();
+
+                if (r.ok) {
+                    document.getElementById('form-kart').style.display = 'none';
+                    basari.innerHTML = `
+                        <h2>✅ Başvurunuz Alındı!</h2>
+                        <p style="margin-top:10px;">Başvurunuz incelendikten sonra e-posta ile bilgilendirileceksiniz. Onay sonrası profilini platformda görünecek.</p>
+                    `;
+                    basari.style.display = 'block';
+                } else {
+                    hata.textContent = data.detail || 'Başvuru gönderilemedi.';
+                    hata.style.display = 'block';
+                }
+            } catch (e) {
+                hata.textContent = 'Bağlantı hatası. Lütfen tekrar deneyin.';
+                hata.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

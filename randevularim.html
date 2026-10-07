@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Randevularım - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .kapsayici { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 32px; margin-bottom: 10px; }
+        .alt-baslik { color: #a8c5e0; margin-bottom: 30px; }
+
+        .filtre {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .filtre button {
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #a8c5e0;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .filtre button.aktif {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .randevu-kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .randevu-sol { flex: 1; min-width: 250px; }
+        .randevu-uzman { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .randevu-hizmet {
+            display: inline-block;
+            background: rgba(0,180,216,0.15);
+            color: #00b4d8;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .randevu-bilgi { color: #a8c5e0; font-size: 14px; margin-top: 5px; }
+
+        .durum {
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+        }
+        .durum-beklemede {
+            background: rgba(251,191,36,0.15);
+            color: #fbbf24;
+        }
+        .durum-onaylandi {
+            background: rgba(74,222,128,0.15);
+            color: #4ade80;
+        }
+        .durum-tamamlandi {
+            background: rgba(0,180,216,0.15);
+            color: #00b4d8;
+        }
+        .durum-iptal {
+            background: rgba(239,68,68,0.15);
+            color: #ef4444;
+        }
+
+        .bos-mesaj {
+            text-align: center;
+            color: #a8c5e0;
+            padding: 60px 20px;
+            font-size: 16px;
+        }
+
+        .email-giris {
+            background: rgba(0,180,216,0.08);
+            border: 1px solid rgba(0,180,216,0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+        .email-giris label { display: block; color: #a8c5e0; font-size: 14px; margin-bottom: 8px; }
+        .email-giris input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .email-giris button {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            padding: 12px 30px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <a href="panel.html">Panel</a>
+            <a href="uzmanlar.html">Uzmanlar</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici">
+        <h1>Randevularım</h1>
+        <p class="alt-baslik">Uzman danışmanlarla olan randevularınızı buradan takip edin.</p>
+
+        <div class="email-giris" id="email-giris">
+            <label>E-posta adresinizi girin:</label>
+            <input type="email" id="email-input" placeholder="ornek@email.com">
+            <button onclick="randevulariYukle()">Randevularımı Gör</button>
+        </div>
+
+        <div class="filtre" id="filtre" style="display:none;">
+            <button class="aktif" onclick="filtrele('hepsi', this)">Tümü</button>
+            <button onclick="filtrele('beklemede', this)">Beklemede</button>
+            <button onclick="filtrele('onaylandi', this)">Onaylandı</button>
+            <button onclick="filtrele('tamamlandi', this)">Tamamlandı</button>
+            <button onclick="filtrele('iptal', this)">İptal</button>
+        </div>
+
+        <div id="randevu-listesi"></div>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+        let tumRandevular = [];
+        let aktifFiltre = 'hepsi';
+
+        async function randevulariYukle() {
+            const email = document.getElementById('email-input').value.trim();
+            if (!email) {
+                alert('Lütfen e-posta adresinizi girin.');
+                return;
+            }
+
+            try {
+                const r = await fetch(API + '/randevularim?email=' + encodeURIComponent(email));
+                const data = await r.json();
+                tumRandevular = data.randevular || [];
+
+                document.getElementById('email-giris').style.display = 'none';
+                document.getElementById('filtre').style.display = 'flex';
+
+                listeyiGoster();
+            } catch (e) {
+                alert('Randevular yüklenemedi.');
+            }
+        }
+
+        function filtrele(durum, btn) {
+            aktifFiltre = durum;
+            document.querySelectorAll('.filtre button').forEach(b => b.classList.remove('aktif'));
+            btn.classList.add('aktif');
+            listeyiGoster();
+        }
+
+        function listeyiGoster() {
+            const liste = document.getElementById('randevu-listesi');
+            let randevular = tumRandevular;
+
+            if (aktifFiltre !== 'hepsi') {
+                randevular = randevular.filter(r => r.durum === aktifFiltre);
+            }
+
+            if (randevular.length === 0) {
+                liste.innerHTML = '<div class="bos-mesaj">Bu filtrede randevu bulunmuyor.</div>';
+                return;
+            }
+
+            liste.innerHTML = randevular.map(r => `
+                <div class="randevu-kart">
+                    <div class="randevu-sol">
+                        <div class="randevu-uzman">👤 ${r.uzman_adi}</div>
+                        <div class="randevu-hizmet">${r.hizmet_turu}</div>
+                        <div class="randevu-bilgi">📅 ${r.tarih} — ${r.saat}</div>
+                    </div>
+                    <div class="durum durum-${r.durum}">
+                        ${r.durum === 'beklemede' ? '⏳ Beklemede' :
+                          r.durum === 'onaylandi' ? '✅ Onaylandı' :
+                          r.durum === 'tamamlandi' ? '🎉 Tamamlandı' :
+                          '❌ İptal'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('email-input').addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') randevulariYukle();
+        });
+    </script>
+</body>
+</html>
