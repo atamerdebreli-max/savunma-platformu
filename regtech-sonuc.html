@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegTech Sonuç - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .kapsayici { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 30px; margin-bottom: 5px; }
+        .alt-baslik { color: #a8c5e0; margin-bottom: 30px; }
+
+        .skor-kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .skor-yuzde {
+            font-size: 70px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        .skor-yuzde.hazir { color: #4ade80; }
+        .skor-yuzde.ileri { color: #00b4d8; }
+        .skor-yuzde.gelismekte { color: #fbbf24; }
+        .skor-yuzde.baslangic { color: #ef4444; }
+        .seviye-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .seviye-hazir { background: rgba(74,222,128,0.15); color: #4ade80; }
+        .seviye-ileri { background: rgba(0,180,216,0.15); color: #00b4d8; }
+        .seviye-gelismekte { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .seviye-baslangic { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+        .kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .kart h2 { font-size: 18px; margin-bottom: 20px; color: #00b4d8; }
+
+        .kategori-satir {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .kategori-satir:last-child { border-bottom: none; }
+        .kategori-ad { font-weight: 600; text-transform: capitalize; }
+        .kategori-skor { font-weight: 700; font-size: 18px; }
+        .kategori-skor.iyi { color: #4ade80; }
+        .kategori-skor.orta { color: #fbbf24; }
+        .kategori-skor.zayif { color: #ef4444; }
+
+        .eksik-satir {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+        }
+        .eksik-satir:last-child { border-bottom: none; }
+        .eksik-kategori {
+            display: inline-block;
+            background: rgba(239,68,68,0.15);
+            color: #ef4444;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        .oneri {
+            padding: 15px;
+            background: rgba(0,180,216,0.08);
+            border-left: 3px solid #00b4d8;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            padding: 14px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn.ikincil {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <a href="regtech.html">← RegTech</a>
+            <a href="panel.html">Panel</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici" id="icerik">
+        <p style="text-align:center; color:#a8c5e0;">Yükleniyor...</p>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+        const params = new URLSearchParams(window.location.search);
+        const assessmentId = params.get('id');
+
+        async function yukle() {
+            if (!assessmentId) {
+                document.getElementById('icerik').innerHTML = '<p>Sonuç bulunamadı.</p>';
+                return;
+            }
+
+            try {
+                const r = await fetch(API + '/regtech/sonuc/' + assessmentId);
+                const data = await r.json();
+
+                const seviyeEtiket = {
+                    "hazir": "✅ Hazır",
+                    "ileri": "🟢 İleri Seviye",
+                    "gelismekte": "🟡 Gelişmekte",
+                    "baslangic": "🔴 Başlangıç"
+                };
+
+                const kategorilerHTML = (data.gap_raporu?.kategoriler || []).map(k => `
+                    <div class="kategori-satir">
+                        <span class="kategori-ad">${k.kategori}</span>
+                        <span class="kategori-skor ${k.durum}">${k.yuzde}%</span>
+                    </div>
+                `).join('') || '<p style="color:#a8c5e0;">Kategori bilgisi yok.</p>';
+
+                const eksikler = data.gap_raporu?.kritik_eksikler || [];
+                const eksiklerHTML = eksikler.length === 0 
+                    ? '<p style="color:#4ade80;">✅ Kritik eksik yok!</p>'
+                    : eksikler.map(e => `
+                        <div class="eksik-satir">
+                            <span class="eksik-kategori">${e.kategori}</span>
+                            ${e.soru}
+                        </div>
+                    `).join('');
+
+                const onerilerHTML = (data.oneriler || []).map(o => 
+                    `<div class="oneri">💡 ${o}</div>`
+                ).join('');
+
+                document.getElementById('icerik').innerHTML = `
+                    <h1>${data.sektor_adi} Sonucu</h1>
+                    <p class="alt-baslik">Değerlendirme tamamlandı. İşte gap raporunuz.</p>
+
+                    <div class="skor-kart">
+                        <div class="skor-yuzde ${data.seviye}">${data.yuzde}%</div>
+                        <div class="seviye-badge seviye-${data.seviye}">${seviyeEtiket[data.seviye] || data.seviye}</div>
+                    </div>
+
+                    <div class="kart">
+                        <h2>📊 Kategori Bazlı Skorlar</h2>
+                        ${kategorilerHTML}
+                    </div>
+
+                    <div class="kart">
+                        <h2>⚠️ Kritik Eksikler (${eksikler.length})</h2>
+                        ${eksiklerHTML}
+                    </div>
+
+                    <div class="kart">
+                        <h2>💡 Öneriler</h2>
+                        ${onerilerHTML || '<p style="color:#a8c5e0;">Öneri yok.</p>'}
+                    </div>
+
+                    <div style="text-align:center; margin-top:20px;">
+                        <a href="regtech.html" class="btn">← Diğer Modüller</a>
+                        <a href="uzmanlar.html" class="btn ikincil">Uzman Desteği Al</a>
+                    </div>
+                `;
+            } catch (e) {
+                document.getElementById('icerik').innerHTML = '<p>Sonuç yüklenemedi.</p>';
+            }
+        }
+
+        yukle();
+    </script>
+</body>
+</html>

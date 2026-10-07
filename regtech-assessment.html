@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegTech Assessment - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .kapsayici { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 28px; margin-bottom: 10px; }
+        .alt-baslik { color: #a8c5e0; margin-bottom: 30px; }
+
+        .ilerleme-bar {
+            background: rgba(255,255,255,0.08);
+            height: 8px;
+            border-radius: 50px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        .ilerleme-dolgu {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        .soru-kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 35px;
+        }
+        .kategori-badge {
+            display: inline-block;
+            background: rgba(0,180,216,0.15);
+            color: #00b4d8;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .soru-metin {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .soru-aciklama {
+            color: #a8c5e0;
+            font-size: 14px;
+            font-style: italic;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(0,180,216,0.05);
+            border-left: 3px solid #00b4d8;
+            border-radius: 8px;
+        }
+        .secenek {
+            display: block;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+        .secenek:hover {
+            border-color: #00b4d8;
+            background: rgba(0,180,216,0.08);
+        }
+        .secenek.secili {
+            border-color: #00b4d8;
+            background: rgba(0,180,216,0.15);
+            color: #00b4d8;
+            font-weight: 600;
+        }
+        .btn {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            padding: 16px 40px;
+            border-radius: 50px;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .bos-mesaj {
+            text-align: center;
+            color: #a8c5e0;
+            padding: 60px 20px;
+        }
+        .bos-mesaj h2 { color: #fbbf24; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <a href="regtech.html">← RegTech</a>
+            <a href="panel.html">Panel</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici" id="icerik">
+        <p style="text-align:center; color:#a8c5e0;">Yükleniyor...</p>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+        const params = new URLSearchParams(window.location.search);
+        const sektor = params.get('sektor');
+
+        let sorular = [];
+        let mevcutSoru = 0;
+        let cevaplar = {};
+        let kullaniciEmail = localStorage.getItem('kullanici_email') || '';
+
+        async function yukle() {
+            if (!sektor) {
+                document.getElementById('icerik').innerHTML = '<p>Geçersiz sektör.</p>';
+                return;
+            }
+
+            try {
+                const r = await fetch(API + '/regtech/sorular/' + sektor);
+                const data = await r.json();
+                sorular = data.sorular || [];
+
+                if (sorular.length === 0) {
+                    document.getElementById('icerik').innerHTML = `
+                        <div class="bos-mesaj">
+                            <h2>⏳ Bu Modül Yakında Eklenecek</h2>
+                            <p>${data.sektor_adi || 'Bu sektör'} için sorular hazırlanıyor.</p>
+                            <p style="margin-top:15px;">Çok yakında hizmete girecek.</p>
+                            <a href="regtech.html" style="display:inline-block; margin-top:25px; color:#00b4d8; text-decoration:none; font-weight:600;">← Diğer Modüllere Dön</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                soruGoster();
+            } catch (e) {
+                document.getElementById('icerik').innerHTML = '<p>Assessment yüklenemedi.</p>';
+            }
+        }
+
+        function soruGoster() {
+            if (mevcutSoru >= sorular.length) {
+                assessmentBitir();
+                return;
+            }
+
+            const s = sorular[mevcutSoru];
+            const ilerleme = ((mevcutSoru) / sorular.length) * 100;
+            const secili = cevaplar[`soru_${s.soru_no}`];
+
+            const secenekler = [
+                { deger: 0, etiket: "Yok / Hiç yapılmamış" },
+                { deger: 3, etiket: "Kısmen var / Eksik" },
+                { deger: 6, etiket: "Büyük ölçüde var" },
+                { deger: 10, etiket: "Tam ve etkin" }
+            ];
+
+            document.getElementById('icerik').innerHTML = `
+                <h1>RegTech Değerlendirmesi</h1>
+                <p class="alt-baslik">Soru ${mevcutSoru + 1} / ${sorular.length}</p>
+                <div class="ilerleme-bar">
+                    <div class="ilerleme-dolgu" style="width: ${ilerleme}%"></div>
+                </div>
+                <div class="soru-kart">
+                    <div class="kategori-badge">${(s.kategori || '').toUpperCase()} — AĞIRLIK: ${s.agirlik}</div>
+                    <div class="soru-metin">${s.soru}</div>
+                    ${s.aciklama ? `<div class="soru-aciklama">${s.aciklama}</div>` : ''}
+                    ${secenekler.map(sec => `
+                        <div class="secenek ${secili === sec.deger ? 'secili' : ''}" 
+                             onclick="sec(${s.soru_no}, ${sec.deger})">
+                            ${sec.etiket}
+                        </div>
+                    `).join('')}
+                    <button class="btn" onclick="sonraki()" ${secili === undefined ? 'disabled' : ''}>
+                        ${mevcutSoru === sorular.length - 1 ? 'Değerlendirmeyi Bitir →' : 'Sonraki Soru →'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function sec(soruNo, deger) {
+            cevaplar[`soru_${soruNo}`] = deger;
+            soruGoster();
+        }
+
+        function sonraki() {
+            mevcutSoru++;
+            soruGoster();
+        }
+
+        async function assessmentBitir() {
+            if (!kullaniciEmail) {
+                kullaniciEmail = prompt('Sonucu kaydetmek için e-posta adresinizi girin:') || 'anonim@test.com';
+                if (kullaniciEmail !== 'anonim@test.com') {
+                    localStorage.setItem('kullanici_email', kullaniciEmail);
+                }
+            }
+
+            try {
+                const r = await fetch(API + '/regtech/degerlendirme', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        kullanici_email: kullaniciEmail,
+                        sektor: sektor,
+                        sirket_adi: '',
+                        cevaplar: cevaplar
+                    })
+                });
+                const data = await r.json();
+                if (r.ok) {
+                    window.location.href = 'regtech-sonuc.html?id=' + data.assessment_id;
+                } else {
+                    alert('Değerlendirme kaydedilemedi.');
+                }
+            } catch (e) {
+                alert('Bağlantı hatası.');
+            }
+        }
+
+        yukle();
+    </script>
+</body>
+</html>

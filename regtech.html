@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegTech Modülleri - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .navbar-links a:hover { color: #00b4d8; }
+        .kapsayici { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 36px; margin-bottom: 10px; }
+        .alt-baslik { color: #a8c5e0; margin-bottom: 40px; max-width: 700px; }
+
+        .sektor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 25px;
+        }
+        .sektor-kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        .sektor-kart:hover {
+            border-color: rgba(0,180,216,0.4);
+            transform: translateY(-5px);
+        }
+        .sektor-ikon {
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+        .sektor-ad {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .sektor-aciklama {
+            color: #a8c5e0;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex: 1;
+        }
+        .sektor-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 15px;
+        }
+        .sektor-soru-sayisi { color: #a8c5e0; font-size: 13px; }
+        .sektor-fiyat {
+            color: #00b4d8;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .sektor-btn {
+            display: block;
+            text-align: center;
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            padding: 13px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .sektor-btn:hover { opacity: 0.9; }
+        .yakinda {
+            display: inline-block;
+            background: rgba(251,191,36,0.15);
+            color: #fbbf24;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <a href="panel.html">Panel</a>
+            <a href="egitimler.html">Eğitimler</a>
+            <a href="uzmanlar.html">Uzmanlar</a>
+            <a href="regtech.html">RegTech</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici">
+        <h1>RegTech Modülleri</h1>
+        <p class="alt-baslik">
+            Farklı sektörlerdeki zorunlu uyumluluk süreçleri için assessment, 
+            gap raporu ve yol haritası. AI Act, Medikal CE, Karbon, NIS2 ve daha fazlası.
+        </p>
+
+        <div class="sektor-grid" id="sektor-grid">
+            <div class="bos-mesaj" style="text-align:center; color:#a8c5e0; padding:60px 20px;">
+                Yükleniyor...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+
+        const IKONLAR = {
+            "ai_act": "🤖",
+            "medikal_ce": "🏥",
+            "karbon": "🌱",
+            "nis2": "🔒",
+            "dpp": "📦",
+            "kyc_aml": "💳"
+        };
+
+        async function sektorleriYukle() {
+            const grid = document.getElementById('sektor-grid');
+            try {
+                const r = await fetch(API + '/regtech/sektorler');
+                const data = await r.json();
+
+                if (!data.sektorler || data.sektorler.length === 0) {
+                    grid.innerHTML = '<div style="text-align:center;color:#a8c5e0;padding:60px;">Henüz sektör tanımlanmamış.</div>';
+                    return;
+                }
+
+                grid.innerHTML = data.sektorler.map(s => `
+                    <div class="sektor-kart">
+                        <div class="sektor-ikon">${IKONLAR[s.kod] || "📋"}</div>
+                        <div class="sektor-ad">
+                            ${s.ad}
+                            ${s.soru_sayisi === 0 ? '<span class="yakinda">Yakında</span>' : ''}
+                        </div>
+                        <div class="sektor-aciklama">${s.aciklama}</div>
+                        <div class="sektor-meta">
+                            <span class="sektor-soru-sayisi">📝 ${s.soru_sayisi} soru</span>
+                            <span class="sektor-fiyat">${s.fiyat.toLocaleString('tr-TR')} TL</span>
+                        </div>
+                        <a href="regtech-assessment.html?sektor=${s.kod}" class="sektor-btn">
+                            Değerlendirmeye Başla →
+                        </a>
+                    </div>
+                `).join('');
+            } catch (e) {
+                grid.innerHTML = '<div style="text-align:center;color:#a8c5e0;padding:60px;">Sektörler yüklenemedi.</div>';
+            }
+        }
+
+        sektorleriYukle();
+    </script>
+</body>
+</html>
