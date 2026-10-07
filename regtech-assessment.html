@@ -136,6 +136,7 @@
         const API = window.location.origin;
         const params = new URLSearchParams(window.location.search);
         const sektor = params.get('sektor');
+        const tip = params.get('tip') || 'farkindalik';
 
         let sorular = [];
         let mevcutSoru = 0;
@@ -149,7 +150,7 @@
             }
 
             try {
-                const r = await fetch(API + '/regtech/sorular/' + sektor);
+                const r = await fetch(API + '/regtech/sorular/' + sektor + '?tip=' + tip)
                 const data = await r.json();
                 sorular = data.sorular || [];
 
@@ -189,7 +190,7 @@
             ];
 
             document.getElementById('icerik').innerHTML = `
-                <h1>RegTech Değerlendirmesi</h1>
+                <h1>${tip === 'detayli' ? 'Detaylı Assessment' : 'Farkındalık Taraması'}</h1>
                 <p class="alt-baslik">Soru ${mevcutSoru + 1} / ${sorular.length}</p>
                 <div class="ilerleme-bar">
                     <div class="ilerleme-dolgu" style="width: ${ilerleme}%"></div>

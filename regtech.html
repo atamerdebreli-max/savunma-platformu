@@ -164,9 +164,16 @@
                             <span class="sektor-soru-sayisi">📝 ${s.soru_sayisi} soru</span>
                             <span class="sektor-fiyat">${s.fiyat.toLocaleString('tr-TR')} TL</span>
                         </div>
-                        <a href="regtech-assessment.html?sektor=${s.kod}" class="sektor-btn">
-                            Değerlendirmeye Başla →
-                        </a>
+                        <div style="display:flex; gap:10px; margin-top:10px;">
+    <a href="regtech-assessment.html?sektor=${s.kod}&tip=farkindalik" 
+       class="sektor-btn" style="flex:1; background: rgba(74,222,128,0.15); color:#4ade80; border:1px solid rgba(74,222,128,0.4);">
+        Ücretsiz Tarama
+    </a>
+    <a href="regtech-assessment.html?sektor=${s.kod}&tip=detayli" 
+       class="sektor-btn" style="flex:1;">
+        Detaylı (${s.fiyat.toLocaleString('tr-TR')} TL)
+    </a>
+</div>
                     </div>
                 `).join('');
             } catch (e) {
