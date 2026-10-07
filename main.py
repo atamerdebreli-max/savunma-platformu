@@ -43,6 +43,13 @@ from database import (
     Uzman, Randevu, UzmanOdeme, UzmanYorum,
     AnaYuklenici
 )
+from database import (
+    Degerlendirme, Kullanici, DanismanlikTalebi, YolHaritasi,
+    Hatirlatici, Kalibrasyon, get_db, SessionLocal,
+    Uzman, Randevu, UzmanOdeme, UzmanYorum,
+    AnaYuklenici, Egitim, EgitimSoru, EgitimIlerleme,
+    YETENBilgi
+)
 load_dotenv()
 
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -1844,5 +1851,202 @@ def admin_egitimler(db: Session = Depends(get_db)):
         } for e in egitimler]
     }
 # Değerlendirme kaydedilirken EYDEP seviyesini de güncelle
+# ==================== YETEN PORTAL ENTEGRASYONU ====================
+
+class YETENBilgiGirdi(BaseModel):
+    kullanici_email: str
+    firma_adi: str = ""
+    vergi_no: str = ""
+    ticaret_sicil_no: str = ""
+    yetkili_adi: str = ""
+    telefon: str = ""
+    email: str = ""
+    website: str = ""
+    sektor: str = ""
+    calisan_sayisi: int = 0
+    muhendis_sayisi: int = 0
+    arge_personel_sayisi: int = 0
+    ciro_son_yil: float = 0
+    ciro_2_yil_once: float = 0
+    ciro_3_yil_once: float = 0
+    makine_parki: str = ""
+    sertifikalar: str = ""
+    urunler: str = ""
+    arge_projeleri: str = ""
+    patentler: str = ""
+
+
+@app.post("/yeten-bilgi-kaydet")
+def yeten_bilgi_kaydet(girdi: YETENBilgiGirdi, db: Session = Depends(get_db)):
+    mevcut = db.query(YETENBilgi).filter(
+        YETENBilgi.kullanici_email == girdi.kullanici_email
+    ).first()
+
+    if mevcut:
+        # Güncelle
+        for key, value in girdi.dict().items():
+            if key != "kullanici_email":
+                setattr(mevcut, key, value)
+        mevcut.son_guncelleme = datetime.utcnow()
+        # 3 ay sonrası hatırlatma
+        hatirlatma = datetime.utcnow() + timedelta(days=90)
+        mevcut.hatirlatma_tarihi = hatirlatma.strftime("%Y-%m-%d")
+        db.commit()
+        return {"mesaj": "YETEN bilgileri güncellendi", "id": mevcut.id}
+    else:
+        yeni = YETENBilgi(**girdi.dict())
+        hatirlatma = datetime.utcnow() + timedelta(days=90)
+        yeni.hatirlatma_tarihi = hatirlatma.strftime("%Y-%m-%d")
+        db.add(yeni)
+        db.commit()
+        db.refresh(yeni)
+        return {"mesaj": "YETEN bilgileri kaydedildi", "id": yeni.id}
+
+
+@app.get("/yeten-bilgi/{email}")
+def yeten_bilgi_getir(email: str, db: Session = Depends(get_db)):
+    bilgi = db.query(YETENBilgi).filter(
+        YETENBilgi.kullanici_email == email
+    ).first()
+
+    if not bilgi:
+        return {"var": False, "bilgi": None}
+
+    return {
+        "var": True,
+        "bilgi": {
+            "id": bilgi.id, "firma_adi": bilgi.firma_adi,
+            "vergi_no": bilgi.vergi_no, "ticaret_sicil_no": bilgi.ticaret_sicil_no,
+            "yetkili_adi": bilgi.yetkili_adi, "telefon": bilgi.telefon,
+            "email": bilgi.email, "website": bilgi.website,
+            "sektor": bilgi.sektor, "calisan_sayisi": bilgi.calisan_sayisi,
+            "muhendis_sayisi": bilgi.muhendis_sayisi,
+            "arge_personel_sayisi": bilgi.arge_personel_sayisi,
+            "ciro_son_yil": bilgi.ciro_son_yil,
+            "ciro_2_yil_once": bilgi.ciro_2_yil_once,
+            "ciro_3_yil_once": bilgi.ciro_3_yil_once,
+            "makine_parki": bilgi.makine_parki,
+            "sertifikalar": bilgi.sertifikalar,
+            "urunler": bilgi.urunler,
+            "arge_projeleri": bilgi.arge_projeleri,
+            "patentler": bilgi.patentler,
+            "yeten_kayit_durumu": bilgi.yeten_kayit_durumu,
+            "eydep_seviye": bilgi.eydep_seviye,
+            "son_guncelleme": bilgi.son_guncelleme.isoformat(),
+            "hatirlatma_tarihi": bilgi.hatirlatma_tarihi
+        }
+    }
+
+
+@app.get("/yeten-kontrol-listesi/{email}")
+def yeten_kontrol_listesi(email: str, db: Session = Depends(get_db)):
+    bilgi = db.query(YETENBilgi).filter(
+        YETENBilgi.kullanici_email == email
+    ).first()
+
+    if not bilgi:
+        return {"var": False, "eksikler": [], "tamamlanma": 0}
+
+    # İdari, mali, teknik kriterler
+    kriterler = {
+        "idari": [
+            ("firma_adi", "Firma Adı"),
+            ("vergi_no", "Vergi Numarası"),
+            ("ticaret_sicil_no", "Ticaret Sicil Numarası"),
+            ("yetkili_adi", "Yetkili Adı Soyadı"),
+            ("telefon", "Telefon"),
+            ("email", "E-posta"),
+            ("sektor", "Faaliyet Alanı/Sektör"),
+            ("calisan_sayisi", "Çalışan Sayısı"),
+        ],
+        "mali": [
+            ("ciro_son_yil", "Son Yıl Cirosu"),
+            ("ciro_2_yil_once", "2 Yıl Önceki Ciro"),
+            ("ciro_3_yil_once", "3 Yıl Önceki Ciro"),
+        ],
+        "teknik": [
+            ("muhendis_sayisi", "Mühendis Sayısı"),
+            ("arge_personel_sayisi", "Ar-Ge Personel Sayısı"),
+            ("makine_parki", "Makine Parkı"),
+            ("sertifikalar", "Sertifikalar"),
+            ("urunler", "Ürünler"),
+        ]
+    }
+
+    eksikler = {"idari": [], "mali": [], "teknik": []}
+    toplam = 0
+    dolu = 0
+
+    for kategori, alanlar in kriterler.items():
+        for alan_key, alan_adi in alanlar:
+            toplam += 1
+            deger = getattr(bilgi, alan_key, None)
+            if deger is None or deger == "" or deger == 0:
+                eksikler[kategori].append(alan_adi)
+            else:
+                dolu += 1
+
+    tamamlanma = round((dolu / toplam) * 100) if toplam > 0 else 0
+
+    return {
+        "var": True,
+        "tamamlanma": tamamlanma,
+        "eksikler": eksikler,
+        "toplam_eksik": sum(len(v) for v in eksikler.values())
+    }
+
+
+@app.post("/yeten-kayit-durumu-guncelle")
+def yeten_kayit_durumu_guncelle(email: str, durum: str, db: Session = Depends(get_db)):
+    bilgi = db.query(YETENBilgi).filter(YETENBilgi.kullanici_email == email).first()
+    if not bilgi:
+        raise HTTPException(status_code=404, detail="YETEN bilgisi bulunamadı")
+    bilgi.yeten_kayit_durumu = durum
+    db.commit()
+    return {"mesaj": "Durum güncellendi", "durum": durum}
+
+
+@app.get("/yeten-kopyala-format/{email}")
+def yeten_kopyala_format(email: str, db: Session = Depends(get_db)):
+    """YETEN portalına kopyala-yapıştır için hazır metin formatı"""
+    bilgi = db.query(YETENBilgi).filter(YETENBilgi.kullanici_email == email).first()
+    if not bilgi:
+        raise HTTPException(status_code=404, detail="YETEN bilgisi bulunamadı")
+
+    metin = f"""=== YETEN PORTAL KAYIT FORMATI ===
+
+FİRMA BİLGİLERİ
+Firma Adı: {bilgi.firma_adi}
+Vergi No: {bilgi.vergi_no}
+Ticaret Sicil No: {bilgi.ticaret_sicil_no}
+Sektör: {bilgi.sektor}
+
+YETKİLİ BİLGİLERİ
+Yetkili Adı: {bilgi.yetkili_adi}
+Telefon: {bilgi.telefon}
+E-posta: {bilgi.email}
+Web Sitesi: {bilgi.website}
+
+İDARİ BİLGİLER
+Çalışan Sayısı: {bilgi.calisan_sayisi}
+Mühendis Sayısı: {bilgi.muhendis_sayisi}
+Ar-Ge Personel Sayısı: {bilgi.arge_personel_sayisi}
+
+MALİ BİLGİLER
+Son Yıl Cirosu: {bilgi.ciro_son_yil} TL
+2 Yıl Önceki Ciro: {bilgi.ciro_2_yil_once} TL
+3 Yıl Önceki Ciro: {bilgi.ciro_3_yil_once} TL
+
+TEKNİK BİLGİLER
+Makine Parkı: {bilgi.makine_parki}
+Sertifikalar: {bilgi.sertifikalar}
+Ürünler: {bilgi.urunler}
+Ar-Ge Projeleri: {bilgi.arge_projeleri}
+Patentler: {bilgi.patentler}
+
+=== BU METNİ YETEN PORTALINA KOPYALAYIN ===
+"""
+
+    return {"metin": metin}
 # ==================== STATİK ====================
 app.mount("/static", StaticFiles(directory=".", html=True), name="static")

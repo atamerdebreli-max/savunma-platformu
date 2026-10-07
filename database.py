@@ -209,6 +209,37 @@ class EgitimIlerleme(Base):
     son_izleme_tarihi = Column(DateTime, default=datetime.utcnow)
     tamamlanma_tarihi = Column(DateTime, nullable=True)
 # ==================== TABLOLARI OLUŞTUR ====================
+# ==================== YETEN PORTAL ENTEGRASYONU ====================
+
+class YETENBilgi(Base):
+    __tablename__ = "yeten_bilgileri"
+
+    id = Column(Integer, primary_key=True, index=True)
+    kullanici_email = Column(String, unique=True, index=True)
+    firma_adi = Column(String, default="")
+    vergi_no = Column(String, default="")
+    ticaret_sicil_no = Column(String, default="")
+    yetkili_adi = Column(String, default="")
+    telefon = Column(String, default="")
+    email = Column(String, default="")
+    website = Column(String, default="")
+    sektor = Column(String, default="")
+    calisan_sayisi = Column(Integer, default=0)
+    muhendis_sayisi = Column(Integer, default=0)
+    arge_personel_sayisi = Column(Integer, default=0)
+    ciro_son_yil = Column(Float, default=0)
+    ciro_2_yil_once = Column(Float, default=0)
+    ciro_3_yil_once = Column(Float, default=0)
+    makine_parki = Column(Text, default="")  # JSON veya virgüllü liste
+    sertifikalar = Column(Text, default="")
+    urunler = Column(Text, default="")
+    arge_projeleri = Column(Text, default="")
+    patentler = Column(Text, default="")
+    yeten_kayit_durumu = Column(String, default="yok")  # yok, taslak, kayitli, guncel
+    eydep_seviye = Column(String, default="yok")  # A, B, C, D, yok
+    son_guncelleme = Column(DateTime, default=datetime.utcnow)
+    hatirlatma_tarihi = Column(String, default="")
+    olusturma_tarihi = Column(DateTime, default=datetime.utcnow)
 Base.metadata.create_all(bind=engine)
 
 # ==================== ANA YÜKLENİCİ MODÜLÜ ====================
