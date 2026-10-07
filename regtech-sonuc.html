@@ -210,9 +210,52 @@
                         ${onerilerHTML || '<p style="color:#a8c5e0;">Öneri yok.</p>'}
                     </div>
 
+                    <div class="kart" style="background:rgba(0,180,216,0.08); border-color:rgba(0,180,216,0.3);">
+                        <h2>🎯 Sonraki Adımlar</h2>
+                        <p style="color:#d1e3f0; line-height:1.7; margin-bottom:20px;">
+                            ${data.yuzde < 85 ? 
+                                'Uyumluluk seviyenizi yükseltmek için aşağıdaki adımları izleyin:' : 
+                                'Uyumluluk seviyeniz yüksek. Yıllık gözden geçirme ile koruyun.'}
+                        </p>
+                        
+                        ${data.yuzde < 85 ? `
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:15px;">
+                            <div style="background:rgba(255,255,255,0.04); border-radius:12px; padding:20px; text-align:center;">
+                                <div style="font-size:36px; margin-bottom:10px;">👨‍💼</div>
+                                <div style="font-weight:700; margin-bottom:8px;">Uzman Desteği</div>
+                                <div style="color:#a8c5e0; font-size:13px; margin-bottom:15px;">
+                                    ${data.sektor_adi} uzmanı ile eksiklerinizi hızlıca kapatın.
+                                </div>
+                                <a href="uzmanlar.html" class="btn" style="font-size:13px; padding:10px 20px;">Uzman Bul →</a>
+                            </div>
+                            
+                            <div style="background:rgba(255,255,255,0.04); border-radius:12px; padding:20px; text-align:center;">
+                                <div style="font-size:36px; margin-bottom:10px;">🏢</div>
+                                <div style="font-weight:700; margin-bottom:8px;">Belgelendirme</div>
+                                <div style="color:#a8c5e0; font-size:13px; margin-bottom:15px;">
+                                    Akredite kuruluşlarla denetim sürecini başlatın.
+                                </div>
+                                <a href="belgelendirme-ortaklari.html" class="btn ikincil" style="font-size:13px; padding:10px 20px;">Ortakları Gör →</a>
+                            </div>
+                            
+                            <div style="background:rgba(255,255,255,0.04); border-radius:12px; padding:20px; text-align:center;">
+                                <div style="font-size:36px; margin-bottom:10px;">📚</div>
+                                <div style="font-weight:700; margin-bottom:8px;">Eğitimler</div>
+                                <div style="color:#a8c5e0; font-size:13px; margin-bottom:15px;">
+                                    ${data.sektor_adi} konusunda eğitim içeriklerini inceleyin.
+                                </div>
+                                <a href="egitimler.html" class="btn ikincil" style="font-size:13px; padding:10px 20px;">Eğitimler →</a>
+                            </div>
+                        </div>
+                        ` : `
+                        <div style="text-align:center;">
+                            <a href="belgelendirme-ortaklari.html" class="btn">Belgelendirme Ortağını Seç →</a>
+                        </div>
+                        `}
+                    </div>
+
                     <div style="text-align:center; margin-top:20px;">
-                        <a href="regtech.html" class="btn">← Diğer Modüller</a>
-                        <a href="uzmanlar.html" class="btn ikincil">Uzman Desteği Al</a>
+                        <a href="regtech.html" class="btn ikincil">← Diğer Modüller</a>
                     </div>
                 `;
             } catch (e) {
