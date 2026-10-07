@@ -166,7 +166,48 @@ class UzmanYorum(Base):
     yorum = Column(Text, default="")
     olusturma_tarihi = Column(DateTime, default=datetime.utcnow)
 
+# ==================== EĞİTİM MODÜLLERİ ====================
 
+class Egitim(Base):
+    __tablename__ = "egitimler"
+
+    id = Column(Integer, primary_key=True, index=True)
+    baslik = Column(String, nullable=False)
+    aciklama = Column(Text, default="")
+    kategori = Column(String)  # FAI, FOD, YETEN, AS9100, EYDEP
+    seviye = Column(String, default="baslangic")  # baslangic, orta, ileri
+    video_url = Column(String, default="")
+    sure_dakika = Column(Integer, default=0)
+    fiyat = Column(Float, default=0)  # 0 = ücretsiz
+    onizleme_metni = Column(Text, default="")
+    aktif = Column(Integer, default=1)
+    olusturma_tarihi = Column(DateTime, default=datetime.utcnow)
+
+
+class EgitimSoru(Base):
+    __tablename__ = "egitim_sorulari"
+
+    id = Column(Integer, primary_key=True, index=True)
+    egitim_id = Column(Integer, ForeignKey("egitimler.id"))
+    soru = Column(Text, nullable=False)
+    secenek_a = Column(String)
+    secenek_b = Column(String)
+    secenek_c = Column(String)
+    secenek_d = Column(String)
+    dogru_cevap = Column(String)  # A, B, C, D
+
+
+class EgitimIlerleme(Base):
+    __tablename__ = "egitim_ilerleme"
+
+    id = Column(Integer, primary_key=True, index=True)
+    kullanici_email = Column(String, index=True)
+    egitim_id = Column(Integer, ForeignKey("egitimler.id"))
+    tamamlandi = Column(Integer, default=0)  # 0/1
+    quiz_skoru = Column(Integer, default=0)  # 0-100
+    sertifika_alindi = Column(Integer, default=0)
+    son_izleme_tarihi = Column(DateTime, default=datetime.utcnow)
+    tamamlanma_tarihi = Column(DateTime, nullable=True)
 # ==================== TABLOLARI OLUŞTUR ====================
 Base.metadata.create_all(bind=engine)
 

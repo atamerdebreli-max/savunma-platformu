@@ -35,6 +35,12 @@ from database import (
     Degerlendirme, Kullanici, DanismanlikTalebi, YolHaritasi,
     Hatirlatici, Kalibrasyon, get_db, SessionLocal,
     Uzman, Randevu, UzmanOdeme, UzmanYorum,
+    AnaYuklenici, Egitim, EgitimSoru, EgitimIlerleme
+)
+from database import (
+    Degerlendirme, Kullanici, DanismanlikTalebi, YolHaritasi,
+    Hatirlatici, Kalibrasyon, get_db, SessionLocal,
+    Uzman, Randevu, UzmanOdeme, UzmanYorum,
     AnaYuklenici
 )
 load_dotenv()
@@ -1637,7 +1643,206 @@ def admin_ana_yuklenici_onay(ana_id: int, onay: str = "onayli", db: Session = De
 
     return {"mesaj": f"Ana yüklenici durumu '{onay}' olarak güncellendi"}
 
+# ==================== EĞİTİM MODÜLLERİ ====================
 
+class EgitimKayitGirdi(BaseModel):
+    baslik: str
+    aciklama: str = ""
+    kategori: str
+    seviye: str = "baslangic"
+    video_url: str = ""
+    sure_dakika: int = 0
+    fiyat: float = 0
+    onizleme_metni: str = ""
+
+
+class QuizGirdi(BaseModel):
+    kullanici_email: str
+    egitim_id: int
+    cevaplar: Dict[str, str]  # {"1": "A", "2": "B", ...}
+
+
+@app.get("/egitimler")
+def egitimleri_listele(kategori: str = None, db: Session = Depends(get_db)):
+    sorgu = db.query(Egitim).filter(Egitim.aktif == 1)
+    if kategori:
+        sorgu = sorgu.filter(Egitim.kategori == kategori)
+    egitimler = sorgu.order_by(Egitim.olusturma_tarihi.desc()).all()
+    return {
+        "toplam": len(egitimler),
+        "egitimler": [{
+            "id": e.id, "baslik": e.baslik, "aciklama": e.aciklama,
+            "kategori": e.kategori, "seviye": e.seviye,
+            "sure_dakika": e.sure_dakika, "fiyat": e.fiyat,
+            "video_url": e.video_url, "onizleme_metni": e.onizleme_metni
+        } for e in egitimler]
+    }
+
+
+@app.get("/egitim/{egitim_id}")
+def egitim_detay(egitim_id: int, db: Session = Depends(get_db)):
+    egitim = db.query(Egitim).filter(Egitim.id == egitim_id).first()
+    if not egitim:
+        raise HTTPException(status_code=404, detail="Eğitim bulunamadı")
+
+    sorular = db.query(EgitimSoru).filter(EgitimSoru.egitim_id == egitim_id).all()
+
+    return {
+        "egitim": {
+            "id": egitim.id, "baslik": egitim.baslik,
+            "aciklama": egitim.aciklama, "kategori": egitim.kategori,
+            "seviye": egitim.seviye, "video_url": egitim.video_url,
+            "sure_dakika": egitim.sure_dakika, "fiyat": egitim.fiyat,
+            "onizleme_metni": egitim.onizleme_metni
+        },
+        "soru_sayisi": len(sorular)
+    }
+
+
+@app.get("/egitim/{egitim_id}/quiz")
+def egitim_quiz(egitim_id: int, db: Session = Depends(get_db)):
+    sorular = db.query(EgitimSoru).filter(EgitimSoru.egitim_id == egitim_id).all()
+    return {
+        "toplam": len(sorular),
+        "sorular": [{
+            "id": s.id, "soru": s.soru,
+            "secenek_a": s.secenek_a, "secenek_b": s.secenek_b,
+            "secenek_c": s.secenek_c, "secenek_d": s.secenek_d
+        } for s in sorular]
+    }
+
+
+@app.post("/egitim/quiz-gonder")
+def quiz_gonder(girdi: QuizGirdi, db: Session = Depends(get_db)):
+    egitim = db.query(Egitim).filter(Egitim.id == girdi.egitim_id).first()
+    if not egitim:
+        raise HTTPException(status_code=404, detail="Eğitim bulunamadı")
+
+    sorular = db.query(EgitimSoru).filter(EgitimSoru.egitim_id == girdi.egitim_id).all()
+
+    if not sorular:
+        raise HTTPException(status_code=400, detail="Bu eğitim için soru tanımlanmamış")
+
+    dogru = 0
+    toplam = len(sorular)
+    detay = []
+
+    for s in sorular:
+        verilen = girdi.cevaplar.get(str(s.id), "").upper()
+        dogru_mu = verilen == s.dogru_cevap.upper()
+        if dogru_mu:
+            dogru += 1
+        detay.append({
+            "soru_id": s.id, "soru": s.soru,
+            "verilen": verilen, "dogru": s.dogru_cevap,
+            "dogru_mu": dogru_mu
+        })
+
+    skor = round((dogru / toplam) * 100) if toplam > 0 else 0
+    gecti = skor >= 70
+
+    # İlerlemeyi kaydet
+    mevcut = db.query(EgitimIlerleme).filter(
+        EgitimIlerleme.kullanici_email == girdi.kullanici_email,
+        EgitimIlerleme.egitim_id == girdi.egitim_id
+    ).first()
+
+    if mevcut:
+        mevcut.quiz_skoru = max(mevcut.quiz_skoru, skor)
+        mevcut.son_izleme_tarihi = datetime.utcnow()
+        if gecti:
+            mevcut.tamamlandi = 1
+            mevcut.tamamlanma_tarihi = datetime.utcnow()
+            mevcut.sertifika_alindi = 1
+    else:
+        yeni = EgitimIlerleme(
+            kullanici_email=girdi.kullanici_email,
+            egitim_id=girdi.egitim_id,
+            tamamlandi=1 if gecti else 0,
+            quiz_skoru=skor,
+            sertifika_alindi=1 if gecti else 0,
+            tamamlanma_tarihi=datetime.utcnow() if gecti else None
+        )
+        db.add(yeni)
+
+    db.commit()
+
+    return {
+        "basarili": True,
+        "skor": skor,
+        "dogru": dogru,
+        "toplam": toplam,
+        "gecti": gecti,
+        "detay": detay
+    }
+
+
+@app.get("/egitim/ilerleme/{email}")
+def egitim_ilerleme(email: str, db: Session = Depends(get_db)):
+    ilerlemeler = db.query(EgitimIlerleme).filter(
+        EgitimIlerleme.kullanici_email == email
+    ).all()
+
+    liste = []
+    for i in ilerlemeler:
+        egitim = db.query(Egitim).filter(Egitim.id == i.egitim_id).first()
+        liste.append({
+            "egitim_id": i.egitim_id,
+            "egitim_baslik": egitim.baslik if egitim else "—",
+            "kategori": egitim.kategori if egitim else "—",
+            "tamamlandi": i.tamamlandi,
+            "quiz_skoru": i.quiz_skoru,
+            "sertifika_alindi": i.sertifika_alindi,
+            "tamamlanma_tarihi": i.tamamlanma_tarihi.isoformat() if i.tamamlanma_tarihi else None
+        })
+
+    return {"toplam": len(liste), "ilerlemeler": liste}
+
+
+@app.post("/admin/egitim-ekle")
+def admin_egitim_ekle(girdi: EgitimKayitGirdi, db: Session = Depends(get_db)):
+    yeni = Egitim(
+        baslik=girdi.baslik, aciklama=girdi.aciklama,
+        kategori=girdi.kategori, seviye=girdi.seviye,
+        video_url=girdi.video_url, sure_dakika=girdi.sure_dakika,
+        fiyat=girdi.fiyat, onizleme_metni=girdi.onizleme_metni
+    )
+    db.add(yeni)
+    db.commit()
+    db.refresh(yeni)
+    return {"mesaj": "Eğitim eklendi", "id": yeni.id}
+
+
+@app.post("/admin/egitim-soru-ekle")
+def admin_egitim_soru_ekle(
+    egitim_id: int, soru: str,
+    secenek_a: str, secenek_b: str, secenek_c: str, secenek_d: str,
+    dogru_cevap: str, db: Session = Depends(get_db)
+):
+    yeni = EgitimSoru(
+        egitim_id=egitim_id, soru=soru,
+        secenek_a=secenek_a, secenek_b=secenek_b,
+        secenek_c=secenek_c, secenek_d=secenek_d,
+        dogru_cevap=dogru_cevap.upper()
+    )
+    db.add(yeni)
+    db.commit()
+    db.refresh(yeni)
+    return {"mesaj": "Soru eklendi", "id": yeni.id}
+
+
+@app.get("/admin/egitimler")
+def admin_egitimler(db: Session = Depends(get_db)):
+    egitimler = db.query(Egitim).order_by(Egitim.olusturma_tarihi.desc()).all()
+    return {
+        "toplam": len(egitimler),
+        "egitimler": [{
+            "id": e.id, "baslik": e.baslik, "kategori": e.kategori,
+            "seviye": e.seviye, "sure_dakika": e.sure_dakika,
+            "fiyat": e.fiyat, "aktif": e.aktif,
+            "olusturma_tarihi": e.olusturma_tarihi.isoformat()
+        } for e in egitimler]
+    }
 # Değerlendirme kaydedilirken EYDEP seviyesini de güncelle
 # ==================== STATİK ====================
 app.mount("/static", StaticFiles(directory=".", html=True), name="static")
