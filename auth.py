@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from database import Kullanici, get_db
 
 # Güvenlik ayarları
-SECRET_KEY = "savunma-platformu-gizli-anahtar-2026"
+SECRET_KEY = "UyumOS-platformu-gizli-anahtar-2026"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 gün
 
