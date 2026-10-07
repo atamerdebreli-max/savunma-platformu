@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eğitimlerim - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .kapsayici { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 32px; margin-bottom: 10px; }
+        .alt-baslik { color: #a8c5e0; margin-bottom: 30px; }
+
+        .giris-kutu {
+            background: rgba(0,180,216,0.08);
+            border: 1px solid rgba(0,180,216,0.3);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+        .giris-kutu label { display: block; color: #a8c5e0; font-size: 14px; margin-bottom: 8px; }
+        .giris-kutu input {
+            width: 100%;
+            padding: 13px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .giris-kutu button {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            padding: 13px 30px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .ilerleme-kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .ilerleme-sol { flex: 1; min-width: 250px; }
+        .egitim-baslik { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+        .kategori {
+            display: inline-block;
+            background: rgba(0,180,216,0.15);
+            color: #00b4d8;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+        .ilerleme-detay { color: #a8c5e0; font-size: 13px; margin-top: 8px; }
+
+        .durum {
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+        }
+        .durum-tamamlandi {
+            background: rgba(74,222,128,0.15);
+            color: #4ade80;
+        }
+        .durum-devam {
+            background: rgba(251,191,36,0.15);
+            color: #fbbf24;
+        }
+        .skor {
+            font-size: 24px;
+            font-weight: 800;
+            color: #00b4d8;
+        }
+
+        .bos-mesaj {
+            text-align: center;
+            color: #a8c5e0;
+            padding: 60px 20px;
+        }
+        .btn-kucuk {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <a href="panel.html">Panel</a>
+            <a href="egitimler.html">Eğitimler</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici">
+        <h1>Eğitimlerim</h1>
+        <p class="alt-baslik">Tamamladığınız eğitimleri ve sertifikalarınızı görün.</p>
+
+        <div class="giris-kutu" id="giris-kutu">
+            <label>E-posta adresinizi girin:</label>
+            <input type="email" id="email-input" placeholder="ornek@email.com">
+            <button onclick="ilerlemeleriYukle()">Eğitimlerimi Gör</button>
+        </div>
+
+        <div id="liste"></div>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+
+        async function ilerlemeleriYukle() {
+            const email = document.getElementById('email-input').value.trim();
+            if (!email) {
+                alert('Lütfen e-posta adresinizi girin.');
+                return;
+            }
+
+            localStorage.setItem('kullanici_email', email);
+
+            try {
+                const r = await fetch(API + '/egitim/ilerleme/' + encodeURIComponent(email));
+                const data = await r.json();
+
+                document.getElementById('giris-kutu').style.display = 'none';
+                listeyiGoster(data.ilerlemeler || []);
+            } catch (e) {
+                alert('İlerleme yüklenemedi.');
+            }
+        }
+
+        function listeyiGoster(ilerlemeler) {
+            const liste = document.getElementById('liste');
+
+            if (ilerlemeler.length === 0) {
+                liste.innerHTML = `
+                    <div class="bos-mesaj">
+                        <p style="margin-bottom:20px;">Henüz eğitim tamamlamadınız.</p>
+                        <a href="egitimler.html" class="btn-kucuk">Eğitimlere Göz At →</a>
+                    </div>
+                `;
+                return;
+            }
+
+            liste.innerHTML = ilerlemeler.map(i => `
+                <div class="ilerleme-kart">
+                    <div class="ilerleme-sol">
+                        <div class="egitim-baslik">${i.egitim_baslik}</div>
+                        <span class="kategori">${i.kategori}</span>
+                        ${i.tamamlanma_tarihi ? `<span style="color:#6b8ba3; font-size:12px;">${new Date(i.tamamlanma_tarihi).toLocaleDateString('tr-TR')}</span>` : ''}
+                        <div class="ilerleme-detay">
+                            ${i.tamamlandi ? '✅ Tamamlandı' : '⏳ Devam ediyor'}
+                            ${i.sertifika_alindi ? ' — 📜 Sertifika alındı' : ''}
+                        </div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div class="skor">${i.quiz_skoru}%</div>
+                        <div class="durum ${i.tamamlandi ? 'durum-tamamlandi' : 'durum-devam'}" style="margin-top:8px;">
+                            ${i.tamamlandi ? '✅ Başarılı' : 'Devam Ediyor'}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('email-input').addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') ilerlemeleriYukle();
+        });
+
+        // Daha önce girilen email varsa otomatik doldur
+        const kayitliEmail = localStorage.getItem('kullanici_email');
+        if (kayitliEmail) {
+            document.getElementById('email-input').value = kayitliEmail;
+        }
+    </script>
+</body>
+</html>

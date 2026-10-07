@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .kapsayici { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 28px; margin-bottom: 10px; }
+        .alt-baslik { color: #a8c5e0; margin-bottom: 30px; }
+
+        .ilerleme-bar {
+            background: rgba(255,255,255,0.08);
+            height: 8px;
+            border-radius: 50px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        .ilerleme-dolgu {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        .soru-kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 35px;
+        }
+        .soru-no {
+            color: #00b4d8;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+        .soru-metin {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .secenek {
+            display: block;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+        .secenek:hover {
+            border-color: #00b4d8;
+            background: rgba(0,180,216,0.08);
+        }
+        .secenek.secili {
+            border-color: #00b4d8;
+            background: rgba(0,180,216,0.15);
+            color: #00b4d8;
+            font-weight: 600;
+        }
+        .btn {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            padding: 16px 40px;
+            border-radius: 50px;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* SONUÇ EKRANI */
+        .sonuc-kart {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 50px 35px;
+            text-align: center;
+        }
+        .sonuc-ikon { font-size: 80px; margin-bottom: 20px; }
+        .sonuc-skor {
+            font-size: 60px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        .sonuc-skor.gec { color: #4ade80; }
+        .sonuc-skor.kal { color: #ef4444; }
+        .sonuc-mesaj { font-size: 20px; margin-bottom: 30px; }
+        .sonuc-detay {
+            text-align: left;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .detay-satir {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+        }
+        .detay-satir:last-child { border-bottom: none; }
+        .detay-dogru { color: #4ade80; }
+        .detay-yanlis { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+    </nav>
+
+    <div class="kapsayici" id="icerik">
+        <p style="text-align:center; color:#a8c5e0;">Yükleniyor...</p>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+        const params = new URLSearchParams(window.location.search);
+        const egitimId = params.get('id');
+
+        let sorular = [];
+        let mevcutSoru = 0;
+        let cevaplar = {};
+        let kullaniciEmail = localStorage.getItem('kullanici_email') || '';
+
+        async function yukle() {
+            if (!egitimId) {
+                document.getElementById('icerik').innerHTML = '<p>Eğitim bulunamadı.</p>';
+                return;
+            }
+
+            try {
+                const r = await fetch(API + '/egitim/' + egitimId + '/quiz');
+                const data = await r.json();
+                sorular = data.sorular || [];
+
+                if (sorular.length === 0) {
+                    document.getElementById('icerik').innerHTML = '<p style="text-align:center; color:#a8c5e0;">Bu eğitimin quizi henüz hazırlanmadı.</p>';
+                    return;
+                }
+
+                soruGoster();
+            } catch (e) {
+                document.getElementById('icerik').innerHTML = '<p>Quiz yüklenemedi.</p>';
+            }
+        }
+
+        function soruGoster() {
+            if (mevcutSoru >= sorular.length) {
+                quiziBitir();
+                return;
+            }
+
+            const s = sorular[mevcutSoru];
+            const ilerleme = ((mevcutSoru) / sorular.length) * 100;
+            const secili = cevaplar[s.id] || '';
+
+            document.getElementById('icerik').innerHTML = `
+                <h1>Quiz</h1>
+                <p class="alt-baslik">Soru ${mevcutSoru + 1} / ${sorular.length}</p>
+                <div class="ilerleme-bar">
+                    <div class="ilerleme-dolgu" style="width: ${ilerleme}%"></div>
+                </div>
+                <div class="soru-kart">
+                    <div class="soru-no">SORU ${mevcutSoru + 1}</div>
+                    <div class="soru-metin">${s.soru}</div>
+                    <div class="secenek ${secili === 'A' ? 'secili' : ''}" onclick="sec('${s.id}', 'A')">
+                        <strong>A)</strong> ${s.secenek_a}
+                    </div>
+                    <div class="secenek ${secili === 'B' ? 'secili' : ''}" onclick="sec('${s.id}', 'B')">
+                        <strong>B)</strong> ${s.secenek_b}
+                    </div>
+                    <div class="secenek ${secili === 'C' ? 'secili' : ''}" onclick="sec('${s.id}', 'C')">
+                        <strong>C)</strong> ${s.secenek_c}
+                    </div>
+                    <div class="secenek ${secili === 'D' ? 'secili' : ''}" onclick="sec('${s.id}', 'D')">
+                        <strong>D)</strong> ${s.secenek_d}
+                    </div>
+                    <button class="btn" onclick="sonraki()" ${!secili ? 'disabled' : ''}>
+                        ${mevcutSoru === sorular.length - 1 ? 'Quizi Bitir →' : 'Sonraki Soru →'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function sec(soruId, cevap) {
+            cevaplar[soruId] = cevap;
+            soruGoster();
+        }
+
+        function sonraki() {
+            mevcutSoru++;
+            soruGoster();
+        }
+
+        async function quiziBitir() {
+            if (!kullaniciEmail) {
+                kullaniciEmail = prompt('Sonucu kaydetmek için e-posta adresinizi girin:') || 'anonim@test.com';
+                if (kullaniciEmail !== 'anonim@test.com') {
+                    localStorage.setItem('kullanici_email', kullaniciEmail);
+                }
+            }
+
+            try {
+                const r = await fetch(API + '/egitim/quiz-gonder', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        kullanici_email: kullaniciEmail,
+                        egitim_id: parseInt(egitimId),
+                        cevaplar: cevaplar
+                    })
+                });
+                const data = await r.json();
+
+                if (r.ok) {
+                    sonucGoster(data);
+                } else {
+                    alert('Sonuç kaydedilemedi.');
+                }
+            } catch (e) {
+                alert('Bağlantı hatası.');
+            }
+        }
+
+        function sonucGoster(data) {
+            const detayHTML = (data.detay || []).map(d => `
+                <div class="detay-satir">
+                    <div style="margin-bottom:5px;">${d.soru}</div>
+                    <div class="${d.dogru_mu ? 'detay-dogru' : 'detay-yanlis'}">
+                        ${d.dogru_mu ? '✅ Doğru' : `❌ Yanlış — Doğru cevap: ${d.dogru}`}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('icerik').innerHTML = `
+                <div class="sonuc-kart">
+                    <div class="sonuc-ikon">${data.gecti ? '🎉' : '📚'}</div>
+                    <div class="sonuc-skor ${data.gecti ? 'gec' : 'kal'}">${data.skor}%</div>
+                    <div class="sonuc-mesaj">
+                        ${data.gecti ? 'Tebrikler! Eğitimi tamamladınız.' : 'Maalesef geçemediniz. Tekrar deneyin.'}
+                    </div>
+                    <div class="sonuc-detay">
+                        <div style="margin-bottom:15px; color:#00b4d8; font-weight:700;">
+                            DETAYLAR (${data.dogru}/${data.toplam} doğru)
+                        </div>
+                        ${detayHTML}
+                    </div>
+                    ${data.gecti ? `
+                        <button class="btn" onclick="alert('✅ Sertifikanız hazır! Eğitimlerim sayfasından görüntüleyebilirsiniz.')">
+                            📜 Sertifikayı Gör
+                        </button>
+                    ` : `
+                        <a href="egitim-quiz.html?id=${egitimId}" class="btn" style="text-decoration:none; display:block;">
+                            🔄 Tekrar Dene
+                        </a>
+                    `}
+                    <a href="egitimlerim.html" class="btn" style="text-decoration:none; display:block; margin-top:10px; background: rgba(255,255,255,0.08);">
+                        ← Eğitimlerime Dön
+                    </a>
+                </div>
+            `;
+        }
+
+        yukle();
+    </script>
+</body>
+</html>

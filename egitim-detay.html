@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eğitim Detayı - UyumOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a3a5c 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(0,0,0,0.25);
+        }
+        .navbar-logo { font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar-logo span { color: #00b4d8; }
+        .navbar-links a {
+            color: #a8c5e0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .kapsayici { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .video-kutu {
+            background: rgba(0,0,0,0.4);
+            border-radius: 20px;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.08);
+            overflow: hidden;
+        }
+        .video-kutu iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .video-placeholder {
+            text-align: center;
+            color: #a8c5e0;
+        }
+        .video-placeholder .ikon { font-size: 60px; margin-bottom: 15px; }
+
+        h1 { font-size: 28px; margin-bottom: 10px; }
+        .meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .badge-kategori { background: rgba(0,180,216,0.15); color: #00b4d8; }
+        .badge-sure { background: rgba(255,255,255,0.08); color: #a8c5e0; }
+
+        .aciklama {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            line-height: 1.7;
+            color: #d1e3f0;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: #fff;
+            padding: 16px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn.ikincil {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .bilgi-kutu {
+            background: rgba(0,180,216,0.08);
+            border: 1px solid rgba(0,180,216,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+        .bilgi-kutu p { color: #d1e3f0; font-size: 14px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">🛡️ Uyum<span>OS</span></a>
+        <div class="navbar-links">
+            <a href="egitimler.html">← Eğitimlere Dön</a>
+            <a href="egitimlerim.html">Eğitimlerim</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici" id="icerik">
+        <div class="video-kutu">Yükleniyor...</div>
+    </div>
+
+    <script>
+        const API = window.location.origin;
+        const params = new URLSearchParams(window.location.search);
+        const egitimId = params.get('id');
+
+        async function yukle() {
+            if (!egitimId) {
+                document.getElementById('icerik').innerHTML = '<p>Eğitim bulunamadı.</p>';
+                return;
+            }
+
+            try {
+                const r = await fetch(API + '/egitim/' + egitimId);
+                const data = await r.json();
+                const e = data.egitim;
+
+                let videoHTML = '';
+                if (e.video_url && e.video_url.trim()) {
+                    // YouTube veya doğrudan video URL'i
+                    if (e.video_url.includes('youtube.com') || e.video_url.includes('youtu.be')) {
+                        let vid = e.video_url;
+                        if (vid.includes('youtu.be/')) vid = vid.split('youtu.be/')[1];
+                        else if (vid.includes('v=')) vid = vid.split('v=')[1].split('&')[0];
+                        videoHTML = `<iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe>`;
+                    } else {
+                        videoHTML = `<iframe src="${e.video_url}" allowfullscreen></iframe>`;
+                    }
+                } else {
+                    videoHTML = `
+                        <div class="video-placeholder">
+                            <div class="ikon">🎥</div>
+                            <p>Video henüz yüklenmedi.</p>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('icerik').innerHTML = `
+                    <div class="video-kutu">${videoHTML}</div>
+                    <h1>${e.baslik}</h1>
+                    <div class="meta">
+                        <span class="badge badge-kategori">${e.kategori}</span>
+                        <span class="badge badge-sure">⏱️ ${e.sure_dakika} dk</span>
+                        <span class="badge badge-sure">📊 ${data.soru_sayisi} soru</span>
+                    </div>
+                    <div class="aciklama">${e.aciklama || 'Açıklama yakında eklenecek.'}</div>
+
+                    ${data.soru_sayisi > 0 ? `
+                        <a href="egitim-quiz.html?id=${e.id}" class="btn">Quiz'e Başla →</a>
+                    ` : `
+                        <div class="bilgi-kutu">
+                            <p>⏳ Bu eğitimin quizi henüz hazırlanmadı. Yakında eklenecek.</p>
+                        </div>
+                    `}
+                    <a href="egitimler.html" class="btn ikincil">← Eğitimlere Dön</a>
+                `;
+            } catch (err) {
+                document.getElementById('icerik').innerHTML = '<p>Eğitim yüklenemedi.</p>';
+            }
+        }
+
+        yukle();
+    </script>
+</body>
+</html>
