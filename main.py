@@ -2127,19 +2127,45 @@ def regtech_sektorler():
         ]
     }
 
+@app.get("/regtech/sektor/{sektor}")
+def regtech_sektor_detay(sektor: str, db: Session = Depends(get_db)):
+    if sektor not in SEKTORLER:
+        raise HTTPException(status_code=404, detail="Sektör bulunamadı")
 
+    farkindalik_sayisi = db.query(RegTechSoru).filter(
+        RegTechSoru.sektor == sektor,
+        RegTechSoru.assessment_tipi == "farkindalik"
+    ).count()
+
+    detayli_sayisi = db.query(RegTechSoru).filter(
+        RegTechSoru.sektor == sektor,
+        RegTechSoru.assessment_tipi == "detayli"
+    ).count()
+
+    return {
+        "kod": sektor,
+        "ad": SEKTORLER[sektor]["ad"],
+        "aciklama": SEKTORLER[sektor]["aciklama"],
+        "fiyat": SEKTORLER[sektor]["fiyat"],
+        "farkindalik_soru_sayisi": farkindalik_sayisi,
+        "detayli_soru_sayisi": detayli_sayisi,
+        "farkindalik_fiyat": 0,
+        "detayli_fiyat": SEKTORLER[sektor]["fiyat"]
+    }
 @app.get("/regtech/sorular/{sektor}")
-def regtech_sorular(sektor: str, db: Session = Depends(get_db)):
+def regtech_sorular(sektor: str, tip: str = "farkindalik", db: Session = Depends(get_db)):
     if sektor not in SEKTORLER:
         raise HTTPException(status_code=404, detail="Sektör bulunamadı")
 
     sorular = db.query(RegTechSoru).filter(
-        RegTechSoru.sektor == sektor
+        RegTechSoru.sektor == sektor,
+        RegTechSoru.assessment_tipi == tip
     ).order_by(RegTechSoru.soru_no).all()
 
     return {
         "sektor": sektor,
         "sektor_adi": SEKTORLER[sektor]["ad"],
+        "tip": tip,
         "toplam": len(sorular),
         "sorular": [{
             "id": s.id, "soru_no": s.soru_no, "soru": s.soru,
@@ -2156,7 +2182,8 @@ def regtech_degerlendirme(girdi: RegTechGirdi, db: Session = Depends(get_db)):
 
     # Soruları çek ve ağırlıklı puan hesapla
     sorular = db.query(RegTechSoru).filter(
-        RegTechSoru.sektor == girdi.sektor
+        RegTechSoru.sektor == girdi.sektor,
+        RegTechSoru.assessment_tipi == girdi.assessment_tipi
     ).all()
 
     if not sorular:
@@ -2198,7 +2225,8 @@ def regtech_degerlendirme(girdi: RegTechGirdi, db: Session = Depends(get_db)):
         toplam_puan=toplam_puan,
         maksimum_puan=maksimum_puan,
         yuzde=yuzde,
-        seviye=seviye
+        seviye=seviye,
+        assessment_tipi=girdi.assessment_tipi
     )
     db.add(yeni)
     db.commit()

@@ -254,6 +254,7 @@ class RegTechAssessment(Base):
     maksimum_puan = Column(Integer, default=0)
     yuzde = Column(Integer, default=0)
     seviye = Column(String, default="baslangic")  # baslangic, gelismekte, ileri, hazir
+    assessment_tipi = Column(String, default="farkindalik")  # farkindalik, detayli
     olusturma_tarihi = Column(DateTime, default=datetime.utcnow)
 
 
@@ -267,6 +268,7 @@ class RegTechSoru(Base):
     kategori = Column(String)  # idari, teknik, operasyonel
     agirlik = Column(Integer, default=1)  # 1-3
     aciklama = Column(Text, default="")
+    assessment_tipi = Column(String, default="farkindalik")  # farkindalik, detayli
 
 
 class RegTechSonuc(Base):
